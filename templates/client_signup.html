@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="form-container">
+    <div class="flash-messages" class="btns">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for  category, message in messages %}
+                    <div class="flash-messages alert-{{category}}"> {{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    <br><br>
+    <h1  style="width:70%;margin:20px auto;">Welcome on-board, <span class="spans">Create Account</span></h1>
+
+  <p class="paras-subtopics">Open an account with us, we will make sure your files, data and records are consolidated properly and kept safe;</p>
+    <!----FORM----->
+    <br><br>
+  <div style="width:50%" id="" class="general-flex-col border-spec">
+
+        <h2 class="">Register</h2>
+        <form _lpchecked="1" action="" method="post">
+
+            <div class="group">
+                {{register.hidden_tag()}}
+                {{   register.name(class="form-control",placeholder="Name")}}<br>
+
+                {% if register.name.errors %}
+                    {% for error in register.name.errors %}
+                        <span class="span-error" >*Password {{error}}</span>
+                    {% endfor %}
+                 {% endif %}
+
+               <!--<input type="text" class="form-control" id="name" name="nm" placeholder="Name">-->
+            </div>
+            <div class="group">
+                  {{ register.email(class="form-control",placeholder="Email")}}<br>
+                  {% if register.email.errors %}
+                    {% for error in register.email.errors %}
+                        <span class="span-error" >*{{error}}</span>
+                    {% endfor %}
+                 {% endif %}
+
+                <!--<input type="email" class="form-control" id="email" name="email" placeholder="Email">-->
+            </div>
+            <div class="group">
+                 {{ register.password(class="form-control",placeholder="Password")}}<br>
+                 {% if register.password.errors %}
+                    {% for error in register.password.errors %}
+                        <span class="span-error" >*Password {{error}}</span>
+                    {% endfor %}
+                 {% endif %}
+
+               <!--<input type="password" class="form-control" id="password" name="passw" placeholder="Password">-->
+            </div>
+            <div class="group">
+                <!--<input type="password" class="form-control" id="confirm-password" name="confirm_pass" placeholder="confirm-password">-->
+                 {{ register.confirm(class="form-control",placeholder="Confirm Password")}}<br>
+                 {% if register.confirm.errors %}
+                    {% for error in register.confirm.errors %}
+                        <span class="span-error" >*Passwords that not match</span>
+                    {% endfor %}
+                 {% endif %}
+
+
+            </div><br><br>
+
+            <div style="" class="group">
+                 <div style="padding-left:;width:100%;background-color:339ab3" class="d-flex">
+                     <div>{{ register.submit(class="btns") }}</div><br>
+                     <!--<input class="btns" type="submit" value="Create Account" />-->
+                     <div><a class="slinks-li" href="login">Login instead?</a></div>
+                </div>
+            </div>
+
+        </form>
+
+
+    </div>
+</div>
+{% endblock %}

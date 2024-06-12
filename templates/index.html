@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <section>
+        <div class="banner-cap">
+
+            <div class="center-prl-img">
+                <div style=""  class="img-banner-cont">
+                     <img class="prf-image" src="static/images/artificial-intelligence-used-generate-images-collage.jpg">
+                </div>
+                <div class="text-center-div">
+                    <div class="logo-img-cont" ><img class="logo" src="static/images/logo-tex.png"></div>
+                    <p class="text-center">Exlusive Solutions, The Technological Way</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <a class="hyper-links" id="services">
+        <div class="sub-topics"><p>Services</p></div>
+    </a>
+    <section class="services">
+        <a class="a-links" href="/graphic_design"><div class="service grey_gra_hover">
+            <div class="icon-cont"><img src="static/images/draw_FILL0_wght400_GRAD0_opsz24.svg"/> </div>
+            <h2 style="color:#24788f" >Graphic Design</h2>
+            <p style="text-align:center;">At Tech Xol we meet all your business graphic designs needs.
+                We make an impressive touch with to ensure quality is the top priority
+            The list is endless from Logos, Business profile, Flyers, Brochures, Email signatures, etc. </p>
+        </div></a>
+
+        <a class="a-links" href="/web_development">
+            <div class="service grey_gra_hover">
+                <div class="icon-cont"><img src="static/images/design_services_FILL0_wght400_GRAD0_opsz24.svg"/> </div>
+                <h2 style="text-align:center;color:coral" >Website & App Development</h2>
+                <p style="text-align:center;">At Tech Xol we meet all your business graphic designs needs.
+                    We make an impressive touch with to ensure quality is the top priority
+                The list is endless from Logos, Business profile, Flyers, Brochures, Email signatures, etc. </p>
+            </div>
+        </a>
+
+        <div class="service grey_gra_hover">
+            <div class="icon-cont"><img src="static/images/order_approve_FILL0_wght400_GRAD0_opsz24.svg"/></div>
+            <h2 style="color:#eea742" >e-Commerce</h2>
+            <label>At Tech Xol we meet all your business graphic designs needs.</label>
+            <label>We make an impressive touch with to ensure quality is the top priority</label>
+            <label>The list is endless from Logos, Business profile, Flyers, Brochures, Email signatures, etc.</label>
+        </div>
+
+        <div class="service grey_gra_hover">
+            <div class="icon-cont"><img src="static/images/language_FILL0_wght400_GRAD0_opsz24.svg"/> </div>
+            <h2 style="color:#2f884f" >UX & UI</h2>
+            <label>At Tech Xol we meet all your business graphic designs needs.</label>
+            <label>We make an impressive touch with to ensure quality is the top priority</label>
+            <label>The list is endless from Logos, Business profile, Flyers, Brochures, Email signatures, etc.</label>
+        </div>
+
+    </section>
+
+
+    <section class="account">
+        <div class="sub-topics"><p>Open Account</p></div>
+    <div class="sub-topics"><p style="font-size:20px;width:70%;" >We are glad you prefer working online, Everyone seems to embrace this initiative, we embrace technology trends too and we have braced
+        ourselves to be the game-changer in the technology industry, that's why
+        we have made this platform just for you to serve you at the comfort of your office or home environment, open an account with us today and enjoy a fleet of our services that goes hand-in-hand with benefits. </p></div>
+        <div class="general-flex">
+            <a class="a-links hover_cls_rad" href="/client_signup"><div class="info-cont">
+                <div class="icon-cont"><img src="static/images/draw_FILL0_wght400_GRAD0_opsz24.svg"/></div>
+                <h2 style="color:#24788f" >Sign-Up Today</h2>
+            </div></a><br>
+            <a class="a-links " href="/user_section"><div class="info-demo-cont hover_cls_rad">
+    <!--            <div class="icon-cont"><img src="static/images/draw_FILL0_wght400_GRAD0_opsz24.svg"/> </div>-->
+                <h2 style="color:white;text-align:center" >Explore<br> Demo Account</h2>
+
+            </div></a>
+
+        </div><br><br>
+    </section>
+
+    <a id="contact_us"></a>
+    <section>
+        <div class="sub-topics"><p>Contact Us</p></div>
+        <div style="width:40%;margin:60px auto; padding:20px;" class="border-spec">
+        <div class="flash-messages btns">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for  category, message in messages %}
+                        <div class="flash-messages alert-{{category}}"> {{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+        <h1 >We would like to hear from you, <br><span class="spans">Write to us</span></h1>
+        <div class="contact-form">
+            <form style="width:100%;" action = "{{url_for('contact_us')}}" method="post" >
+                {{contact_form.hidden_tag()}}
+                <div  style="width:100%;">
+                    {{contact_form.name(class="contact-form-control",placeholder="Name")}}
+                </div>
+                 <div>
+                    {{contact_form.email(class="contact-form-control",placeholder="Email Address")}}
+                </div>
+                <div>
+                    {{contact_form.subject(class="contact-form-control",placeholder="Subject")}}
+                </div>
+                <div>
+                    {{contact_form.message(class="contact-form-control  text-area",placeholder="Message")}}
+                </div>
+                <div>
+                    {{contact_form.submit}}
+                </div>
+
+            </form>
+        </div>
+</div>
+
+    </section>
+
+
+    <p>Hey My Home Page</p>
+{% endblock %}

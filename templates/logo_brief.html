@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="form-container">
+    <div class="flash-messages" class="btns">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for  category, message in messages %}
+                    <div class="flash-messages alert-{{category}}"> {{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    <br><br>
+    <h1  style="width:70%;margin:20px auto;">Almost there, <span class="spans">Lets seal up the deal</span></h1>
+
+  <p class="paras-subtopics">Give us a clue of how your want your artwork to look like;</p>
+    <!----FORM----->
+    <br><br>
+  <div style="width:50%" id="" class="general-flex-col border-spec">
+
+        <h2 class="">Logo Design Brief</h2>
+        <form _lpchecked="1" action="" method="post">
+
+            {{brief.hidden_tag()}}
+            <div class="group">
+                    {{brief.target_audience.label}}<br>
+                  {{ brief.target_audience(class="form-control")}}<br>
+                  {% if brief.target_audience.errors %}
+                    {% for error in brief.target_audience.errors %}
+                        <span class="span-error" >*{{error}}</span>
+                    {% endfor %}
+                 {% endif %}
+
+                <!--<input type="email" class="form-control" id="email" name="email" placeholder="Email">-->
+            </div>
+            <div class="group">
+                {{brief.artwork_name.label}}<br>
+                 {{ brief.artwork_name(class="form-control",placeholder="Name to display or company")}}<br>
+                 {% if brief.artwork_name.errors %}
+                    {% for error in brief.artwork_name.errors %}
+                        <span class="span-error" >*Artwork {{error}}</span>
+                    {% endfor %}
+                 {% endif %}
+
+               <!--<input type="artwork_name" class="form-control" id="password" name="passw" placeholder="Password">-->
+            </div>
+            <div class="group">
+                <!--<input type="password" class="form-control" id="confirm-password" name="confirm_pass" placeholder="confirm-password">-->
+                {{brief.slogan.label}}<br>
+                 {{ brief.slogan(class="form-control",placeholder="Slogan / Tagline")}}<br>
+                 {% if brief.slogan.errors %}
+                    {% for error in brief.slogan.errors %}
+                        <span class="span-error" >*Slogan{{error}}</span>
+                    {% endfor %}
+                 {% endif %}
+
+
+            </div>
+            <div class="group">
+                {{brief.proj_deadline.label}}<br>
+                 {{ brief.proj_deadline(class="form-control",placeholder="When are you expecting your project")}}<br>
+                 {% if brief.proj_deadline.errors %}
+                    {% for error in brief.proj_deadline.errors %}
+                        <span class="span-error" >*Deadline {{error}}</span>
+                    {% endfor %}
+                 {% endif %}
+
+               <!--<input type="artwork_name" class="form-control" id="password" name="passw" placeholder="Password">-->
+            </div>
+
+
+            <div class="group">
+                {{brief.comments.label}}<br>
+                 {{ brief.comments(class="form-control",placeholder="Any Comments?")}}<br>
+                 {% if brief.comments.errors %}
+                    {% for error in brief.comments.errors %}
+                        <span class="span-error" >*Comments {{error}}</span>
+                    {% endfor %}
+                 {% endif %}
+
+               <!--<input type="artwork_name" class="form-control" id="password" name="passw" placeholder="Password">-->
+            </div>
+
+            <input name="project-name" type="hidden" value="logo design" />
+
+            <br><br>
+
+            <div style="" class="group">
+                 <div style="padding-left:;width:100%;background-color:339ab3" class="d-flex">
+                     <div>{{ brief.submit(class="btns") }}</div><br>
+                </div>
+            </div>
+
+        </form>
+
+
+    </div>
+</div>
+{% endblock %}

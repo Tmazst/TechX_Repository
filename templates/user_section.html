@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="user-sec-page">
+
+    <div class="side-nav">
+
+        <nav id="sidenav"  class="nav">
+            <ul class="sidenav-ul">
+                <li class="slinks-li"><a class="side-a" href="/">Account</a>
+                </li>
+                <li class="slinks-li" id="li-project" >
+                    <label for="proj-check" id="proj-list" ><span >Projects +</span></label>
+                    <input type="checkbox" id="proj-check" />
+    <!--                <ul id="ul-1">-->
+    <!--                    <li><a class="side-a" href="#">Finance</a></li>-->
+    <!--                    <li><a class="side-a" href="#">Project Status</a></li>-->
+    <!--                    <li><a class="side-a" href="#">Tracking</a></li>-->
+    <!--                </ul>-->
+                </li>
+                <li class="slinks-li" ><a class="side-a" href="/">Archives</a></li>
+                <li class="slinks-li"><a class="side-a" href="/">TechXol Tools</a></li>
+                <li class="slinks-li"><a class="side-a" href="/">My Documents</a></li>
+            </ul>
+        </nav>
+
+    </div>
+
+     <div style="align-self:flex-start;" class="sec-section">
+        <h2 style="width:100%;">Projects</h2>
+         <a class="sub-sect-a a-links" href="#"><div class="options" >
+             <h4>Company Logo</h4>
+             <label><span>Date Created: 23-05-23</span></label><br> <label><span>Date Modified: 23-05-23</span></label>
+         </div></a>
+
+         <a class="sub-sect-a a-links" href="#">
+         <div class="options">
+             <h4>Company Profile</h4>
+             <label><span>Date Created: 23-03-23</span></label><br> <label><span>Date Modified: 23-05-23</span></label>
+         </div></a>
+
+         <div class="options">
+             <h4>Poster</h4>
+             <label><span>Topic: Weekend Enkulu</span></label><br> <label><span>Date Modified: 23-05-23</span></label>
+         </div>
+         <div class="options">
+             <h4>Poster</h4>
+             <label><span>Topic: Weekend Enkulu</span></label><br> <label><span>Date Modified: 23-05-23</span></label>
+         </div>
+
+     </div>
+
+    <div class="content-section">
+        <h2 style="width:100%;">Content Section</h2>
+    </div>
+</div>
+
+{% endblock %}

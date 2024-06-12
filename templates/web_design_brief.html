@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="form-container">
+    <div class="flash-messages" class="btns">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for  category, message in messages %}
+                    <div class="flash-messages alert-{{category}}"> {{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    <br><br>
+    <h1  style="width:70%;margin:20px auto;">Almost there, <span class="spans">Lets seal up the deal</span></h1>
+
+  <p class="paras-subtopics">Give us a clue of how your want your artwork to look like;</p>
+    <!----FORM----->
+  <br><br>
+  <div style="width:80%" id="" class="general-flex-col ">
+
+        <h2 class="">Website Development Brief</h2>
+        <form _lpchecked="1" enctype=multipart/form-data method="post">
+
+            {{web_brief.hidden_tag()}}
+            <section class="profile-sections">
+                <div>
+                    <div class="progress-cont">
+                    </div>
+                    <p class="form-sub-topics">Purpose</p>
+
+                    <div style="background-color:coral" class="line"></div><br><br>
+                    <p class="">Please choose below,</p>
+                    <legend class="">You can skip & answear later</legend><br><br>
+                    <div class="gro1up">
+                        <fieldset class="field-set-wb">
+                            <legend class="legends"> What is the main purpose of this project</legend>
+                            {{ web_brief.web_traffic(class="")}}        {{web_brief.web_traffic.label}}<br><br>
+                        {{ web_brief.web_forum(class="")}}       {{web_brief.web_forum.label}}<br><br>
+                        {{ web_brief.build_brand(class="")}}       {{web_brief.build_brand.label}}<br><br>
+                        {{ web_brief.web_ui_interactivity(class="")}}       {{web_brief.web_ui_interactivity.label}}<br><br>
+                        {{ web_brief.web_new_look(class="")}}       {{web_brief.web_new_look.label}}<br><br>
+                        <!--<input type="email" class="form-control" id="email" name="email" placeholder="Email">-->
+                        </fieldset>
+                    </div>
+                    <button class="btns-coral"  onclick="showNextSection()">Next</button>
+
+    <!--                <a href="#categorize-company">Next Page &ndash;&gt;</a>-->
+                </div>
+            </section>
+
+            <section class="profile-sections">
+                <div>
+                    <div class="progress-cont"></div>
+
+                    <p class="form-sub-topics">Site Logistics</p>
+
+                    <div style="background-color:coral" class="line"></div><br><br>
+                    <p class="">Let us know a little about the site technical plan<br><span class="">You can skip & answear later</span></p>
+                    <br><br>
+
+                    <div class="group">
+                            <span style="font-size:20px">{{web_brief.pages.label}}</span><br>
+                            {{ web_brief.pages(class="form-control input-size")}}<br>
+                    </div>
+
+                    <div class="group">
+                            <span style="font-size:20px">{{web_brief.type.label}}</span><br>
+                            {{ web_brief.type(class="form-control input-size", id="otherType" ,fdfg="if(this.selectedIndex==5) onOtherOption()")}}<br>
+                    </div>
+
+    <!--                <a href="#categorize-company">Next Page &ndash;&gt;</a>-->
+                </div>
+                <button class="btns-coral"  onclick="showNextSection()">Next</button>
+                <a class="a-links"  onclick="showPreviousSection()">< Back</a>
+            </section>
+
+            <section class="profile-sections">
+                <div>
+                    <div class="progress-cont"></div>
+
+                    <p class="form-sub-topics">Website Content Organization</p>
+
+                    <div style="background-color:coral" class="line"></div><br><br>
+                    <p class="">Website Content<br><span class="">You can skip & answear later</span></p>
+                    <br><br>
+
+                    <div class="group">
+                          {{ web_brief.company_profile(class="", id='checkbox-opt')}}        {{web_brief.company_profile.label}}<br>
+                    </div>
+
+    <!--                <a href="#categorize-company">Next Page &ndash;&gt;</a>-->
+                </div>
+                <button class="btns-coral"  onclick="showNextSection()">Next</button>
+                <a class="a-links"  onclick="showPreviousSection()">< Back</a>
+            </section>
+
+
+            <section class="profile-sections">
+                <div>
+                    <div class="progress-cont"></div>
+
+                    <p class="form-sub-topics">Domain & Hosting Plan</p>
+
+                    <div style="background-color:coral" class="line"></div><br><br>
+                    <p class="">Let us know a little about the site technical plan<br><span class="">You can skip & answear later</span></p>
+                    <br><br>
+
+                    <div class="group">
+                            <span style="font-size:17px">{{web_brief.dns.label}}:</span><br>
+                            {{ web_brief.dns(class="form-control input-size")}}<br>
+                    </div>
+
+                    <div class="group">
+                            <span style="font-size:17px">{{web_brief.hosting.label}}:</span><br>
+                            {{ web_brief.hosting(class="form-control input-size")}}<br>
+                    </div>
+
+    <!--                <a href="#categorize-company">Next Page &ndash;&gt;</a>-->
+                </div>
+                <button class="btns-coral"  onclick="showNextSection()">Next</button>
+                <a class="a-links"  onclick="showPreviousSection()">< Back</a>
+            </section>
+
+            <section class="profile-sections">
+                <div>
+                    <div class="progress-cont"></div>
+
+                    <p class="form-sub-topics">Domain & Hosting Plan</p>
+
+                    <div style="background-color:coral" class="line"></div><br><br>
+                    <p class="">Let us know a little about the site technical plan<br><span class="">You can skip & answear later</span></p>
+                    <br><br>
+
+                    <div class="group">
+                            <span style="font-size:17px">{{web_brief.dns.label}}:</span><br>
+                            {{ web_brief.dns(class="form-control input-size")}}<br>
+                    </div>
+
+                    <div class="group">
+                            <span style="font-size:17px">{{web_brief.hosting.label}}:</span><br>
+                            {{ web_brief.hosting(class="form-control input-size")}}<br>
+                    </div>
+
+    <!--                <a href="#categorize-company">Next Page &ndash;&gt;</a>-->
+                </div>
+                <button class="btns-coral"  onclick="showNextSection()">Next</button>
+                <a class="a-links"  onclick="showPreviousSection()">< Back</a>
+            </section>
+
+            <section class="profile-sections">
+                <div>
+                    <div class="progress-cont">
+                    </div>
+                    <p class="form-sub-topics">UI Design Guide</p>
+
+                    <div style="background-color:coral" class="line"></div><br><br>
+                    <p class="">We want to have a picture in mind of how you want your UI to look like</p>
+                    <br><br>
+                    <div class="gro1up">
+                        <fieldset class="field-set-wb">
+                            <legend class="legends">  How do you want the UI to look </legend>
+                            {{ web_brief.feel1(class="")}}        {{web_brief.feel1.label}}<br><br>
+                            {{ web_brief.feel2(class="")}}       {{web_brief.feel2.label}}<br><br>
+                            {{ web_brief.feel3(class="")}}       {{web_brief.feel3.label}}<br><br>
+                            {{ web_brief.feel4(class="")}}       {{web_brief.feel4.label}}<br><br>
+                            {{ web_brief.feel5(class="")}}       {{web_brief.feel5.label}}<br><br>
+                        <!--<input type="email" class="form-control" id="email" name="email" placeholder="Email">-->
+                        </fieldset>
+                    </div>
+                    <button class="btns-coral"  onclick="showNextSection()">Next</button><br>
+                    <a class="ba-links"  onclick="showPreviousSection()"><--</a>
+    <!--                <a href="#categorize-company">Next Page &ndash;&gt;</a>-->
+                </div>
+            </section>
+
+
+        </form>
+
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="form-container">
+    <div class="flash-messages" class="btns">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for  category, message in messages %}
+                    <div class="flash-messages alert-{{category}}"> {{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    <br><br>
+    <h1  style="width:70%;margin:20px auto;">Welcome on-board, <span class="spans">Create Account</span></h1>
+
+  <p class="paras-subtopics">Open an account with us, we will make sure your files, data and records are consolidated properly and kept safe;</p>
+    <!----FORM----->
+    <br><br>
+  <div style="width:50%" id="" class="general-flex-col border-spec">
+
+        <h2 class="">Login</h2>
+        <form _lpchecked="1" action="" method="post">
+            {{login.hidden_tag()}}
+            <div class="group">
+                  {{ login.email(class="form-control",placeholder="Email")}}<br>
+                  {% if login.email.errors %}
+                    {% for error in login.email.errors %}
+                        <span class="span-error" >*{{error}}</span>
+                    {% endfor %}
+                 {% endif %}
+
+                <!--<input type="email" class="form-control" id="email" name="email" placeholder="Email">-->
+            </div>
+
+            <div class="group">
+                 {{ login.password(class="form-control",placeholder="Password")}}<br>
+                 {% if login.password.errors %}
+                    {% for error in login.password.errors %}
+                        <span class="span-error" >*Password {{error}}</span>
+                    {% endfor %}
+                 {% endif %}
+
+               <!--<input type="password" class="form-control" id="password" name="passw" placeholder="Password">-->
+            </div>
+            <br><br>
+
+            <div style="" class="group">
+                 <div style="padding-left:;width:100%;background-color:339ab3" class="d-flex">
+                     <div>{{ login.submit(class="btns") }}</div><br>
+                     <!--<input class="btns" type="submit" value="Create Account" />-->
+                     <div><a class="slinks-li" href="login">Create Account</a></div>
+                </div>
+            </div>
+
+        </form>
+
+
+    </div>
+</div>
+{% endblock %}

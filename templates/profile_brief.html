@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="form-container">
+    <div class="flash-messages" class="btns">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for  category, message in messages %}
+                    <div class="flash-messages alert-{{category}}"> {{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    <br><br>
+    <h1  style="width:70%;margin:20px auto;">Almost there, <span class="spans">Lets seal up the deal</span></h1>
+
+  <p class="paras-subtopics">Give us a clue of how your want your artwork to look like;</p>
+    <!----FORM----->
+  <br><br>
+  <div style="width:80%" id="" class="general-flex-col ">
+
+        <h2 class="">Profile Design Brief</h2>
+        <form _lpchecked="1" enctype=multipart/form-data method="post">
+
+            {{brief.hidden_tag()}}
+            <section class="profile-sections">
+                <div>
+                <div class="progress-cont">
+<!--                    <div class="progress-incr">-->
+<!--                        <p class="progress-no">2</p>-->
+<!--                    </div>-->
+                </div>
+
+                <p class="form-sub-topics">Target Market</p>
+                <div style="background-color:coral" class="line"></div><br><br>
+            <div class="group">
+                <span>{{brief.target_audience.label}}</span><br>
+                  {{ brief.target_audience(class="form-control")}}<br>
+                  {% if brief.target_audience.errors %}
+                    {% for error in brief.target_audience.errors %}
+                        <span class="span-error" >*{{error}}</span>
+                    {% endfor %}
+                 {% endif %}
+                <!--<input type="email" class="form-control" id="email" name="email" placeholder="Email">-->
+            </div>
+
+            <div class="group">
+                  <span>{{brief.targetm_area.label}}</span><br>
+                  {{ brief.targetm_area(class="form-control")}}<br>
+                  {% if brief.targetm_area.errors %}
+                    {% for error in brief.targetm_area.errors %}
+                        <span class="span-error" >*{{error}}</span>
+                    {% endfor %}
+                 {% endif %}
+
+                <!--<input type="email" class="form-control" id="email" name="email" placeholder="Email">-->
+            </div>
+
+            <div class="group">
+                <span>{{brief.targetm_segment.label}}</span><br>
+                  {{ brief.targetm_segment(class="form-control")}}<br>
+                  {% if brief.targetm_segment.errors %}
+                    {% for error in brief.targetm_segment.errors %}
+                        <span class="span-error" >*{{error}}</span>
+                    {% endfor %}
+                 {% endif %}
+            <button class="btns-coral" onclick="showNextSection()">Next</button>
+                <!--<input type="email" class="form-control" id="email" name="email" placeholder="Email">-->
+            </div>
+<!--                <a href="#categorize-company">Next Page &ndash;&gt;</a>-->
+                </div>
+            </section>
+
+
+            <section class="profile-sections">
+                <div>
+                    <div class="progress-cont"></div>
+
+                    <a id="categorize-company"></a>
+                    <p class="form-sub-topics">Your Company Info</p>
+                    <div style="background-color:coral" class="line"></div><br><br>
+
+                    <div class="group">
+                        <!--<input type="password" class="form-control" id="confirm-password" name="confirm_pass" placeholder="confirm-password">-->
+                        <span>{{brief.company_category.label}}</span><br>
+                         {{ brief.company_category(class="form-control",placeholder="Slogan / Tagline")}}<br>
+                         {% if brief.company_category.errors %}
+                            {% for error in brief.company_category.errors %}
+                                <span class="span-error" >*{{error}}</span>
+                            {% endfor %}
+                         {% endif %}
+                    </div>
+
+                    <div class="group">
+                        <!--<input type="password" class="form-control" id="confirm-password" name="confirm_pass" placeholder="confirm-password">-->
+                        <span>{{brief.other_services.label}}</span><br>
+                         {{ brief.other_services(class="form-control",placeholder="Slogan / Tagline")}}<br>
+                         {% if brief.other_services.errors %}
+                            {% for error in brief.other_services.errors %}
+                                <span class="span-error" >*{{error}}</span>
+                            {% endfor %}
+                         {% endif %}
+                    </div>
+                    <button class="btns-coral"  onclick="showNextSection()">Next</button>
+                </div>
+            </section>
+
+            <section class="profile-sections">
+                <div> <div class="progress-cont"></div>
+
+                    <p class="form-sub-topics">Concept Development</p>
+                    <div style="background-color:coral" class="line"></div><br><br>
+                    <div class="group">
+                        <span>{{brief.artwork_name.label}}</span><br>
+                         {{ brief.artwork_name(class="form-control",placeholder="Name to display or company")}}<br>
+                         {% if brief.artwork_name.errors %}
+                            {% for error in brief.artwork_name.errors %}
+                                <span class="span-error" >*Artwork {{error}}</span>
+                            {% endfor %}
+                         {% endif %}
+
+                       <!--<input type="artwork_name" class="form-control" id="password" name="passw" placeholder="Password">-->
+                    </div>
+
+                        <div class="group">
+                            <!--<input type="password" class="form-control" id="confirm-password" name="confirm_pass" placeholder="confirm-password">-->
+                            <label>Choose Design Color</label><br>
+                             <input style="height:70px;width:90px" class="form-control" type="color" value="" name="color_1"/><br>
+                             {% if brief.slogan.errors %}
+                                {% for error in brief.slogan.errors %}
+                                    <span class="span-error" >*Slogan{{error}}</span>
+                                {% endfor %}
+                             {% endif %}
+                        </div>
+
+                        <div class="group">
+                             <label>Choose Design Color</label><br>
+                             <input style="height:70px;width:90px"  class="form-control" type="color" value="" name="color_12"/><br>
+                           <!--<input type="artwork_name" class="form-control" id="password" name="passw" placeholder="Password">-->
+                        </div>
+                </div><button class="btns-coral"  onclick="showNextSection()">Next</button>
+            </section>
+
+            <section class="profile-sections">
+                <div><div class="progress-cont"></div>
+
+                    <p class="form-sub-topics">What would you like to add on comments?</p>
+                    <div style="background-color:coral" class="line"></div><br><br>
+                    <div class="group"><br>
+                         {{ brief.comments(class="form-control text-area",placeholder="Any Comments?")}}<br>
+                         {% if brief.comments.errors %}
+                            {% for error in brief.comments.errors %}
+                                <span class="span-error" >*Comments {{error}}</span>
+                            {% endfor %}
+                         {% endif %}
+                        <button class="btns-coral"  onclick="showNextSection()">Next</button>
+                       <!--<input type="artwork_name" class="form-control" id="password" name="passw" placeholder="Password">-->
+                    </div>
+                </div>
+            </section>
+
+
+            <section class="profile-sections">
+                <div><div class="progress-cont"></div>
+                    <div class="group">
+                        <br>
+                        <label>Do you have the business profile content documented?</label><br>
+                        <label>If yes please upload below</label><br><br>
+                         {{ brief.upload_profile}}<br>
+                       <!--<input type="artwork_name" class="form-control" id="password" name="passw" placeholder="Password">-->
+                    </div>
+
+                    <input name="project-name" type="hidden" value="profile design" />
+
+                    <br><br>
+
+                    <div style="" class="group">
+                         <div style="padding-left:;width:100%;background-color:339ab3" class="d-flex">
+                             <div>{{ brief.submit(class="btns") }}</div><br>
+                         </div>
+                    </div>
+                </div>
+            </section>
+        </form>
+
+
+    </div>
+</div>
+{% endblock %}
