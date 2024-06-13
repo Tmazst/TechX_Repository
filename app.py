@@ -13,7 +13,8 @@ from flask_colorpicker import colorpicker
 
 
 
- #project cloned from git
+#Did latest commit with the requirements file
+
 #Change App
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "sdsdjfe832j2rj_32j"
