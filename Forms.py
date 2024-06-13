@@ -134,7 +134,7 @@ class Update_account_form(FlaskForm):
                                 validators=[DataRequired(), Length(min=8, max=64)])
 
     def validate_email(self,email):
-        from application import db, user
+        from app import db, user
         if current_user.email != self.email.data:
             #Check if email exeists in database
             user_email = user.query.filter_by(email = self.email.data).first()
