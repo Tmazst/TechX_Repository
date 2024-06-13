@@ -13,7 +13,7 @@ from flask_colorpicker import colorpicker
 
 
 
-#Did latest commit with the requirements file
+#Did latest commit with the requirement file
 
 #Change App
 app = Flask(__name__)
