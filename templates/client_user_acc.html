@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!---------------FLASH------------------->
+<div class="flash-messages" id="">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for  category, message in messages %}
+                    <div class="flash-messages alert-{{category}}"> {{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+</div>
+
+<br><br>
+<div class="account_container">
+    <div style="width:50%" class="general-flex-col border-spec">
+
+        <div style="width:100%;">
+        <form _lpchecked="1" action="" method="post" enctype="multipart/form-data" class="forms" >
+
+            <h3 style="font-size:25px;margin-left:50px;margin-bottom:0;"> {{current_user.name.title()}}<br> <span class="spans" style="font-size:16px">{{current_user.email}}</span></h3>
+
+            <div  style="width:60%;margin-left:30px;" ><hr></div>
+
+            <div style="padding-left:50px" class="form-group">
+                   {{signup.hidden_tag()}}
+                    {{signup.csrf_token()}}
+                   <h2 class="media-h2"> Account Details </h2>
+
+                    <!-- -----------NAME--------------->
+                  <div  class="group">{{ signup.name.label()}}<br>
+                   {{   signup.name(class="form-control",placeholder="Name",value=current_user.name)}}
+                   {% if signup.name.errors %}
+                       {% for error in signup.name.errors %}
+                           <span class="span-error" >*[name], {{error}}</span>
+                       {% endfor %}
+                    {% endif %}
+                   </div>
+
+                  <!-- ------------EMAIL--------------->
+                  <div class="group">{{ signup.email.label()}}<br>
+                     {{ signup.email(class="form-control",placeholder="Email", value=current_user.email)}}
+                     {% if signup.email.errors %}
+                       {% for error in signup.email.errors %}
+                           <span class="span-error" >*{{error}}</span>
+                       {% endfor %}
+                    {% endif %}
+                  </div>
+                <!-- ------------CONTACTS--------------->
+                  <div class="group">{{ signup.contacts.label()}}<br>
+                    {{ signup.contacts(class="form-control",placeholder="Contacts", value=current_user.contacts)}}
+                     {% if signup.contacts.errors %}
+                       {% for error in signup.contacts.errors %}
+                           <span class="span-error" >*{{error}}</span>
+                       {% endfor %}
+                    {% endif %}
+                  </div>
+
+                  <!-- ------------ZIPCODE--------------->
+                  <div class="group">{{ signup.zip_code.label()}}<br>
+                    {{ signup.zip_code(class="form-control",placeholder="Zip Code / Post Code", value=current_user.zip_code)}}
+                     {% if signup.contacts.errors %}
+                       {% for error in signup.zip_code.errors %}
+                           <span class="span-error" >*{{error}}</span>
+                       {% endfor %}
+                    {% endif %}
+                  </div>
+
+
+                <!-- ------------ADDRESS--------------->
+                  <div class="group">{{ signup.address.label()}}<br>
+                    {{ signup.address(class="form-control",placeholder="Physical Address", value=current_user.address)}}
+                     {% if signup.address.errors %}
+                       {% for error in signup.address.errors %}
+                           <span class="span-error" >*[Contacts]{{error}}</span>
+                       {% endfor %}
+                    {% endif %}
+                  </div>
+
+
+                  <div style="margin-left:0;width:100px;" class="user-links" >
+                        <a href="/reset_request"> Change Password </a>
+                  </div><br>
+
+            </div>
+
+
+            <div style="padding-left:50px;width:40% !important;" class="d-flex flex-row align-items-center justify-content-between">
+                <input class="btns" type="submit" value="Update" />
+            </div>
+
+        </form>
+        </div>
+    </div>
+</div>
+</div>
+
+
+{% endblock %}

@@ -14,7 +14,7 @@ class users_data:
     def other_one_page_design(self):
         pass
 
-    def project_data(self,project_title,_dict):
+    def project_data(self, project_title, _dict):
         import json
         self._dict = _dict
 

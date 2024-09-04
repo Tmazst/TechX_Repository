@@ -34,11 +34,25 @@ class User(db.Model,UserMixin):
     projects = relationship("Curr_Projects",backref="Curr_Projects",lazy=True)
     project_briefs = relationship("Project_Brief", backref="Project_Brief", lazy=True)
 
-
     __mapper_args__={
         "polymorphic_identity":'user',
         'polymorphic_on':role
     }
+
+
+class client_user(User):
+
+    id = db.Column(db.Integer, ForeignKey('user.id'), primary_key=True)
+    contacts = db.Column(db.String(20))
+    date_of_birth = db.Column(db.DateTime())
+    address = db.Column(db.String(120))
+    other = db.Column(db.String(120)) #Resume
+    # jobs_applied_for = relationship("Applications", backref='Applications.job_title', lazy=True)
+    # hired_user = relationship("hired", backref='Hired Applicant', lazy=True)
+
+    __mapper_args__={
+            "polymorphic_identity":'client_user'
+        }
 
 
 class Project_Brief(db.Model,UserMixin):
@@ -48,7 +62,6 @@ class Project_Brief(db.Model,UserMixin):
     name = db.Column(db.String(120))
     brief_date = db.Column(db.String(120))
     token = db.Column(db.String(120))
-
 
 
 class Curr_Projects(db.Model,UserMixin):

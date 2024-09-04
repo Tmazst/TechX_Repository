@@ -1,119 +1,556 @@
 {% extends "base.html" %}
 {% block content %}
 
-    <section>
-        <div class="banner-cap">
+    <style>
+        .form-fields{
+            display:flex;
+            flex-direction:column;
+        }
+        section{ background-image:url(static/images/bg_service.png) }
+    </style>
 
+    <section>
+        <div style="background-color:" class="banner-cap">
             <div class="center-prl-img">
                 <div style=""  class="img-banner-cont">
                      <img class="prf-image" src="static/images/artificial-intelligence-used-generate-images-collage.jpg">
                 </div>
                 <div class="text-center-div">
                     <div class="logo-img-cont" ><img class="logo" src="static/images/logo-tex.png"></div>
-                    <p class="text-center">Exlusive Solutions, The Technological Way</p>
+                    <p class="text-center">Exclusive Solutions, The Technological Way</p>
                 </div>
             </div>
         </div>
     </section>
+
+<div class="sub-container">
     <a class="hyper-links" id="services">
         <div class="sub-topics"><p>Services</p></div>
-    </a>
-    <section class="services">
-        <a class="a-links" href="/graphic_design"><div class="service grey_gra_hover">
-            <div class="icon-cont"><img src="static/images/draw_FILL0_wght400_GRAD0_opsz24.svg"/> </div>
-            <h2 style="color:#24788f" >Graphic Design</h2>
-            <p style="text-align:center;">At Tech Xol we meet all your business graphic designs needs.
-                We make an impressive touch with to ensure quality is the top priority
-            The list is endless from Logos, Business profile, Flyers, Brochures, Email signatures, etc. </p>
-        </div></a>
-
-        <a class="a-links" href="/web_development">
-            <div class="service grey_gra_hover">
-                <div class="icon-cont"><img src="static/images/design_services_FILL0_wght400_GRAD0_opsz24.svg"/> </div>
-                <h2 style="text-align:center;color:coral" >Website & App Development</h2>
-                <p style="text-align:center;">At Tech Xol we meet all your business graphic designs needs.
-                    We make an impressive touch with to ensure quality is the top priority
-                The list is endless from Logos, Business profile, Flyers, Brochures, Email signatures, etc. </p>
+    </a><br><br>
+    <section style="background-color:;"  class="services hidden">
+        <div style="background-color:" class="selling-content">
+            <div style="background-color:" class="service">
+                <div class="icon-cont"><a class="a-links" href="/graphic_design">
+                    <div class="big-btns-c serv-icon">
+                        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                width="158.333px" height="157.639px" viewBox="0 0 158.333 157.639" style="enable-background:new 0 0 158.333 157.639;"
+                                xml:space="preserve">
+                            <path style="fill:#858484;" d="M59.778,67.405c0,1.513-0.981,2.751-2.179,2.751H36.293c-1.198,0-2.179-1.238-2.179-2.751v-0.714
+                                c0-1.513,0.981-2.751,2.179-2.751h21.306c1.198,0,2.179,1.238,2.179,2.751V67.405z"/>
+                            <path style="fill:#858484;" d="M55.111,81.468c0,1.513-0.802,2.751-1.783,2.751H35.897c-0.981,0-1.783-1.238-1.783-2.751v-0.714
+                                c0-1.513,0.802-2.751,1.783-2.751h17.432c0.981,0,1.783,1.238,1.783,2.751V81.468z"/>
+                            <path style="fill:#858484;" d="M86.129,94.552c1.874-3.846,5.166-6.475,8.762-7.443c-0.36-2.672,0.181-5.691,1.731-8.521
+                                l30.434-55.564c3.356-6.127,8.5-9.972,11.431-8.544c2.931,1.428,3.073,7.848,0.316,14.268l-25,58.212
+                                c-1.273,2.965-3.318,5.252-5.643,6.615c1.454,3.428,1.412,7.641-0.462,11.487c-3.232,6.633-21.837,14.834-27.793,11.932
+                                C88.08,108.592,82.897,101.185,86.129,94.552z"/>
+                            <path style="fill:#858484;" d="M127.513,61.921v52.58c0,5.303-4.314,9.618-9.618,9.618h-82.47c-5.304,0-9.619-4.314-9.619-9.618
+                                V61.557c0-5.303,4.314-9.618,9.619-9.618h72.724l4.521-8.254H35.425c-9.855,0-17.873,8.018-17.873,17.872v52.944
+                                c0,9.855,8.018,17.872,17.873,17.872h82.47c9.855,0,17.872-8.017,17.872-17.872V61.557c0-3.982-1.325-7.651-3.535-10.625
+                                L127.513,61.921z"/>
+                            <polygon style="fill:#858484;" points="30.557,116.78 46.559,91.029 56.931,106.406 65.453,99.742 75.094,116.78 "/>
+                            <circle style="fill:none;stroke:#858484;stroke-width:6;stroke-miterlimit:10;" cx="74.984" cy="74.405" r="10.466"/>
+                        </svg>
+                    </div> </a></div><br>
+                <h1 style="color:#24788f;font-size:40px;">Graphic Design</h1>
             </div>
-        </a>
+            <div style="animation-delay:500ms" class="sub-sel-tag hidden"><div class="line-decor css-selector"></div><p>Business Intelligence</p>
+                <p  onloadstart=""  class="sel-tag-text"></p>
+            </div>
+<!--        <img class="selling-content-img" src="static/images/bg_services.png"/>-->
+            <p class="sel-tag stretched-text" style="text-align:center;"><span>At Tech Xolutions we meet all your business</span> graphic designs needs.
+                We make an impressive touch with to ensure quality is the top priority</p><br>
+            <div class="serv-list">
+                <div  class="item hidden"><label id="logo_quote_btn" style="background-color:orange"><span><img src="static/images/draw_FILL0_wght400_GRAD0_opsz24.svg"/> </a></span>Logo Design</label></div>
+                <div class="item hidden"><label id="poster_quote_btn" style="background-color:#006769"><span><img src="static/images/draw_FILL0_wght400_GRAD0_opsz24.svg"/> </a></span>Event Posters</label></div>
+                <div class="item hidden"><label id="flyer_quote_btn" style="background-color:coral"><span><img src="static/images/draw_FILL0_wght400_GRAD0_opsz24.svg"/> </a></span>Flyers</label></div>
+                <div class="item hidden"><label id="brochure_quote_btn" style="background-color:#ff6769"><span><img src="static/images/draw_FILL0_wght400_GRAD0_opsz24.svg"/> </a></span>Brochures</label></div>
+                <div class="item hidden"><label id="email_quote_btn"><span><img src="static/images/draw_FILL0_wght400_GRAD0_opsz24.svg"/> </a></span>Email Signature</label></div>
+            </div><br><br>
+            <div><a class="a-links" href="/graphic_design"><label style="" class="explore-btn"><span></span> Explore</label></a></div>
+        </div>
+    </section><div class="spacing"></div>
 
-        <div class="service grey_gra_hover">
-            <div class="icon-cont"><img src="static/images/order_approve_FILL0_wght400_GRAD0_opsz24.svg"/></div>
-            <h2 style="color:#eea742" >e-Commerce</h2>
-            <label>At Tech Xol we meet all your business graphic designs needs.</label>
-            <label>We make an impressive touch with to ensure quality is the top priority</label>
-            <label>The list is endless from Logos, Business profile, Flyers, Brochures, Email signatures, etc.</label>
+
+     <!------Website------->
+    <section style=";background-size:;" class="services hidden">
+        <img class="background-img" src="" />
+        <div style="background-color:;width:100%" class="selling-content">
+            <div style="background-color:;" class="service">
+                <div class="icon-cont"><a class="a-links" href="/web_development">
+                    <div class="big-btns-c serv-icon">
+                        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                            width="158.333px" height="157.639px" viewBox="0 0 158.333 157.639" style="enable-background:new 0 0 158.333 157.639;"
+                            xml:space="preserve">
+                        <path style="fill:#858484;" d="M60.778,65.405c0,1.513-0.981,2.751-2.179,2.751H37.293c-1.198,0-2.179-1.238-2.179-2.751v-0.714
+                            c0-1.513,0.981-2.751,2.179-2.751h21.306c1.198,0,2.179,1.238,2.179,2.751V65.405z"/>
+                        <path style="fill:#858484;" d="M56.111,79.468c0,1.513-0.802,2.751-1.783,2.751H36.896c-0.981,0-1.783-1.238-1.783-2.751v-0.714
+                            c0-1.513,0.802-2.751,1.783-2.751h17.432c0.981,0,1.783,1.238,1.783,2.751V79.468z"/>
+                        <g>
+                            <path style="fill:#858484;" d="M66.308,111.92c0,1.65-1.35,3-3,3H36.901c-1.65,0-3-1.35-3-3V97.742c0-1.65,1.35-3,3-3h26.406
+                                c1.65,0,3,1.35,3,3V111.92z"/>
+                        </g>
+                        <path style="fill:#858484;" d="M87.129,92.552c1.874-3.846,5.166-6.475,8.762-7.443c-0.36-2.672,0.181-5.691,1.731-8.521
+                            l30.434-55.564c3.356-6.127,8.5-9.972,11.431-8.544c2.931,1.428,3.073,7.848,0.316,14.268l-25,58.212
+                            c-1.273,2.965-3.318,5.252-5.643,6.615c1.454,3.428,1.412,7.641-0.462,11.487c-3.232,6.633-21.837,14.834-27.793,11.932
+                            C89.08,106.592,83.897,99.185,87.129,92.552z"/>
+                        <path style="fill:#858484;" d="M128.513,59.921v52.58c0,5.303-4.314,9.618-9.618,9.618h-82.47c-5.304,0-9.619-4.314-9.619-9.618
+                            V59.557c0-5.303,4.314-9.618,9.619-9.618h72.724l4.521-8.254H36.425c-9.855,0-17.873,8.018-17.873,17.872v52.944
+                            c0,9.855,8.018,17.872,17.873,17.872h82.47c9.855,0,17.872-8.017,17.872-17.872V59.557c0-3.982-1.325-7.651-3.535-10.625
+                            L128.513,59.921z"/>
+                        <path style="fill:#858484;" d="M77.66,59.717c-8.98,0-16.285,7.306-16.285,16.285S68.68,92.288,77.66,92.288
+                            s16.285-7.306,16.285-16.285S86.639,59.717,77.66,59.717z M77.66,88.813c-1.281,0-2.956-2.331-3.89-6.3h7.779
+                            C80.616,86.483,78.94,88.813,77.66,88.813z M73.208,79.038c-0.092-0.956-0.145-1.969-0.145-3.036c0-0.544,0.014-1.074,0.04-1.59
+                            h9.113c0.025,0.516,0.04,1.046,0.04,1.59c0,1.067-0.052,2.079-0.145,3.036H73.208z M64.849,76.003c0-0.539,0.037-1.069,0.102-1.59
+                            h4.673c-0.023,0.522-0.036,1.052-0.036,1.59c0,1.044,0.046,2.056,0.13,3.036h-4.503C64.978,78.064,64.849,77.048,64.849,76.003z
+                            M77.66,63.192c1.429,0,3.349,2.903,4.182,7.746h-8.363C74.31,66.095,76.231,63.192,77.66,63.192z M85.695,74.413h4.632v-0.319
+                            c0.094,0.623,0.143,1.26,0.143,1.909c0,1.046-0.129,2.062-0.367,3.036H85.6c0.084-0.979,0.13-1.992,0.13-3.036
+                            C85.731,75.464,85.718,74.935,85.695,74.413z M89.424,70.938h-4.062c-0.367-2.42-0.995-4.563-1.824-6.312
+                            C86.155,65.984,88.248,68.217,89.424,70.938z M71.781,64.626c-0.829,1.749-1.458,3.891-1.824,6.312h-4.062
+                            C67.071,68.217,69.164,65.984,71.781,64.626z M66.633,82.513h3.58c0.375,1.833,0.908,3.474,1.569,4.866
+                            C69.644,86.27,67.857,84.578,66.633,82.513z M83.537,87.379c0.66-1.392,1.194-3.033,1.569-4.866h3.58
+                            C87.462,84.578,85.675,86.27,83.537,87.379z"/>
+                        </svg>
+                    </div> </a>
+                </div><br><br>
+                <h1 style="color:#24788f;font-size:30px;text-align:center" >Website & App Development</h1>
+            </div>
+            <div id="" style="animation-delay:500ms" class="sub-sel-tag hidden"><div class="line-decor css-selector"></div><p>Website Development</p>
+            <p  onloadstart=""  class="sel-tag-text"></p>
+            </div>
+<!--            <img class="selling-content-img" src="static/images/bg_services.png"/>-->
+            <p onmouseover=""  id="myText" class="sel-tag" style="text-align:center;color:#24788f">"Bold Designs for a Digital World. We are Transforming Ideas into Online Experiences"</p><br>
+            <div class="border-art">
+                <h1 class="sub-sel-tag">"Simplify navigation & Enhance user experience"</h1>
+            </div>
+            <br><br>
+
+            <!-- <div class="sel-imgs">
+                <div class="shapes"></div>
+                <div class="shapes"></div>
+                <div class="shapes"></div>
+            </div> -->
+            <div> We take a proactive approach to identify technical & non-technical problems and provide cuting-edge solutions in the industry</div><br>
+            <div class="saas-cont">
+                <div id="car_bids" class="saas-apps"><br><br>
+                    <div><h1 class="app-title">CarBids App</h1></div>
+                    <div class="app-logo"><img style="height: inherit;" src="static/images/car_bids_logo.png" /></div>
+                    <div class="app-content"><p>"CarBids allows car dealers and individuals to buy & sell thier cars in few clicks. This innovative app like 
+                        Auto Hose its easy to understand is features provide a seamless connection between selling and buying."
+                    </p></div>
+                    <div class="app-btns">
+                        <a class="app-link" href="#">Explore</a>
+                        <a class="app-link" href="#">Read Docs</a>
+                        <a class="app-link" href="#">sign-up</a>
+                    </div><br><br>
+                </div>
+                <div id="car_bids" class="saas-apps"><br><br>
+                    <div><h1 class="app-title">Vakasha n Explore</h1></div>
+                    <div class="app-logo"><img style="height: 150px;" src="static/images/vakashanexplore_logo.png" /></div>
+
+                    <div class="app-content"><p>"CarBids allows car dealers and individuals to buy & sell thier cars in few clicks. This innovative app like 
+                        Auto Hose its easy to understand is features provide a seamless connection between selling and buying."</p>
+                    </div>
+
+                    <div class="app-btns">
+                        <a class="app-link" href="#">Explore</a>
+                        <a class="app-link" href="#">Read Docs</a>
+                        <a class="app-link" href="#">sign-up</a>
+                    </div><br><br>
+                    
+                </div>
+            </div><br><br><br><br>
+
+            <div class="serv-list">
+                <div>We also cater for needs </div><br>
+                <div  class="item hidden app-link"><img src="static/icons/techX-icons-ecommerce.png" /><label class="web-labels" style=""> <span></a></span>e-commerce sites</label></div>
+                <div class="item hidden"><img src="static/icons/techX-icons-business.png" /><label class="web-labels" style=""><span></a></span>Business sites</label></div>
+                <div class="item hidden"><img src="static/icons/techX-icons-portfolio.png" /><label class="web-labels" style=""><span></a></span>Portfolios</label></div>
+                <div class="item hidden"><img src="static/icons/techX-icons-blog.png" /><label class="web-labels"  style=""><span></a></span>Blogs</label></div>
+            </div><br><br>
+            <div><a class="a-links" href="/web_design_brief"><label style="" class="explore-btn"><span></span> Web Development Brief </label></a></div>
+        </div>
+    </section><div class="spacing"></div>
+
+<!--        Pop-up-->
+    <div class="pop-up">
+
+        <div id="logo_quote" class="pop-cont">
+            <form name="Logo Quote Request" method="post">
+                <h1 style="margin:0 auto">Request A Quote</h1>
+                <div><hr></div>
+                <small class="bold">The Logo Design will include the following files;</small>
+                <small class="bold">Please Click to include your requirements on the quote</small><p></p>
+
+                    <div style="" class="bool-opt-cont">
+                        <div>{{logo_options.artwork.label(class="activate-options", style="color:coral")}}</div>
+                        <div>{{logo_options.file_types.label(class="activate-options")}}</div>
+                        <div>{{logo_options.email_signature.label(class="bool-options kolor")}}</div><small>{{logo_options.letterhead.label(class="bool-options kolor")}}</small>
+                        <div>{{logo_options.mock_up.label(class="bool-options kolor")}}</div>
+                    </div><br><br>
+                    <div style="flex-grow:1"></div>
+                    <div>
+                        <input class="form-control" type="text" name="Name" placeholder="Name" />
+                        <input class="form-control" type="email" name="Email" placeholder="Email"/>
+                        <input class="form-control" type="tel" name="Phone No."  placeholder="Phone Number"/>
+                        <input class="form-control" type="submit" value="Submit"/>
+                    </div>
+            <div style="align-self:flex-end"><input onclick="closePopup()" type="button" value="Exit"></div>
+            </form>
         </div>
 
-        <div class="service grey_gra_hover">
-            <div class="icon-cont"><img src="static/images/language_FILL0_wght400_GRAD0_opsz24.svg"/> </div>
-            <h2 style="color:#2f884f" >UX & UI</h2>
-            <label>At Tech Xol we meet all your business graphic designs needs.</label>
-            <label>We make an impressive touch with to ensure quality is the top priority</label>
-            <label>The list is endless from Logos, Business profile, Flyers, Brochures, Email signatures, etc.</label>
+        <div style="margin:0 auto" id="poster_quote" class="pop-cont">
+                <h1 style="margin:0 auto">Request A Quote</h1>
+                <div><hr></div>
+                <small class="bold">The Poster Design will include the following files;</small>
+                <small class="bold">A Brief of your interest on the artwork</small><p></p>
+                <form name="Logo Quote Request" method="post">
+                    <div style="" class="bool-opt-cont">
+                        <div class="form-fields">{{poster_options.poster_types(class="form-control", style="color:coral")}}</div>
+                        <div class="form-fields">{{poster_options.theme_color.label(class="")}}{{poster_options.theme_color(class="form-control")}}</div>
+                        <div class="form-fields">{{poster_options.poster_title.label(class="")}}{{poster_options.poster_title(class="form-control")}}</div>
+                        <div class="form-fields">{{poster_options.hash_tags.label(class="")}}{{poster_options.hash_tags(class="form-control")}}</div>
+                        <div class="form-fields">{{poster_options.poster_content.label(class="")}}{{poster_options.poster_content(class="form-control")}}</div>
+                        <div class="form-fields">{{poster_options.instructional_info.label(class="")}}{{poster_options.instructional_info(id="instruct-ps",class="form-control")}}</div><br>
+                        <div><label>Choose File Format:</label></div><br>
+                        <div>{{poster_options.file_type1.label(class="bool-options kolor")}}</div>
+                        <div>{{poster_options.file_type2.label(class="bool-options kolor")}}</div>
+                        <div>{{poster_options.file_type3.label(class="bool-options kolor")}}</div>
+                        <div>{{poster_options.file_type4.label(class="bool-options kolor")}}</div>
+                    </div><br><br>
+                    <div style="flex-grow:1"></div>
+                    <div>
+                        <input class="form-control" type="text" name="Name" placeholder="Name" />
+                        <input class="form-control" type="email" name="Email" placeholder="Email"/>
+                        <input class="form-control" type="tel" name="Phone No."  placeholder="Phone Number"/>
+                        <input onclick="ProcessFrom()" class="form-control pop-btns" type="button" value="Submit"/>
+                    </div>
+                </form>
+            <div style="align-self:flex-end"><input onclick="closePopup()" type="button" value="Exit"></div>
+
+            <!----------Website Popups------------>
+
         </div>
 
-    </section>
+        <p id="form-date"></p>
+<!--    Pop-up    -->
+        <div style="margin:0 auto" id="flyer_quote" class="pop-cont">
+                <h1 style="margin:0 auto">Request A Quote</h1>
+                <div><hr></div>
+                <small class="bold">The Flyer Design will include the following files;</small>
+                <small class="bold">A Brief of your interest on the artwork</small><p></p>
+                <form name="Logo Quote Request" method="post">
+                    <div style="" class="bool-opt-cont">
+                        <div class="form-fields">{{flyer_options.theme_color.label(class="")}}{{flyer_options.theme_color(class="form-control")}}</div>
+                        <div class="form-fields">{{flyer_options.flyer_title.label(class="")}}{{flyer_options.flyer_title(class="form-control")}}</div>
+                        <div class="form-fields">{{flyer_options.hash_tags.label(class="")}}{{flyer_options.hash_tags(class="form-control")}}</div>
+                        <div class="form-fields">{{flyer_options.content.label(class="")}}{{flyer_options.content(class="form-control")}}</div>
+                        <div class="form-fields">{{flyer_options.instructional_info.label(class="")}}{{flyer_options.instructional_info(class="form-control")}}</div><br>
+                        <div><label>Choose File Format:</label></div><br>
+                        <div>{{flyer_options.file_type1.label(class="bool-options kolor")}}</div>
+                        <div>{{flyer_options.file_type2.label(class="bool-options kolor")}}</div>
+                        <div>{{flyer_options.file_type3.label(class="bool-options kolor")}}</div>
+                        <div>{{flyer_options.file_type4.label(class="bool-options kolor")}}</div>
+                    </div><br><br>
+                    <div style="flex-grow:1"></div>
+                    <div>
+                        {% if current_user.is_authenticated %}
+                            <input class="form-control" type="text" name="Name" value="{{current_user.name}}" />
+                            <input class="form-control" type="email" name="Email" value="{{current_user.email}}"/>
+                            <input class="form-control" type="tel" name="Phone No."  value="{{current_user.name}}"/>
+                            <input class="form-control" type="submit" value="Submit"/>
+                        {% else %}
+                            <input class="form-control" type="text" name="Name" placeholder="Name" />
+                            <input class="form-control" type="email" name="Email" placeholder="Email"/>
+                            <input class="form-control" type="tel" name="Phone No."  placeholder="Phone Number"/>
+                            <input class="btns" type="submit" value="Submit"/>
+                        {% endif %}
+                    </div>
+                </form>
+            <div style="align-self:flex-end"><input onclick="closePopup()" type="button" value="Exit"></div>
+        </div>
+    </div>
+<!--    Pop-end   -->
 
+<!--    <section class="services hidden">-->
+<!--        <div style="background-color:" class="selling-content">-->
+<!--            <div style="background-color:" class="service">-->
+<!--                <div class="icon-cont"><a class="a-links" href="/web_development">-->
+<!--<div class="spacing"></div>-->
+
+    <section id="bi-sect-container" style="background-color:;" class="services hidden">
+        <div id="bi-container" class="selling-content">
+            <div style="background-color:" class="service">
+                <div class="icon-cont"><a class="a-links" href="/web_development">
+                    <div class="big-btns-c  serv-icon">
+                        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                width="158.333px" height="157.639px" viewBox="0 0 158.333 157.639" style="enable-background:new 0 0 158.333 157.639;"
+                                xml:space="preserve">
+                            <path style="fill:#929191;" d="M54.182,36.524l-1.719,1.264l-3.364,0.282c-6.454,0.542-14.209,5.368-17.233,10.725L30.452,51.3
+                                c-1.154,2.044-1.783,4.59-1.92,7.256c-4.145,4.879-7.298,12.427-7.465,18.542l-0.095,3.489c-0.184,6.738,3.519,14.798,8.489,18.995
+                                c0.617,3.856,2.043,7.572,4.103,10.101l1.816,2.231c3.273,4.021,9.745,6.56,15.516,6.384l1.682,0.893
+                                c10.051,5.337,25.173,0.392,25.173-10.988V44.958C77.75,33.578,63.351,29.782,54.182,36.524z"/>
+                            <g>
+                                <path style="fill:#858484;" d="M83.018,63.689h22.524v-23.98c5.494-1.62,9.519-6.703,9.519-12.715
+                                    c0-7.313-5.949-13.263-13.262-13.263s-13.263,5.95-13.263,13.263c0,6.013,4.025,11.095,9.52,12.716v16.494H83.018
+                                    c-2.067,0-3.743,1.676-3.743,3.743C79.275,62.013,80.95,63.689,83.018,63.689z M96.021,26.993c0-3.186,2.591-5.777,5.777-5.777
+                                    c3.185,0,5.776,2.591,5.776,5.777c0,3.185-2.591,5.776-5.776,5.776C98.613,32.769,96.021,30.178,96.021,26.993z"/>
+                                <path style="fill:#858484;" d="M124.787,65.393c-6.013,0-11.095,4.025-12.715,9.519H83.018c-2.067,0-3.743,1.676-3.743,3.743
+                                    c0,2.067,1.676,3.743,3.743,3.743h29.054c1.62,5.494,6.703,9.519,12.715,9.519c7.313,0,13.262-5.949,13.262-13.262
+                                    C138.049,71.342,132.1,65.393,124.787,65.393z M124.787,84.431c-3.185,0-5.776-2.591-5.776-5.776c0-3.185,2.591-5.776,5.776-5.776
+                                    s5.776,2.591,5.776,5.776C130.563,81.84,127.972,84.431,124.787,84.431z"/>
+                                <path style="fill:#858484;" d="M105.541,118.676V94.742H83.018c-2.067,0-3.743,1.676-3.743,3.743c0,2.067,1.676,3.743,3.743,3.743
+                                    h15.038v16.448c-5.495,1.62-9.52,6.703-9.52,12.716c0,7.313,5.95,13.263,13.263,13.263s13.262-5.95,13.262-13.263
+                                    C115.06,125.379,111.036,120.296,105.541,118.676z M101.798,137.168c-3.186,0-5.777-2.591-5.777-5.777
+                                    c0-3.185,2.591-5.776,5.777-5.776c3.185,0,5.776,2.591,5.776,5.776C107.575,134.577,104.983,137.168,101.798,137.168z"/>
+                            </g>
+                        </svg>
+                    </div> </a></div><br><br>
+                <h1 style="color:#24788f;font-size:30px;white-space:;text-align:center" >Business Intelligence Services</h1>
+            </div>
+<!--            <img class="selling-content-img" src="static/images/bg_services.png"/>-->
+            <p id="busns-inteli-txt" class="sel-tag" style="text-align:center;color:#24788f">
+                Say goodbye to outdated business practices and hello to a more agile, data-driven, and innovative business model.
+            </p>
+            <div id="sub-sel-tag-1" style="animation-delay:500ms" class="sub-sel-tag hidden"><div class="line-decor css-selector"></div><p>Business Intelligence</p>
+            <p  onloadstart="" id="typewrite-text" class="sel-tag-text"></p>
+            </div><br><br>
+            <!-- Oddoo  -->
+            <div class="flex-just-align bs-cont" style="">
+                <div style="" id="bus-icons-fs-1"  class="bus-icons hidden bs-tools bus-icons-fs">
+                    <img style="height:inherit" src="static/icons/tx-sales-trend-upwards-crm.png"/><label class="legendary">Customer Relations (CRM)</label></div>
+                <div style="background-color:;"  class="bus-icons hidden bs-tools bus-icons-fs">
+                    <img style="height:inherit" src="static/icons/tx-sales-trend-upwards-so.png"/><label class="legendary">Sales Forecasts</label></div>
+                <div style="" id="bus-icons-fs-2" class="bus-icons hidden bs-tools bus-icons-fs">
+                    <img style="height:inherit" src="static/icons/tx-sales-trend-upwards-market-automation.png"/><label class="legendary">Market Automation</label></div>
+                <div style="" id="bus-icons-fs-3"   class="bus-icons hidden bs-tools bus-icons-fs">
+                    <img style="height:inherit" src="static/icons/tx-sales-trend-upwards-analysis.png"/><label class="legendary">Data Analysis</label></div>
+                <div style="" id="bus-icons-fs-4"  class="bus-icons hidden bs-tools bus-icons-fs">
+                    <img style="height:inherit" src="static/icons/tx-sales-trend-upwards-social-integration.png"/><label class="legendary">Social Media Integration</label></div>
+<!--                <div style="" id="bus-icons-fs-5"   class="bus-icons hidden bs-tools bus-icons-fs">label<label class="legendary">Online Sales</label></div>-->
+<!--                <div style="" id="bus-icons-fs-6"   class="bus-icons hidden bs-tools bus-icons-fs"><label class="legendary">Social Media Integration</label></div>-->
+            </div>
+<!--            <div class="action-prompt">-->
+<!--                <div class="popup-icons"><img style="height:inherit" class="" src="static/icons/whatsapp_icon.png"/></div>-->
+<!--                <div class="popup-icons"><img style="height:inherit" class="" src="static/icons/whatsapp_icon.png"/></div>-->
+<!--                <div class="popup-icons"><img style="height:inherit" class="" src="static/icons/whatsapp_icon.png"/></div>-->
+<!--            </div>-->
+
+<!--            <div style="display:flex"  class="popup">-->
+<!--                <div style="display:flex" id="bs-inteli-pop" class="pop-cont">-->
+<!--                <form name="Logo Quote Request" method="post">-->
+<!--                    <h1 style="margin:0 auto">Explore Our Services</h1>-->
+<!--                    <div><hr></div>-->
+<!--                    <small class="bold">Take action today to make things happen</small>-->
+<!--&lt;!&ndash;                    <small class="bold">Please Click to include your requirements on the quote</small><p></p>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <div class="action-prompt">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div class="popup-icons"><img style="height:inherit" class="" src="static/icons/whatsapp_icon.png"/></div>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div class="popup-icons"><img style="height:inherit" class="" src="static/icons/whatsapp_icon.png"/></div>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <div class="popup-icons"><img style="height:inherit" class="" src="static/icons/whatsapp_icon.png"/></div>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--                        <div style="" class="bool-opt-cont">-->
+<!--                            <div>{{logo_options.artwork.label(class="activate-options", style="color:coral")}}</div>-->
+<!--                            <div>{{logo_options.file_types.label(class="activate-options")}}</div>-->
+<!--                            <div>{{logo_options.email_signature.label(class="bool-options kolor")}}</div><small>{{logo_options.letterhead.label(class="bool-options kolor")}}</small>-->
+<!--                            <div>{{logo_options.mock_up.label(class="bool-options kolor")}}</div>-->
+<!--                        </div><br><br>-->
+<!--                        <div style="flex-grow:1"></div>-->
+<!--                        <div>-->
+<!--                            <input class="form-control" type="text" name="Name" placeholder="Name" />-->
+<!--                            <input class="form-control" type="email" name="Email" placeholder="Email"/>-->
+<!--                            <input class="form-control" type="tel" name="Phone No."  placeholder="Phone Number"/>-->
+<!--                            <input class="form-control" type="submit" value="Submit"/>-->
+<!--                        </div>-->
+<!--                <div style="align-self:flex-end"><input onclick="closePopup()" type="button" value="Exit"></div>-->
+<!--                </form>-->
+<!--                </div>-->
+
+<!--            </div>-->
+
+            <!--<p>-->
+            <!--Contact us today to learn more about how our Business Intelligence services can transform your business for the better. Embrace the future of business operations-->
+            <!--with Tech Xolutions(TechX).
+            </p>-->
+
+            <br><br><br>
+            <div class="serv-list">
+                <div class="item hidden"><label style="background-color:orange"><span><img src="static/images/draw_FILL0_wght400_GRAD0_opsz24.svg"/> </a></span>Buy Online Securely</label></div>
+<!--                <div><label style="background-color:#006769"><span><img src="static/images/draw_FILL0_wght400_GRAD0_opsz24.svg"/> </a></span>Business sites</label></div>-->
+<!--                <div><label style="background-color:coral"><span><img src="static/images/draw_FILL0_wght400_GRAD0_opsz24.svg"/> </a></span>Portfolios</label></div>-->
+<!--                <div><label style="background-color:#ff6769"><span><img src="static/images/draw_FILL0_wght400_GRAD0_opsz24.svg"/> </a></span>Blogs</label></div>-->
+<!--                <div><label><span><img src="static/images/draw_FILL0_wght400_GRAD0_opsz24.svg"/> </a></span>Nonprofit sites</label></div>-->
+            </div><br><br>
+
+            <p >At Tech Xolutions(TechX), we specialize in offering top-notch services that include implementing tools tailored
+                    to meet your specific business needs.
+                    Whether you are looking to improve your Customer Relations Management(CRM), data analysis capabilities, enhance your reporting functionalities, or automate key business processes,
+                    we are here to guide you every step of the way.</p>
+            <div><a class="a-links" href="/graphic_design"><label style="" class="explore-btn"><span></span> Explore</label></a></div>
+        </div>
+
+    </section><div class="spacing"></div>
+
+    <!-- <section class="services hidden">
+        <div style="background-color:" class="selling-content">
+            <div style="background-color:" class="service">
+                <div class="icon-cont"><a class="a-links" href="/web_development">
+                    <div class="big-btns-c"><img class="serv-icon" src="static/images/order_approve_FILL0_wght400_GRAD0_opsz24.svg"/></div> </a></div><br><br>
+                <h1 style="color:#24788f;font-size:30px;" >Online Services</h1>
+            </div>
+            <img class="selling-content-img" src="static/images/bg_services.png"/>-->
+            <!-- <p class="sel-tag" style="text-align:center;color:#24788f">"Building Your Online Retail Empire. Empowering Your Online Store Success"</p><br><br>
+            <div class="serv-list">
+                <div class="item hidden"><label style="background-color:orange"><span><img src="static/images/draw_FILL0_wght400_GRAD0_opsz24.svg"/> </a></span>Buy Online Securely</label></div> -->
+<!--                <div><label style="background-color:#006769"><span><img src="static/images/draw_FILL0_wght400_GRAD0_opsz24.svg"/> </a></span>Business sites</label></div>-->
+<!--                <div><label style="background-color:coral"><span><img src="static/images/draw_FILL0_wght400_GRAD0_opsz24.svg"/> </a></span>Portfolios</label></div>-->
+<!--                <div><label style="background-color:#ff6769"><span><img src="static/images/draw_FILL0_wght400_GRAD0_opsz24.svg"/> </a></span>Blogs</label></div>-->
+<!--                <div><label><span><img src="static/images/draw_FILL0_wght400_GRAD0_opsz24.svg"/> </a></span>Nonprofit sites</label></div>-->
+            <!-- </div><br><br>
+            <div><a class="a-links" href="/graphic_design"><label style="" class="explore-btn"><span></span> Explore</label></a></div>
+        </div>
+    </section><div class="spacing my-curve"></div>  -->
+
+    <section id="section-last" style="" class="services hidden">
+        <div style="background-color:" class="selling-content">
+            <div style="background-color:" class="service">
+                <div class="icon-cont"><a class="a-links" href="/web_development">
+                    <div class="big-btns-c serv-icon">
+                        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                            width="158.333px" height="157.639px" viewBox="0 0 158.333 157.639" style="enable-background:new 0 0 158.333 157.639;"
+                            xml:space="preserve">
+                        <path style="fill:#929191;" d="M34.811,20.567c-3.619,0-6.58,2.961-6.58,6.58v12.405c0,3.619,2.961,6.58,6.58,6.58h4.392
+                            c3.619,0,7.765,2.713,9.214,6.03L65.284,90.78c1.448,3.316,5.595,6.03,9.214,6.03h9.145c3.619,0,7.765-2.713,9.214-6.03
+                            l16.866-38.618c1.448-3.316,5.595-6.03,9.214-6.03h4.392c3.619,0,6.58-2.961,6.58-6.58V27.147c0-3.619-2.961-6.58-6.58-6.58H34.811z
+                            "/>
+                        <rect x="76.783" y="87.325" style="fill:#929191;" width="4.573" height="35.304"/>
+                        <g>
+                            <path style="fill:none;stroke:#929191;stroke-width:5;stroke-linecap:round;stroke-miterlimit:10;" d="M90.228,138.074
+                                c-0.972,0.515-2.667,0.936-3.767,0.936H16.886c-1.1,0-1.205-0.421-0.233-0.936l48.224-25.556c0.972-0.515,2.667-0.937,3.767-0.937
+                                h69.575c1.1,0,1.205,0.421,0.233,0.937L90.228,138.074z"/>
+                        </g>
+                        <line style="fill:none;stroke:#929191;stroke-width:5;stroke-linecap:round;stroke-miterlimit:10;" x1="47.25" y1="138.67" x2="80.56" y2="121.018"/>
+                        <path style="fill:none;stroke:#929191;stroke-width:5;stroke-linecap:round;stroke-miterlimit:10;" d="M87.584,115.736
+                            c0,0-3.251-11.28,8.029-15.04c11.28-3.76,5.64-13.371,5.64-13.371"/>
+                        <path style="fill:none;stroke:#929191;stroke-width:5;stroke-linecap:round;stroke-miterlimit:10;" d="M94.221,114.627
+                            c0,0,2.042-11.56,13.826-9.975c11.784,1.585,10.947-9.527,10.947-9.527"/>
+                        </svg>
+                    </div></a><br><br>
+                <h1 style="color:#24788f;font-size:30px;" >Engraving</h1>
+            </div>
+<!--            <img class="selling-content-img" src="static/images/bg_services.png"/>-->
+            <p class="sel-tag" style="text-align:center;color:#24788f">"Building Your Online Retail Empire. Empowering Your Online Store Success"</p>
+            <div class="serv-list">
+<!--                <div><label style="background-color:orange"><span><img src="static/images/draw_FILL0_wght400_GRAD0_opsz24.svg"/> </a></span>e-commerce sites</label></div>-->
+<!--                <div><label style="background-color:#006769"><span><img src="static/images/draw_FILL0_wght400_GRAD0_opsz24.svg"/> </a></span>Business sites</label></div>-->
+<!--                <div><label style="background-color:coral"><span><img src="static/images/draw_FILL0_wght400_GRAD0_opsz24.svg"/> </a></span>Portfolios</label></div>-->
+<!--                <div><label style="background-color:#ff6769"><span><img src="static/images/draw_FILL0_wght400_GRAD0_opsz24.svg"/> </a></span>Blogs</label></div>-->
+<!--                <div><label><span><img src="static/images/draw_FILL0_wght400_GRAD0_opsz24.svg"/> </a></span>Nonprofit sites</label></div>-->
+            </div><br><br><br>
+            <div><a class="a-links" href="/graphic_design"><label style="" class="explore-btn"><span></span> Explore </label></a></div>
+        </div>
+    </section><div class="spacing"></div>
 
     <section class="account">
-        <div class="sub-topics"><p>Open Account</p></div>
-    <div class="sub-topics"><p style="font-size:20px;width:70%;" >We are glad you prefer working online, Everyone seems to embrace this initiative, we embrace technology trends too and we have braced
-        ourselves to be the game-changer in the technology industry, that's why
-        we have made this platform just for you to serve you at the comfort of your office or home environment, open an account with us today and enjoy a fleet of our services that goes hand-in-hand with benefits. </p></div>
-        <div class="general-flex">
-            <a class="a-links hover_cls_rad" href="/client_signup"><div class="info-cont">
+        <div class="sub-topics anim"><p>Open Account</p></div>
+        <div class="sub-topics"><p class="acc-p" style="font-size:20px;width:70%;" >We are glad you prefer working online, Everyone seems to embrace this initiative, we embrace technology trends too and we have braced
+            ourselves to be the game-changer in the technology industry, that's why
+            we have made this platform just for you to serve you at the comfort of your office or home environment, open an account with us today and enjoy a fleet of our services that goes hand-in-hand with benefits. </p></div>
+        <div style="justify-content:center" class="general-flex ">
+            <a class="a-links hover_cls_rad hidden item" href="/client_signup"><div class="info-cont">
                 <div class="icon-cont"><img src="static/images/draw_FILL0_wght400_GRAD0_opsz24.svg"/></div>
                 <h2 style="color:#24788f" >Sign-Up Today</h2>
             </div></a><br>
-            <a class="a-links " href="/user_section"><div class="info-demo-cont hover_cls_rad">
+            <a class="a-links hidden item" href="/user_section"><div class="info-demo-cont hover_cls_rad">
     <!--            <div class="icon-cont"><img src="static/images/draw_FILL0_wght400_GRAD0_opsz24.svg"/> </div>-->
-                <h2 style="color:white;text-align:center" >Explore<br> Demo Account</h2>
-
+                <h2 style="color:white;text-align:center" >Explore<br> Demo Account </h2>
             </div></a>
-
         </div><br><br>
     </section>
 
     <a id="contact_us"></a>
-    <section>
+    <section class="" style="background-color:">
         <div class="sub-topics"><p>Contact Us</p></div>
-        <div style="width:40%;margin:60px auto; padding:20px;" class="border-spec">
-        <div class="flash-messages btns">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for  category, message in messages %}
-                        <div class="flash-messages alert-{{category}}"> {{ message }}</div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
+        <div style="width:40%;margin:60px auto; padding:0px;background-color:" class="border-spec ">
+            <div class="flash-messages btns">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for  category, message in messages %}
+                            <div class="flash-messages alert-{{category}}"> {{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+            <h1>We would like to hear from you, <br><span class="spans">Write to us</span></h1>
+            <div style="background-color:;"  class="contact-form">
+                <form class="form-control-techx flex-just-align " style="width:100%;flex-direction:column" action = "{{url_for('contact_us')}}" method="post" >
+                    {{contact_form.hidden_tag()}}
+                    <div  style="width:90%;" class="item hidden" >
+                        {{contact_form.name(class="contact-form-control",placeholder="Name")}}
+                    </div>
+                    <div class="item hidden"  style="width:90%;">
+                        {{contact_form.email(class="contact-form-control",placeholder="Email Address")}}
+                    </div>
+                    <div class="item hidden"  style="width:90%;">
+                        {{contact_form.subject(class="contact-form-control",placeholder="Subject")}}
+                    </div>
+                    <div class="item hidden"  style="width:90%;">
+                        {{contact_form.message(class="contact-form-control  text-area",placeholder="Message")}}
+                    </div>
+                    <div class="item hidden" style="width:90%;">
+                        {{contact_form.submit}}
+                    </div>
+                </form>
+            </div>
         </div>
-        <h1 >We would like to hear from you, <br><span class="spans">Write to us</span></h1>
-        <div class="contact-form">
-            <form style="width:100%;" action = "{{url_for('contact_us')}}" method="post" >
-                {{contact_form.hidden_tag()}}
-                <div  style="width:100%;">
-                    {{contact_form.name(class="contact-form-control",placeholder="Name")}}
-                </div>
-                 <div>
-                    {{contact_form.email(class="contact-form-control",placeholder="Email Address")}}
-                </div>
-                <div>
-                    {{contact_form.subject(class="contact-form-control",placeholder="Subject")}}
-                </div>
-                <div>
-                    {{contact_form.message(class="contact-form-control  text-area",placeholder="Message")}}
-                </div>
-                <div>
-                    {{contact_form.submit}}
-                </div>
-
-            </form>
-        </div>
-</div>
-
     </section>
+</div>
+<script>
+    //Pop up Form, #not used
+    function ProcessFrom(){
+        let submtBtn = document.createElement('input');
+        submtBtn.type = 'submit';
+        let par = document.querySelector('form');
+        $(document).ready(function(){
+               par.appendChild(submtBtn);
+            $('.pop-btns').click(function(){
+                console.log('Cleicked: ',$('form').serializeArray());
+                $('submit').submit()
+            })
+        })
+    }
+
+    //Page load animations
+    const divs = document.querySelectorAll(".hidden");
+    if (window.innerWidth >= 600){
+        var observer = new IntersectionObserver(entries => {
+            entries.forEach(entry =>{
+                //console.log(entry.target)
+                entry.target.classList.toggle("show", entry.isIntersecting)
+                if (entry.isIntersecting) observer.unobserve(entry.target)
+                });
+                },{
+                    threshold: 0.2,
+                    });   //{threshold: 0.5,}
+
+        divs.forEach(div =>{
+            observer.observe(div)
+    });
+    }else{
+        var observer = new IntersectionObserver(entries => {
+        entries.forEach(entry =>{
+            //console.log(entry.target)
+            entry.target.classList.toggle("show", entry.isIntersecting)
+            if (entry.isIntersecting) observer.unobserve(entry.target)
+            });
+            },{
+                threshold: 0.1,
+                });   //{threshold: 0.5,}
+
+    divs.forEach(div =>{
+        observer.observe(div)
+        console.log("Width is below 600: ",window.innerWidth)
+        });
+    }
 
 
-    <p>Hey My Home Page</p>
+</script>
 {% endblock %}

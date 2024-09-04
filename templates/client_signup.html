@@ -34,6 +34,7 @@
 
                <!--<input type="text" class="form-control" id="name" name="nm" placeholder="Name">-->
             </div>
+
             <div class="group">
                   {{ register.email(class="form-control",placeholder="Email")}}<br>
                   {% if register.email.errors %}
@@ -44,6 +45,7 @@
 
                 <!--<input type="email" class="form-control" id="email" name="email" placeholder="Email">-->
             </div>
+
             <div class="group">
                  {{ register.password(class="form-control",placeholder="Password")}}<br>
                  {% if register.password.errors %}
@@ -54,6 +56,7 @@
 
                <!--<input type="password" class="form-control" id="password" name="passw" placeholder="Password">-->
             </div>
+
             <div class="group">
                 <!--<input type="password" class="form-control" id="confirm-password" name="confirm_pass" placeholder="confirm-password">-->
                  {{ register.confirm(class="form-control",placeholder="Confirm Password")}}<br>
@@ -62,8 +65,6 @@
                         <span class="span-error" >*Passwords that not match</span>
                     {% endfor %}
                  {% endif %}
-
-
             </div><br><br>
 
             <div style="" class="group">

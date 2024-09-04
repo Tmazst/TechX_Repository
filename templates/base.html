@@ -2,6 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" type="text/css" href="static/css/styles.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <title>{{title}}</title>
 
     <div class="physical_addr">
@@ -19,12 +23,43 @@
         </ul>
     </nav>
 
-    <div class="user">
+<!--    <button class="menu burger">Menu</button>-->
+    <div  onclick="openMenuFunc()" class="menu-icon">
+        <div class="stroke"></div>
+        <div class="stroke"></div>
+        <div class="stroke"></div>
+    </div>
+
+    <div class="other-nav">
+        <ul class="other-navbar-nav">
+          <li class="other-nav-item active">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+          <div class="navbar-separator"></div>
+          <li class="other-nav-item">
+            <a class="nav-link" href="/#services">About</a>
+          </li>
+          <div class="navbar-separator"></div>
+          <li class="other-nav-item">
+            <a class="nav-link" href="/freelance_job_ads">Contact Us</a>
+          </li>
+          <div class="navbar-separator"></div>
+          <li class="other-nav-item">
+            <a class="nav-link" href="/about">Explore Apps</a>
+          </li>
+          <div class="navbar-separator"></div>
+          <li class="other-nav-item">
+            <a class="nav-link" href="/contact" >Engraving</a>
+          </li>
+        </ul>
+    </div>
+
+    <div style="background-color:" class="user">
         <ul class="user-label">
         {% if current_user.is_authenticated %}
 
                     <li><span style="font-size:13px" class="nav-link">Welcome, {{current_user.name}}</span></li>
-                    <li><a class="btns-user links-user" href="#">Account</a></li>
+                    <li><a class="btns-user links-user" href="/client_user_acc">Account</a></li>
                     <li><a class="btns-outlined links-user" href="/logout">Logout</a></li>
         {% else %}
                     <li><a class="btns-outlined links-user" href="/login">Login</a></li>
@@ -34,8 +69,6 @@
         </ul>
     </div>
 
-
-    <link rel="stylesheet" type="text/css" href="static/styles.css" />
 
 </head>
 <body>

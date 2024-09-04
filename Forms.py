@@ -6,30 +6,109 @@ from flask_wtf.file import FileField , FileAllowed
 # from wtforms.fields.html5 import DateField,DateTimeField
 
 
-
 class Register(FlaskForm):
 
     name = StringField('name', validators=[DataRequired(),Length(min=2,max=20)])
     email = StringField('email', validators=[DataRequired(),Email()])
     password = PasswordField('password', validators=[DataRequired(), Length(min=8, max=64)])
     confirm = PasswordField('confirm', validators=[DataRequired(),EqualTo('password'), Length(min=8, max=64)])
+    contacts = StringField('Contact(s)', validators=[Length(min=8, max=64)])
+    zip_code = StringField('Zip Code / Postal Code', validators=[Length(min=0, max=64)])
+    address = StringField('Physical Address', validators=[DataRequired(), Length(min=8, max=100)])
+    image_pfl = FileField('Profile Image', validators=[FileAllowed(['jpg','png'])])
 
     submit = SubmitField('Create Account!')
 
-
     def validate_email(self,email):
-        from main import db, User,app
+        from app import db, User,app
 
         # with db.init_app(app):
         user_email = User.query.filter_by(email = self.email.data).first()
         if user_email:
             return ValidationError(f"Email already registered in this platform")
 
+class Update_account_form(FlaskForm):
 
+    email = StringField('Email', validators=[DataRequired(), Email()])
+
+
+
+
+
+class Logo_Options(FlaskForm):
+
+    email_signature = BooleanField("Email Signature")
+    letterhead = BooleanField("Letterhead")
+    mock_up = BooleanField("Mock Up")
+    artwork = BooleanField("Logo Artwork",default=True)
+    file_types = BooleanField("EPS, PDF, JPG, PNG",default=True)
+
+class Poster_Options(FlaskForm):
+
+    poster_types = SelectField('Type of Poster',
+                                  choices=[("Travel Poster", "Travel Poster"), ("Advertising Poster", "Advertising Poster"),
+                                           ("Event Poster", "Event Poster"),("Campaign Poster", "Campaign Poster"),
+                                           ("Research Poster", "Research Poster"),("Promotional Poster", "Promotional Poster"),("Fashion Poster", "Fashion Poster")
+                                           ,("Product Promo", "Product Promo")])
+    theme_color = StringField("Theme Color(s)")
+    poster_title = StringField("Poster Title")
+    tag_line = StringField("Tag Line (Optional)")
+    hash_tags = StringField("#tag(s)")
+    poster_content = TextAreaField("Poster Content")
+    instructional_info = TextAreaField("Poster Design Instructions")
+    file_type1 = BooleanField("EPS")
+    file_type2 = BooleanField("PDF", default=True)
+    file_type3 = BooleanField("JPG", default=True)
+    file_type4 = BooleanField("PNG")
+
+
+class Flyer_Options(FlaskForm):
+
+    theme_color = StringField("Theme Color(s)")
+    flyer_title = StringField("Flyer Title")
+    tag_line = StringField("Tag Line (Optional)")
+    hash_tags = StringField("#tag(s)")
+    content = TextAreaField("Content")
+    instructional_info = TextAreaField("Design Instructions")
+    file_type1 = BooleanField("EPS")
+    file_type2 = BooleanField("PDF", default=True)
+    file_type3 = BooleanField("JPG", default=True)
+    file_type4 = BooleanField("PNG")
+
+
+class Brochure_Options(FlaskForm):
+
+    brochure_types = SelectField('Type of Brochure',
+                                  choices=[("Half Fold", "Half Fold"), ("Tri Fold", "Tri Fold"),
+                                           ("Z Fold", "Z Fold"),("Parallel Fold", "Parallel Fold"),
+                                           ("Gate Fold", "Gate Fold"),("Double Gate Fold", "Double Gate Fold"),("Roll Fold", "Roll Fold")
+                                           ,("Accordion Fold", "Accordion Fold"),("Half then Half", "Half then Half"),("Half then Tri", "Half then Tri")])
+    theme_color = StringField("Theme Color(s)")
+    brochure_title = StringField("Flyer Title")
+    tag_line = StringField("Tag Line (Optional)")
+    hash_tags = StringField("#tag(s)")
+    brochure_content = TextAreaField("Content")
+    instructional_info = TextAreaField("Design Instructions")
+    file_type1 = BooleanField("EPS")
+    file_type2 = BooleanField("PDF", default=True)
+    file_type3 = BooleanField("JPG", default=True)
+    file_type4 = BooleanField("PNG")
+
+
+class Ecommerce_Options(FlaskForm):
+
+    theme_color = StringField("Theme Color(s)")
+    flyer_title = StringField("Flyer Title")
+    tag_line = StringField("Tag Line (Optional)")
+    hash_tags = StringField("#tag(s)")
+    content = TextAreaField("Content")
+    instructional_info = TextAreaField("Design Instructions")
+    file_type1 = BooleanField("EPS")
+    file_type2 = BooleanField("PDF", default=True)
+    file_type3 = BooleanField("JPG", default=True)
+    file_type4 = BooleanField("PNG")
 
 class Login(FlaskForm):
-
-
     email = StringField('email', validators=[DataRequired(),Email()])
     password = PasswordField('password', validators=[DataRequired(), Length(min=8, max=64)])
     submit = SubmitField('Login')
@@ -115,29 +194,11 @@ class Web_Design_Brief(Project_Form):
 
 
 
-class Update_account_form(FlaskForm):
-
-
-    name = StringField('Name', validators=[DataRequired(), Length(min=2, max=20)])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    image_pfl = FileField('Profile Image', validators=[FileAllowed(['jpg','png'])])
-    contacts = StringField('Contact(s)', validators=[Length(min=8, max=64)])
-    school = StringField('High School', validators=[Length(min=8, max=64)])
-    tertiary = StringField('Tertiary (Optional)')
-    experience = TextAreaField('Work Experience (Optional)')
-    skills = TextAreaField('Skills', validators=[Length(min=8, max=150)])
-    hobbies = StringField('Hobbies (Optional)')
-    address = StringField('Physical Address', validators=[DataRequired(), Length(min=8, max=100)])
-    reference_1 = TextAreaField('Reference 1 [Fullname & Contact]',
-                                validators=[DataRequired(), Length(min=8, max=64)])
-    reference_2 = TextAreaField('Reference 2  [Fullname & Contact]',
-                                validators=[DataRequired(), Length(min=8, max=64)])
-
     def validate_email(self,email):
-        from app import db, user
+        from app import db, User
         if current_user.email != self.email.data:
             #Check if email exeists in database
-            user_email = user.query.filter_by(email = self.email.data).first()
+            user_email = User.query.filter_by(email = self.email.data).first()
             if user_email:
                 raise ValidationError(f"email, {email.value}, already taken by someone")
 

@@ -1,7 +1,7 @@
 
 from flask import Flask,render_template,url_for,redirect,request,flash
 from flask_login import login_user, LoginManager,current_user,logout_user, login_required
-from Forms import Register, Login,Contact_Form, Project_Form, Web_Design_Brief
+from Forms import Register, Login,Contact_Form, Project_Form, Web_Design_Brief,Logo_Options,Poster_Options,Brochure_Options,Flyer_Options
 from models import *
 from flask_bcrypt import Bcrypt
 import Users_Data
@@ -9,6 +9,7 @@ import secrets
 import os
 from werkzeug.utils import secure_filename
 from flask_mail import Mail, Message
+# from bs4 import BeautifulSoup as bs
 from flask_colorpicker import colorpicker
 
 
@@ -18,8 +19,8 @@ from flask_colorpicker import colorpicker
 #Change App
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "sdsdjfe832j2rj_32j"
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///:memory:"
-app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle' : 280}
+app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///techx_db.db"
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle':280}
 app.config["SQLALCHEMY_POOL_RECYCLE"] = 299
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["UPLOADED"] = 'static/uploads'
@@ -67,28 +68,63 @@ def createall(db_):
 
 encry_pw = Bcrypt()
 
-@app.route("/")
-def home():
+@app.context_processor
+def inject_ser():
+    # ser = Serializer(app.config['SECRET_KEY'])  # Define or retrieve the value for 'ser'
+    # count_jobs = count_ads()
 
+    return dict()
+
+@app.route("/", methods=['POST','GET'])
+def home():
+    logo_options = Logo_Options()
+    poster_options = Poster_Options()
+    flyer_options = Flyer_Options()
+    brochure_options = Brochure_Options()
     db.create_all()
     contact_form = Contact_Form()
     title = "Tech Xolutions (TechX)"
 
+    if request.method == ['GET']:
+        print("Method requested : ",request.form)
+        # soup = bs(request.form, "html.parser")
 
-    return render_template("index.html",title=title,contact_form=contact_form)
+    return render_template("index.html",title=title,contact_form=contact_form,logo_options=logo_options,
+                           poster_options=poster_options,brochure_options=brochure_options,flyer_options=flyer_options)
 
+
+
+# Method to store logo quotation requests from a home popup function
+def quotations(logo_options):
+
+    logo_quote_dict = {}
+
+    logo_quote_dict['Email Sign'] = logo_options.email_signature.data
+    logo_quote_dict['letterhead'] = logo_options.letterhead.data
+    logo_quote_dict['mock_up'] = logo_options.mock_up.data
+    logo_quote_dict['artwork'] = logo_options.artwork.data
+    logo_quote_dict['file_types'] = logo_options.file_types.data
+
+    for key,details in logo_quote_dict.items():
+        print("CHECK DICT: ",key,' : ',details)
+
+    Users_Data.users_data().project_data("logo_quote_popup_" + str(datetime.utcnow()), logo_quote_dict)
+
+
+@app.route("/free_icons", methods=["POST","GET"])
+def free_icons():
+    
+    return render_template('techxicons.html')
 
 
 @app.route("/user_section", methods=["POST","GET"])
 def user_section():
-
 
     return render_template("user_section.html")
 
 
 @app.route("/graphic_design", methods=["POST","GET"])
 def graphic_design():
-
 
     return render_template("graphic_design.html")
 
@@ -137,7 +173,6 @@ def logo_brief():
         print(f"LOGO BRIEF: Dict:{brief_dict} TimeStamp:{time_stamp} Project_Name:{proj_name} ")
 
         return redirect(url_for("logo_brief"))
-
 
     gen_token = ""
 
@@ -224,6 +259,7 @@ def web_design_brief():
 
     return render_template("web_design_brief.html",web_brief=web_brief)
 
+
 @app.route("/client_signup", methods=["POST","GET"])
 def sign_up():
 
@@ -243,9 +279,6 @@ def sign_up():
             # context
 
             hashd_pwd = encry_pw.generate_password_hash(register.password.data).decode('utf-8')
-            # Base.metadata.create_all()
-            # ....user has inherited the Base class
-            # db.create_all()
             user1 = User(name=register.name.data, email=register.email.data, password=hashd_pwd,
                          confirm_password=hashd_pwd,image="default.jpg")
 
@@ -269,14 +302,34 @@ def sign_up():
     # from myproject.models import user
     return render_template("client_signup.html",register=register)
 
+@app.route("/client_user_acc", methods=["POST","GET"])
+@login_required
+def client_user_acc():
+
+    signup = Register()
+
+    user_acc = User.query.get(current_user.id)
+
+    if request.method == "POST":
+         update_acc = client_user(
+             contacts=signup.contacts.data,
+             date_of_birth = db.Column(db.DateTime()),
+             address = signup.address.data,
+             other = signup.zip_code.data  # Zip Code
+         )
+
+         db.session.add(update_acc)
+         db.session.commit()
+
+    return render_template("client_user_acc.html",user_acc=user_acc,signup=signup)
+
+
 @app.route("/login", methods=["POST","GET"])
 def login():
 
     login = Login()
 
     print(f"Submtion: ")
-
-
 
 
     if login.validate_on_submit():
@@ -333,7 +386,7 @@ def contact_us():
                 mail = Mail(app)
 
                 msg = Message(contact_form.subject.data, sender=contact_form.email.data, recipients=[em])
-                msg.body = f"""{contact_form.message.data}
+                msg.body = f"""{contact_form.message.data}\n
 {contact_form.email.data}
                     """
 
@@ -354,6 +407,7 @@ def contact_us():
             flash("Ooops!! Please be sure to fill both email & message fields, correctly","error")
 
     return render_template("contact.html",contact_form=contact_form)
+
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
