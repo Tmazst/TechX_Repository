@@ -85,9 +85,9 @@ def home():
     contact_form = Contact_Form()
     title = "Tech Xolutions (TechX)"
 
-    if request.method == ['GET']:
-        print("Method requested : ",request.form)
-        # soup = bs(request.form, "html.parser")
+    # if request.method == ['GET']:
+    #     print("Method requested : ",request.form)
+    #     # soup = bs(request.form, "html.parser")
 
     return render_template("index.html",title=title,contact_form=contact_form,logo_options=logo_options,
                            poster_options=poster_options,brochure_options=brochure_options,flyer_options=flyer_options)
