@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="form-container">
+    <div class="flash-messages" class="">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for  category, message in messages %}
+                    <div class="flash-messages alert-{{category}}"> {{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    <br><br>
+    <h1  style="width:70%;margin:20px auto;">Almost there, <span class="spans">Lets seal up the deal</span></h1>
+
+    <p class="paras-subtopics">Give us a clue of how your want your artwork to look like;</p>
+    <br><br>
+
+
+</div>
+{% endblock %}

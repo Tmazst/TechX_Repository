@@ -48,6 +48,45 @@
 //window.onscroll = function() {handleScroll()};
 
 
+function sendWhatsappEngrave() {
+    // Get the email input value
+    var email = document.getElementById('emailInput').value;
+    var number = document.getElementById('phoneNo').value;
+    var msg = document.getElementById('msg').value;
+    var name = document.getElementById('name').value;
+    
+    // Encode the email for the URL
+    var encodedEmail = encodeURIComponent(email);
+    
+    // Construct the WhatsApp link
+    var whatsappLink = "https://wa.me/+26879651471?text=Hi I am, "+ name + ". \n\n" +  msg + "\n" + "My contacts:\n" + number;
+
+    // Redirect to the constructed WhatsApp link
+    window.location.href = whatsappLink;
+}
+
+
+function moveNextSection(currentIndex){
+    const sects = document.querySelectorAll('.sections');
+    // const headerHeight = document.querySelector('header').offsetHeight;
+    if (currentIndex < sects.length - 1){
+        sects[currentIndex+1].scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+            inline: 'nearest',
+            // offsetTop: -700
+        });
+    }
+
+};
+
+document.querySelectorAll(".arrow-btn").forEach((botton,i) => {
+    //Current button
+    botton.addEventListener('click', function(){
+        moveNextSection(i);
+        console.log('Button Clicked')
+    })
+});
 
 const paragraph = document.querySelectorAll('.sel-tag');
 
@@ -164,7 +203,7 @@ const navlinks = document.querySelectorAll(".nav-link");
 
 burger.addEventListener("click", () => {
 
-    console.log("Test1");
+    // console.log("Test1");
     otherNav.classList.toggle('menu-appear');
     // navlinks.classList.toggle('navLinkFade');
     burger.classList.toggle("toggle");
