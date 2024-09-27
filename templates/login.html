@@ -29,8 +29,6 @@
                         <span class="span-error" >*{{error}}</span>
                     {% endfor %}
                  {% endif %}
-
-                <!--<input type="email" class="form-control" id="email" name="email" placeholder="Email">-->
             </div>
 
             <div class="group">
@@ -40,17 +38,17 @@
                         <span class="span-error" >*Password {{error}}</span>
                     {% endfor %}
                  {% endif %}
-
-               <!--<input type="password" class="form-control" id="password" name="passw" placeholder="Password">-->
             </div>
             <br><br>
 
             <div style="" class="group">
                  <div style="padding-left:;width:100%;background-color:339ab3" class="d-flex">
                      <div>{{ login.submit(class="btns") }}</div><br>
-                     <!--<input class="btns" type="submit" value="Create Account" />-->
-                     <div><a class="slinks-li" href="login">Create Account</a></div>
                 </div>
+            </div>
+            <div style="" class="group">
+                <div><a class="slinks-li" href="login">Create Account</a></div>
+                <div><a class="slinks-li" href="login">Forgot Password?</a></div>
             </div>
 
         </form>

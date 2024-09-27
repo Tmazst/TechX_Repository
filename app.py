@@ -64,7 +64,6 @@ def process_file(file):
             return f"Allowed are [.txt, .xls,.docx, .pdf, .png, .jpg, .jpeg, .gif] only"
 
 
-
 def createall(db_):
     db_.create_all()
 
