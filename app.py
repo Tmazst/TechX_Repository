@@ -105,7 +105,7 @@ def mail_enqueries(contact_form):
         # Send the pwd reset request to the above email
     send_link()
 
-            #print("Posted")
+
 
 
 @app.route("/", methods=['POST','GET'])
