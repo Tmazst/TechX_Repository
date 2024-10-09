@@ -1858,6 +1858,14 @@ to{
     flex-wrap: wrap;
 }
 
+#ad-icon-intro{
+    position: absolute;
+    height:80px;
+    top:-15px;
+    left:380px;
+
+}
+
 
 
 
@@ -1933,6 +1941,8 @@ to{
     }
 
 }
+
+
 
 
 @media all and (max-width: 600px){
