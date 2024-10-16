@@ -379,7 +379,7 @@ def login():
             # flash(f"Hey! {user_login.password} Welcome", "success")
             if user_login and encry_pw.check_password_hash(user_login.password, login.password.data):
                 login_user(user_login)
-                print("Creditantials are ok")
+                # print("Creditantials are ok")
                 # if not user_login.verified:
                 #     return redirect(url_for('verification'))
                 # else:
