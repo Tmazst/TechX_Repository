@@ -19,8 +19,8 @@ from flask_colorpicker import colorpicker
 #Change App
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "sdsdjfe832j2rj_32j"
-# app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///techx_db.db"
-app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://root:tmazst41@localhost/techxolutions_db"
+app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///techx_db.db"
+# app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://root:tmazst41@localhost/techxolutions_db"
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle':280}
 app.config["SQLALCHEMY_POOL_RECYCLE"] = 299
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
