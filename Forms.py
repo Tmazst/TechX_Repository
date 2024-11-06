@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField,PasswordField,SubmitField, TextAreaField,BooleanField, SelectField,DateField, URLField
+from wtforms import StringField,PasswordField,SubmitField, TextAreaField,BooleanField, SelectField,DateField, URLField,FloatField,RadioField
 from wtforms.validators import DataRequired,Length,Email, EqualTo, ValidationError
 from flask_login import current_user
 from flask_wtf.file import FileField , FileAllowed
@@ -220,6 +220,15 @@ class Reset_Request(FlaskForm):
     email = StringField('email', validators=[DataRequired(), Email()])
 
     reset = SubmitField('Submit')
+
+
+class CashBookForm(FlaskForm):
+
+    entry_date = DateField('Entry Date')
+    description = StringField('Description', validators=[DataRequired()])
+    amount = FloatField('Amount')
+    exp_or_income = RadioField('Choose:', choices=[(0,"Income"), (1, "Expense")])
+    submit = SubmitField('Submit')
 
     # def validate_email(self,email):
     #     user = user.query.filter_by

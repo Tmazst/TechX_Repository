@@ -1,7 +1,7 @@
 
 from flask import Flask,render_template,url_for,redirect,request,flash
 from flask_login import login_user, LoginManager,current_user,logout_user, login_required
-from Forms import Register, Login,Contact_Form, Project_Form, Web_Design_Brief,Logo_Options,Poster_Options,Brochure_Options,Flyer_Options
+from Forms import *
 from models import *
 from flask_bcrypt import Bcrypt
 import Users_Data
@@ -19,7 +19,8 @@ from flask_colorpicker import colorpicker
 #Change App
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "sdsdjfe832j2rj_32j"
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///techx_db.db"
+# app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///techx_db.db"
+app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://root:tmazst41@localhost/techxolutions_db"
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle':280}
 app.config["SQLALCHEMY_POOL_RECYCLE"] = 299
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -401,6 +402,47 @@ def login():
 
     return render_template("login.html",login=login)
 
+
+@app.route('/cashbook',methods=['POST','GET'])
+def cashbook():
+
+    cashbook_form = CashBookForm()
+
+    if request.method == 'POST':
+        if cashbook_form.validate_on_submit():
+            entry = CashBook(
+                entry_date=cashbook_form.entry_date.data,
+                description=cashbook_form.description.data,
+                amount=cashbook_form.amount.data,
+                exp_or_income=cashbook_form.exp_or_income.data,
+                timestamp=datetime.now()
+            )
+
+            db.session.add(entry)
+            db.session.commit()
+            flash('Entry Successfully Recorded','success')
+
+    return render_template('cashbook_form.html',cashbook_form=cashbook_form)
+
+
+@app.route('/cashbooktable',methods=['POST','GET'])
+def cashbook_table():
+
+    cashbook_form = CashBookForm()
+    cb_entries = CashBook.query.all()
+
+    if request.method == 'POST':
+        if cashbook_form.validate_on_submit():
+
+            cb_entries.entry_date=cashbook_form.entry_date.data,
+            cb_entries.description=cashbook_form.description.data,
+            cb_entries.amount=cashbook_form.amount.data,
+            cb_entries.exp_or_income=cashbook_form.exp_or_income.data
+
+            db.session.commit()
+            flash('Update Successfully','success')
+
+    return render_template('cashbook_table.html',cb_entries=cb_entries,cashbook_form=cashbook_form)
 
 @app.route('/logout')
 def log_out():

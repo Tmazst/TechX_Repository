@@ -78,3 +78,12 @@ class Curr_Projects(db.Model,UserMixin):
     submitted = db.Column(db.Date())
 
 
+class CashBook(db.Model,UserMixin):
+
+    id = db.Column(db.Integer, primary_key=True)
+    entry_date = db.Column(db.DateTime())
+    description = db.Column(db.String(120))
+    amount = db.Column(db.Float)
+    exp_or_income = db.Column(db.String(120))
+    timestamp = db.column(db.DateTime())
+

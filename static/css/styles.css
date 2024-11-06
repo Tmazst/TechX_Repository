@@ -517,6 +517,82 @@ overflow:scroll;
     margin:50px auto;
     /* gap:-50px; */
 }
+
+.table_component {
+    overflow: auto;
+    width: 100%;
+}
+
+.table_component table {
+    border: 0px solid #dededf;
+    height: 100%;
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    border-spacing: 1px;
+    text-align: left;
+}
+
+.table_component caption {
+    caption-side: top;
+    text-align: left;
+}
+
+.table_component th {
+    border: 0px solid #dededf;
+    background-color: #eceff1;
+    color: #000000;
+    padding: 5px;
+}
+
+.table_component td {
+    border: 0px solid #dededf;
+    padding: 5px;
+}
+
+.table_component tr:nth-child(even) td {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+.table_component tr:nth-child(odd) td {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+.labels{
+    font-weight:600;
+    font-size: 12px;
+}
+
+.alert-error,.alert-message,.arlet-success{
+    background-color: rgb(236, 235, 235);
+    padding:7px;
+    border-radius: 10px;
+    margin:0 auto !important;
+    width:85% !important;
+    text-align: center;
+}
+
+.alert-error{
+    color:red !important;
+    /* text-decoration: dotted; */
+}
+
+.alert-success{
+    color:rgb(56, 91, 243);
+    background-color: rgb(236, 235, 235);
+    text-align: center;
+    padding:7px;
+    border-radius: 10px;
+    margin:0 auto;
+}
+
+.alert-message{
+    color:rgb(252, 135, 25) !important;
+}
+
+
 .about-img-cont img{
     border-radius: 15px;
     /* height:300px; */
@@ -534,12 +610,17 @@ overflow:scroll;
 .icons-contain{
     height:140px;
     width:120px;
-    border:1px solid #213555;
+    border:2px solid #b8b9b9;
     border-radius: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
+}
+
+.icons-contain p{
+    text-align: center;
+    font-weight: 600;
 }
 
 .btns{
@@ -1346,6 +1427,15 @@ to{
     border-top: none;
     transform: rotate(45deg) !important;
     border-bottom-left-radius: 10px !important;
+}
+
+.footer{
+    width:100%;
+    background-color: #213555;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height:200px;
 }
 
 #scroll-right{
