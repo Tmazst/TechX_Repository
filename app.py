@@ -99,7 +99,6 @@ def mail_enqueries(contact_form):
         flash("Your Message has been Successfully Sent!!", "success")
         return f"Email Sent Successfully"
         # except Exception as e:
-        #     # print(e)
         #     flash(f'Ooops Something went wrong!! Please Retry', 'error')
         #     return f"The mail was not sent"
 
