@@ -16,6 +16,16 @@
 
 html{box-sizing:border-box}*;*:before;*:after{//box-sizing:inherit}
 
+.web-labels{
+    background-color: #24788f !important;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size:14px;
+}
+
+.web-labels:hover{
+    cursor:pointer
+}
 
 .physical_addr{
     display:flex;
@@ -844,7 +854,7 @@ input:focus{
         position:relative;
         padding:5px;
         width:130px;
-        height:130px !important;
+        /* height:130px !important; */
         border-radius:15px;
         /* border:3px solid coral; */
         /* background-color:#24788f; */
@@ -1006,6 +1016,7 @@ label span{
 
 #engrave-img-grad{
     position: relative;
+    width:100%;
 }
 
 #engrave-img-grad p{
@@ -1047,7 +1058,7 @@ label span{
     /* background-color: #0F75BC; */
 }
 
-#engrave-img-grad::after{
+/* #engrave-img-grad::after{
     content: "";
     background: linear-gradient(180deg, rgba(255, 255, 255,0) 30%, #ffffff 70%); 
     position: absolute;
@@ -1057,7 +1068,7 @@ label span{
     top:0;
     z-index: 1;
 
-}
+} */
 
 .engraving-ideas{
     display: flex;
@@ -1454,29 +1465,24 @@ to{
 }
 
 .selling-content{
-    //position:relative;
     display:flex;
     justify-content:center;
     align-items:center;
     flex-direction:column;
     background-color:;
     width:100%;
-    height:auto !important;
-    //gap:30px;
+    height:auto !important; 
 }
 
 
 .sel-tag{
-    //position:absolute;
     top:35px;
     right:30px;
     font-size:50px;
     font-weight:800;
-    //opacity:0;
     padding:0 80px;
     width:100%;
     color:orange;
-    //animation:stretch-txt 4s ease  ;
 }
 
 
@@ -1577,10 +1583,59 @@ to{
 	}
 }
 
+.app-img{
+    max-height: 150px;
+}
+
+.app-card{
+    min-width:350px;
+    max-width:400px;
+    min-height:500px;
+    border-radius:20px;
+    border:1px solid #999;
+    padding:20px;
+    font-size:14px;
+}
+
+.app-btn{
+    background-color: coral;
+    border-radius:15px;
+    transition: all 0.3s ease;
+}
+
+.plt-icons img{
+    height:65px;
+}
+
+.app-describe{
+    padding:10px;
+}
+
+.cards-cont{
+    align-items: stretch !important;
+
+}
+
+.gen-flex-wrap{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap:10px;
+}
+
+.gen-flex-col{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction:column;
+}
+
 .serv-list label{
     padding:10px;
     border-radius:10px;
     background-color:purple;
+    color:rgb(231, 229, 229);
 }
 
 
@@ -1672,7 +1727,7 @@ to{
     margin:0 auto;
     flex-direction:column;
     padding:10px;
-    transform:translateY(20%);
+    /* transform:translateY(20%); */
 }
 
 .hidden{
@@ -1939,10 +1994,7 @@ to{
     font-weight:500;
 }
 
-#web-labels{
-    padding:10px;
 
-}
 
 .contact-nester{
     flex-wrap: wrap;
