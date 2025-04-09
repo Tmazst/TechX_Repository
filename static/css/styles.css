@@ -1607,8 +1607,8 @@ to{
 }
 
 .app-card{
-    min-width:350px;
-    max-width:400px;
+    /* min-width:350px; */
+    max-width:350px;
     min-height:500px;
     border-radius:20px;
     border:1px solid #999;
