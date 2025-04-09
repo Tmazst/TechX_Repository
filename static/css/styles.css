@@ -1440,6 +1440,15 @@ to{
     border-bottom-left-radius: 10px !important;
 }
 
+#scroll-left-2{
+    border-bottom: 4px solid #636262;
+    border-left: 4px solid #636262;
+    border-right: none;
+    border-top: none;
+    transform: rotate(45deg) !important;
+    border-bottom-left-radius: 10px !important;
+}
+
 .footer{
     width:100%;
     background-color: #213555;
@@ -1457,6 +1466,16 @@ to{
     transform: rotate(45deg) !important;
     border-top-right-radius: 10px !important;
 }
+
+#scroll-right-2{
+    border-top: 4px solid #636262;
+    border-right: 4px solid #636262;
+    border-bottom: none;
+    border-left: none;
+    transform: rotate(45deg) !important;
+    border-top-right-radius: 10px !important;
+}
+
 
 .icon-cont{
     //background-color:red;
@@ -1803,6 +1822,16 @@ to{
     height:600px;
 }
 
+.service-printing{
+    width:100%;
+    height:400px;
+    background-image: url("../icons/print-spill-wide.png");
+    background-size:contain;
+    background-position:left;
+    background-repeat: no-repeat;
+    justify-content: flex-end;
+}
+
 .service{
     display:flex;
     flex-direction:column;
@@ -2089,6 +2118,23 @@ to{
 
 @media all and (max-width: 600px){
 
+    .app-card{
+        max-width:300px;
+        min-width: 300px;
+    }
+
+    .service-printing{
+        background-image: url("../icons/print-spill-wide-ph-01.jpg");
+    }
+
+    .service-printing .sel-tag{
+        display: none;
+    }
+
+    .service-printing{
+        height:300px;
+    }
+
     #ad-icon-intro{
         position: absolute;
         height:80px;
@@ -2177,7 +2223,14 @@ to{
     left:0px !important;
 }
 
+#scroll-left-2{
+    left:0px !important;
+}
+
 #scroll-right{
+    right:-5px !important;
+}
+#scroll-right-2{
     right:-5px !important;
 }
 
@@ -2281,6 +2334,18 @@ p{
     padding:0 80px;
     width:100%;
     color:orange;
+}
+
+#spacing-1{
+    display: none;
+}
+
+.selling-content .sel-tag{
+    /* //position:absolute; */
+    font-size:25px;
+    font-weight:600;
+    padding:0 80px;
+    width:70%;
 }
 
 
