@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="contact-us" style="width:400px;margin:150px auto; padding:20px;border-radius: 20px;" class="border-spec">
+        <div class="flash-messages" class="btns">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for  category, message in messages %}
+                        <div class="flash-messages alert-{{category}}"> {{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}</div>
+        <h1 >Cashbook Entry Form <br><span class="spans"></span></h1><br>
+        <div class="cashbook-form">
+            <form style="width:100%;" action = "{{url_for('cashbook')}}" method="post" >
+                {{cashbook_form.hidden_tag()}}
+                <div  style="width:100%;">
+                    {{cashbook_form.entry_date.label(class="labels", style="color:coral")}}
+                    {{cashbook_form.entry_date(class="contact-form-control",placeholder="Name")}}
+                    {% if cashbook_form.entry_date.errors %}
+                        {% for error in cashbook_form.entry_date.errors %}<span class="span-error" >*{{error}}</span>{% endfor %}
+                    {% endif %}
+                </div>
+                 <div>
+                    {{cashbook_form.description.label(class="labels", style="color:coral")}}
+                    {{cashbook_form.description(class="contact-form-control",placeholder="Sales")}}
+                    {% if cashbook_form.description.errors %}
+                        {% for error in cashbook_form.description.errors %}<span class="span-error" >*{{error}}</span>{% endfor %}
+                    {% endif %}
+                </div>
+                <div>
+                    {{cashbook_form.amount.label(class="labels", style="color:coral")}}
+                    {{cashbook_form.amount(class="contact-form-control",placeholder="203.00")}}
+                    {% if cashbook_form.amount.errors %}
+                        {% for error in cashbook_form.amount.errors %}<span class="span-error" >*{{error}}</span>{% endfor %}
+                    {% endif %}
+                </div>
+                <div>
+                    {{cashbook_form.exp_or_income.label(class="labels", style="color:coral")}}
+                    {{cashbook_form.exp_or_income(style="border:none;list-style-type:none",class="contact-form-control",placeholder="Email Address")}}
+                    {% if cashbook_form.exp_or_income.errors %}
+                        {% for error in cashbook_form.exp_or_income.errors %}<span class="span-error" >*{{error}}</span>{% endfor %}
+                    {% endif %}
+                </div>
+                <div>
+                    {{cashbook_form.submit}}
+                </div>
+
+            </form>
+        </div>
+</div>
+{% endblock %}
