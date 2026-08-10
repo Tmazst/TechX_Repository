@@ -140,7 +140,7 @@
 .project-visuals{
     width:30%;
     height:inherit !important;
-    border-left: 1px solid #b1b1b1;
+    border-right: 1px solid #b1b1b1;
 }
 
 #project-2 .project-visuals{
