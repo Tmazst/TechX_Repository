@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero"><div class="site-shell hero-grid">
+    <div class="hero-copy"><span class="eyebrow">Branding · Technology · Growth</span>
+        <h1 style="color:#0b1d43 !important">Creative and digital solutions that move businesses forward.</h1>
+        <p>Tech Xolutions helps ambitious brands stand out, reach more customers and work smarter through branding, signage, websites, applications and digital marketing.</p>
+        <div class="hero-actions"><a class="button button--primary" href="#contact-us">Start a Project</a><a class="button button--secondary" href="#work">Explore Our Work</a></div>
+        <div class="hero-trust"><span>Based in Eswatini</span><span>Creative + technical delivery</span><span>Built around your goals</span></div>
+    </div>
+    <div class="hero-visual"><div class="hero-image-frame">
+        <img src="{{ url_for('static', filename='images/main-img.jpeg') }}" alt="Digital technology solution in use">
+        <div class="hero-card hero-card--top"><strong>Brand visibility</strong><span>Clear, consistent and memorable</span></div>
+        <div class="hero-card hero-card--bottom"><strong>Smarter systems</strong><span>Built to save time and support growth</span></div>
+    </div></div>
+</div></section>
+
+<section class="service-section section-pad" id="services"><div class="site-shell">
+    <div class="section-heading"><span class="eyebrow">What we do</span><h2>One team for your brand and digital growth.</h2><p>From the way your business looks to the systems it runs on, we create practical solutions with a consistent standard.</p></div>
+    <div class="service-grid">
+        <article class="service-card service-card--featured"><span class="service-number">01</span><img src="{{ url_for('static', filename='icons/graphic-design-icon-paint-brush-art.svg') }}" alt=""><h3>Branding &amp; Graphic Design</h3><p>Brand identities and campaign materials designed to make your business easier to recognise and trust.</p><ul><li>Logos and brand systems</li><li>Flyers, brochures and catalogues</li><li>Promotional campaign artwork</li></ul><a href="/graphic_design">Explore branding <span>→</span></a></article>
+        <article class="service-card"><span class="service-number">02</span><img src="{{ url_for('static', filename='icons/sign-up-icon-writing-pen-booklet.svg') }}" alt=""><h3>Signage &amp; Installation</h3><p>Designed, produced and installed branding that gives your physical space a professional presence.</p><ul><li>Business and directional signs</li><li>Glass frosting and tinting</li><li>Billboards and branded displays</li></ul><a href="#contact-us">Discuss signage <span>→</span></a></article>
+        <article class="service-card"><span class="service-number">03</span><img src="{{ url_for('static', filename='icons/web-design-develoment-icon.svg') }}" alt=""><h3>Websites &amp; Applications</h3><p>Modern digital experiences and custom systems shaped around how your organisation actually works.</p><ul><li>Business and e-commerce websites</li><li>Web and progressive web apps</li><li>Workflow and process automation</li></ul><a href="/web_development">Explore development <span>→</span></a></article>
+        <article class="service-card"><span class="service-number">04</span><img src="{{ url_for('static', filename='icons/intelligence-ai-bi-business-icon.svg') }}" alt=""><h3>Digital Marketing</h3><p>Connected campaigns and discovery tools that help your offers reach the right audience and inspire action.</p><ul><li>Smart adverts and catalogues</li><li>Social content and campaigns</li><li>Email, SMS and notifications</li></ul><a href="#qm">Discover Q-Messànger <span>→</span></a></article>
+    </div>
+</div></section>
+
+<section class="approach section-pad"><div class="site-shell approach-grid">
+    <div><span class="eyebrow eyebrow--light">Why TechX</span><h2>Creative thinking backed by technical capability.</h2></div>
+    <div class="approach-points">
+        <article><strong>01</strong><div><h3>Understand the goal</h3><p>We begin with your audience, challenge and desired business result.</p></div></article>
+        <article><strong>02</strong><div><h3>Create with purpose</h3><p>Every design and technical decision supports a clear objective.</p></div></article>
+        <article><strong>03</strong><div><h3>Deliver end to end</h3><p>We take the work from concept through production, launch or installation.</p></div></article>
+    </div>
+</div></section>
+
+<section class="work-section section-pad" id="work"><div class="site-shell">
+    <div class="section-heading section-heading--split"><div><span class="eyebrow">Selected work</span><h2>Solutions designed for real organisations.</h2></div><p>We combine identity, digital experience and practical technology to help ideas become useful, visible products.</p></div>
+    <div class="work-grid">
+        <article class="work-card work-card--large" id="qm"><div class="work-card__copy"><span>TechX platform</span><h3>Q-Messànger Business Connect</h3><p>A business discovery and smart marketing platform connecting organisations with customers, partners and new opportunities.</p><a href="https://quickmessanger.com" target="_blank" rel="noopener">Visit Q-Messànger →</a></div><img src="{{ url_for('static', filename='images/logo-icon.png') }}" alt="Q-Messànger dashboard"></article>
+        <article class="work-card work-card--brand"><img src="{{ url_for('static', filename='images/vakashanexplore_logo.png') }}" alt="Vakashan Explore"><div><span>Travel platform</span><h3>Vakashan Explore</h3></div></article>
+        <article class="work-card work-card--brand"><img src="{{ url_for('static', filename='images/techconnectlogo.png') }}" alt="TechConnect Eswatini"><div><span>Digital community</span><h3>TechConnect Eswatini</h3></div></article>
+    </div>
+</div></section>
+
+<section class="clients-section section-pad" id="clients"><div class="site-shell">
+    <div class="section-heading centered"><span class="eyebrow">Clients &amp; collaborations</span><h2>Ideas grow stronger through partnership.</h2><p>We work with businesses, institutions and project teams to build brands, platforms and communication solutions that create lasting value.</p></div>
+    <div class="logo-wall" aria-label="Selected clients and project collaborations">
+        <div><img src="{{ url_for('static', filename='images/Oval_logo.jpg') }}" alt="OVAL"></div><div><img src="{{ url_for('static', filename='images/moja-logo.png') }}" alt="MojaTicket"></div><div><img src="{{ url_for('static', filename='images/altersol_logo.jpg') }}" alt="Car Bids"></div><div><img src="{{ url_for('static', filename='images/techconnectlogo.png') }}" alt="TechConnect Eswatini"></div><div><img src="{{ url_for('static', filename='images/EFI_logo.png') }}" alt="Eswatini Fire Installation"></div>
+    </div>
+    <div class="partner-callout"><div><span class="eyebrow eyebrow--light">Partner with TechX</span><h3>Let’s create more value together.</h3></div><p>We welcome technology, media, production and service partnerships that expand what we can deliver for clients across Eswatini and the region.</p><a class="button button--white" href="mailto:thabo@techxolutions.com?subject=Partnership%20with%20TechX">Discuss a Partnership</a></div>
+</div></section>
+
+<section class="contact-section section-pad" id="contact-us"><div class="site-shell contact-grid">
+    <div class="contact-copy"><span class="eyebrow">Let’s work together</span><h2>Tell us what you want to build, improve or promote.</h2><p>Share a few details and our team will help you identify the right next step.</p>
+        <div class="contact-details"><a href="tel:+26876412255"><span>Call</span><strong>(+268) 7641 2255</strong></a><a href="mailto:support@techxolutions.com"><span>Email</span><strong>support@techxolutions.com</strong></a><div><span>Visit</span><strong>Corner of Mbhabha &amp; Du Toit Streets, Office #8, Manzini</strong></div></div>
+    </div>
+    <div class="contact-panel">
+        {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}{% for category, message in messages %}<div class="form-alert form-alert--{{ category }}">{{ message }}</div>{% endfor %}{% endif %}{% endwith %}
+        <form action="{{ url_for('home') }}" method="post">{{ contact_form.hidden_tag() }}
+            <label>Your name{{ contact_form.name(class="modern-input", placeholder="Full name") }}</label>
+            <label>Email address{{ contact_form.email(class="modern-input", placeholder="name@company.com") }}</label>
+            <label>What do you need?{{ contact_form.subject(class="modern-input", placeholder="Branding, signage, website, app or marketing") }}</label>
+            <label>Project details{{ contact_form.message(class="modern-input modern-textarea", placeholder="Tell us about your project and what success looks like") }}</label>
+            {{ contact_form.submit(class="button button--primary form-submit", value="Send Enquiry") }}
+        </form>
+    </div>
+</div></section>
+{% endblock %}

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Tech Xolutions helps Eswatini businesses grow through branding, signage, websites, applications and digital marketing.">
+    <title>{{ title or 'Tech Xolutions | Branding & Digital Solutions' }}</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/techx-logo-icon.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body class="site-body">
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="site-header">
+        <div class="contact-strip"><div class="site-shell contact-strip__inner">
+            <a href="mailto:support@techxolutions.com">support@techxolutions.com</a>
+            <span>Corner of Mbhabha &amp; Du Toit Streets, Office #8, Manzini</span>
+            <a href="tel:+26876412255">(+268) 7641 2255</a>
+        </div></div>
+        <nav class="main-nav site-shell" aria-label="Main navigation">
+            <a class="brand" href="/" aria-label="Tech Xolutions home"><img src="{{ url_for('static', filename='images/techx-logo-icon.png') }}" alt="Tech Xolutions"><span>Tech Xolutions</span></a>
+            <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-menu"><span></span><span></span><span></span><span class="sr-only">Open menu</span></button>
+            <div class="nav-links" id="site-menu">
+                <a href="/#services">Services</a><a href="/#work">Our Work</a><a href="/#clients">Clients &amp; Partners</a><a href="/about">About</a>
+                <a class="nav-cta" href="/#contact-us">Request a Quote</a>
+                {% if current_user.is_authenticated %}<a href="/client_user_acc">My Account</a>{% else %}<a class="nav-login" href="/login">Client Login</a>{% endif %}
+            </div>
+        </nav>
+    </header>
+    <main id="main-content">{% block content %}{% endblock %}</main>
+    <footer class="site-footer">
+        <div class="site-shell footer-grid">
+            <div><img class="footer-logo" src="{{ url_for('static', filename='images/TechX_white.png') }}" alt="Tech Xolutions"><p>Practical creative and digital solutions for brands ready to move forward.</p></div>
+            <div><h2>Explore</h2><a href="/#services">Services</a><a href="/#work">Our Work</a><a href="/#clients">Clients &amp; Partners</a><a href="/about">About TechX</a></div>
+            <div><h2>Contact</h2><a href="tel:+26876412255">(+268) 7641 2255</a><a href="tel:+26879651471">(+268) 7965 1471</a><a href="mailto:support@techxolutions.com">support@techxolutions.com</a><span>Office #8, Manzini</span></div>
+        </div>
+        <div class="site-shell footer-bottom">© 2026 Tech Xolutions (Pty) Ltd. All rights reserved.</div>
+    </footer>
+    <a class="whatsapp-fab" href="https://wa.me/26879651471?text=Hello%20TechX%2C%20I%20would%20like%20to%20discuss%20a%20project." target="_blank" rel="noopener" aria-label="Chat with Tech Xolutions on WhatsApp"><span>WhatsApp</span></a>
+    <script>
+        const menuButton=document.querySelector('.nav-toggle');const menu=document.querySelector('.nav-links');
+        if(menuButton&&menu){menuButton.addEventListener('click',()=>{const open=menu.classList.toggle('is-open');menuButton.setAttribute('aria-expanded',String(open));});menu.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>{menu.classList.remove('is-open');menuButton.setAttribute('aria-expanded','false');}));}
+    </script>
+    {% block scripts %}{% endblock %}
+    
+</body>
+</html>
