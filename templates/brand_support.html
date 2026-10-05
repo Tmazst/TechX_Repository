@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="brand-support-section">
+    <div class="brand-support-heading">
+        <p class="brand-support-kicker">TechX Brand Support</p>
+        <h1>Consistent design support for your brand</h1>
+        <p>Move beyond one-off design jobs with ongoing creative support that helps your business stay consistent, professional and ready to communicate.</p>
+    </div>
+
+    <div class="brand-support-grid">
+        <article class="brand-support-card">
+            <span class="brand-support-label">Standard</span>
+            <h2>Standard Package</h2>
+            <div class="brand-support-price">E500 <span>/ month</span></div>
+            <p>Essential ongoing creative support for small businesses that want to keep their brand active and consistent.</p>
+            <ul>
+                <li>Ongoing graphic design support</li>
+                <li>Consistent use of your brand identity</li>
+                <li>Brand asset management</li>
+                <li>Monthly creative support</li>
+            </ul>
+            <a class="brand-support-btn" href="/contact">Choose Standard</a>
+        </article>
+
+        <article class="brand-support-card brand-support-card-featured">
+            <span class="brand-support-label">Advanced</span>
+            <h2>Advanced Package</h2>
+            <div class="brand-support-price">E1,200 <span>/ month</span></div>
+            <p>More creative capacity and priority support for businesses with regular marketing and branding needs.</p>
+            <ul>
+                <li>Everything in Standard</li>
+                <li>Priority creative support</li>
+                <li>Broader marketing design support</li>
+                <li>Ongoing brand improvement</li>
+            </ul>
+            <a class="brand-support-btn" href="/contact">Choose Advanced</a>
+        </article>
+
+        <article class="brand-support-card">
+            <span class="brand-support-label">Custom</span>
+            <h2>Custom Package</h2>
+            <div class="brand-support-price">Let's talk</div>
+            <p>A tailored creative partnership for organisations with larger, specialised or more frequent requirements.</p>
+            <ul>
+                <li>Custom service scope</li>
+                <li>Flexible creative requirements</li>
+                <li>Brand and campaign support</li>
+                <li>Pricing based on your needs</li>
+            </ul>
+            <a class="brand-support-btn" href="/contact">Contact TechX</a>
+        </article>
+    </div>
+
+    <p class="brand-support-note">These packages are an initial service structure. Package benefits, limits and workflow will be refined as the subscription service develops.</p>
+</section>
+
+<style>
+.brand-support-section{max-width:1180px;margin:0 auto;padding:80px 24px 100px;color:#213555}.brand-support-heading{text-align:center;max-width:760px;margin:0 auto 48px}.brand-support-kicker{font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#3157a4}.brand-support-heading h1{font-size:clamp(2rem,4vw,3.4rem);margin:8px 0 16px}.brand-support-heading>p:last-child{line-height:1.7;color:#5c6675}.brand-support-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;align-items:stretch}.brand-support-card{background:#fff;border:1px solid #dce3ef;border-radius:18px;padding:32px;box-shadow:0 10px 30px rgba(33,53,85,.08);display:flex;flex-direction:column}.brand-support-card-featured{border:2px solid #3157a4;transform:translateY(-8px)}.brand-support-label{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#3157a4}.brand-support-card h2{margin:10px 0 12px}.brand-support-price{font-size:2rem;font-weight:800;margin-bottom:18px}.brand-support-price span{font-size:.95rem;font-weight:500;color:#697586}.brand-support-card p{line-height:1.6;color:#5c6675}.brand-support-card ul{padding-left:20px;line-height:1.8;margin:16px 0 28px;flex-grow:1}.brand-support-btn{display:block;text-align:center;background:#213555;color:#fff!important;text-decoration:none;padding:13px 18px;border-radius:8px;font-weight:700}.brand-support-btn:hover{background:#3157a4}.brand-support-note{text-align:center;color:#697586;font-size:.9rem;margin:36px auto 0;max-width:760px}@media(max-width:850px){.brand-support-grid{grid-template-columns:1fr}.brand-support-card-featured{transform:none}.brand-support-section{padding-top:50px}}
+</style>
+{% endblock %}
