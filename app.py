@@ -453,6 +453,11 @@ def log_out():
     return redirect(url_for('home'))
 
 
+@app.route('/domain-support')
+def domain_support():
+
+    return render_template('domain_support.html', title='Domain Support | Tech Xolutions')
+
 @app.route('/about')
 def about():
 
