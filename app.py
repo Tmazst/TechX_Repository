@@ -278,6 +278,10 @@ def profile_brief():
     return render_template("profile_brief.html", brief=brief)
 
 
+@app.route("/brand-support")
+def brand_support():
+    return render_template("brand_support.html")
+
 @app.route("/web_development", methods=["POST","GET"])
 def web_app_dev():
 
