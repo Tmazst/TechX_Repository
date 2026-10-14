@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+    <div class="site-shell hero-grid">
+        <div class="hero-copy">
+            <span class="eyebrow">Domain Support</span>
+            <h1 style="color:#0b1d43 !important">A simpler digital identity for Eswatini.</h1>
+            <p>TechX is preparing locally focused subdomain and email services that will help businesses, organisations and individuals establish a professional online presence without the complexity of managing a full domain.</p>
+            <div class="hero-actions">
+                <a class="button button--primary" href="{{ url_for('home') }}#contact-us">Register Your Interest</a>
+                <a class="button button--secondary" href="#services">Explore the Service</a>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="hero-image-frame">
+                <img src="{{ url_for('static', filename='images/main-img.jpeg') }}" alt="TechX domain and email support">
+                <div class="hero-card hero-card--top"><strong>Local identity</strong><span>Memorable addresses built for Eswatini</span></div>
+                <div class="hero-card hero-card--bottom"><strong>Managed support</strong><span>Setup, DNS, SSL and email assistance</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="service-section section-pad" id="services">
+    <div class="site-shell">
+        <div class="section-heading">
+            <span class="eyebrow">Planned services</span>
+            <h2>Start small and still look professional online.</h2>
+            <p>Our first domain products are being prepared. Additional domain choices and packages will be introduced as the service grows.</p>
+        </div>
+        <div class="service-grid">
+            <article class="service-card service-card--featured">
+                <span class="service-number">01</span>
+                <img src="{{ url_for('static', filename='icons/web-icon.png') }}" alt="">
+                <h3>Business Subdomains</h3>
+                <p>Give your organisation a short, locally relevant web address under a managed TechX domain.</p>
+                <ul>
+                    <li>Planned addresses under swati.co</li>
+                    <li>DNS configuration and support</li>
+                    <li>SSL and website connection assistance</li>
+                </ul>
+            </article>
+            <article class="service-card">
+                <span class="service-number">02</span>
+                <img src="{{ url_for('static', filename='icons/email_icon.png') }}" alt="">
+                <h3>Professional Email</h3>
+                <p>Create a clearer and more credible email identity for business or personal communication.</p>
+                <ul>
+                    <li>Planned email addresses using mail.co</li>
+                    <li>Mailbox setup assistance</li>
+                    <li>Mobile and desktop configuration</li>
+                </ul>
+            </article>
+            <article class="service-card">
+                <span class="service-number">03</span>
+                <img src="{{ url_for('static', filename='icons/services-info-icon.svg') }}" alt="">
+                <h3>Managed Technical Support</h3>
+                <p>TechX will handle the technical setup so customers can focus on using their address.</p>
+                <ul>
+                    <li>DNS record management</li>
+                    <li>Renewal and account support</li>
+                    <li>Troubleshooting and migration guidance</li>
+                </ul>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section class="approach section-pad">
+    <div class="site-shell approach-grid">
+        <div>
+            <span class="eyebrow eyebrow--light">Coming soon</span>
+            <h2>Help shape the first TechX domain packages.</h2>
+        </div>
+        <div class="approach-points">
+            <article><strong>01</strong><div><h3>Register interest</h3><p>Tell us whether you need a business subdomain, email address or both.</p></div></article>
+            <article><strong>02</strong><div><h3>Choose an identity</h3><p>We will confirm available names and the most suitable package when registration opens.</p></div></article>
+            <article><strong>03</strong><div><h3>Get connected</h3><p>TechX will assist with setup and connect the new address to your website or devices.</p></div></article>
+        </div>
+    </div>
+</section>
+
+<section class="contact-section section-pad">
+    <div class="site-shell contact-grid">
+        <div class="contact-copy">
+            <span class="eyebrow">Register your interest</span>
+            <h2>Would you use a local subdomain or professional email address?</h2>
+            <p>Contact us with your preferred name and intended use. We will notify you when the first packages become available.</p>
+        </div>
+        <div class="contact-panel">
+            <a class="button button--primary form-submit" href="mailto:support@techxolutions.com?subject=Domain%20Support%20Interest">Email TechX</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
