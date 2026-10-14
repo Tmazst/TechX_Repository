@@ -20,7 +20,7 @@
             <a class="brand" href="/" aria-label="Tech Xolutions home"><img src="{{ url_for('static', filename='images/techx-logo-icon.png') }}" alt="Tech Xolutions"><span>Tech Xolutions</span></a>
             <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-menu"><span></span><span></span><span></span><span class="sr-only">Open menu</span></button>
             <div class="nav-links" id="site-menu">
-                <a href="/#services">Services</a><a href="/#work">Our Work</a><a href="/#clients">Clients &amp; Partners</a><a href="/about">About</a>
+                <a href="/#services">Services</a><a href="/static/brand-support.html">Brand Support</a><a href="/#work">Our Work</a><a href="/#clients">Clients &amp; Partners</a><a href="/about">About</a>
                 <a class="nav-cta" href="/#contact-us">Request a Quote</a>
                 {% if current_user.is_authenticated %}<a href="/client_user_acc">My Account</a>{% else %}<a class="nav-login" href="/login">Client Login</a>{% endif %}
             </div>
@@ -30,7 +30,7 @@
     <footer class="site-footer">
         <div class="site-shell footer-grid">
             <div><img class="footer-logo" src="{{ url_for('static', filename='images/TechX_white.png') }}" alt="Tech Xolutions"><p>Practical creative and digital solutions for brands ready to move forward.</p></div>
-            <div><h2>Explore</h2><a href="/#services">Services</a><a href="/#work">Our Work</a><a href="/#clients">Clients &amp; Partners</a><a href="/about">About TechX</a></div>
+            <div><h2>Explore</h2><a href="/#services">Services</a><a href="/static/brand-support.html">Brand Support</a><a href="/#work">Our Work</a><a href="/#clients">Clients &amp; Partners</a><a href="/about">About TechX</a></div>
             <div><h2>Contact</h2><a href="tel:+26876412255">(+268) 7641 2255</a><a href="tel:+26879651471">(+268) 7965 1471</a><a href="mailto:support@techxolutions.com">support@techxolutions.com</a><span>Office #8, Manzini</span></div>
         </div>
         <div class="site-shell footer-bottom">© 2026 Tech Xolutions (Pty) Ltd. All rights reserved.</div>
@@ -41,6 +41,5 @@
         if(menuButton&&menu){menuButton.addEventListener('click',()=>{const open=menu.classList.toggle('is-open');menuButton.setAttribute('aria-expanded',String(open));});menu.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>{menu.classList.remove('is-open');menuButton.setAttribute('aria-expanded','false');}));}
     </script>
     {% block scripts %}{% endblock %}
-    
 </body>
 </html>
