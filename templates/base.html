@@ -20,7 +20,17 @@
             <a class="brand" href="/" aria-label="Tech Xolutions home"><img src="{{ url_for('static', filename='images/techx-logo-icon.png') }}" alt="Tech Xolutions"><span>Tech Xolutions</span></a>
             <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-menu"><span></span><span></span><span></span><span class="sr-only">Open menu</span></button>
             <div class="nav-links" id="site-menu">
-                <a href="/#services">Services</a><a href="{{ url_for('brand_support') }}">Brand Support</a><a href="/#work">Our Work</a><a href="/#clients">Clients &amp; Partners</a><a href="/about">About</a>
+                <div class="nav-dropdown">
+                    <button class="nav-dropdown__toggle" type="button" aria-expanded="false" aria-controls="services-menu">Services <span aria-hidden="true">⌄</span></button>
+                    <div class="nav-dropdown__menu" id="services-menu">
+                        <a href="/#services"><strong>All services</strong><span>See the complete TechX offering</span></a>
+                        <a href="{{ url_for('graphic_design') }}"><strong>Branding &amp; Graphic Design</strong><span>Identity, design, signage and installation</span></a>
+                        <a href="{{ url_for('brand_support') }}"><strong>Creative Support</strong><span>Reliable, ongoing brand design</span></a>
+                        <a href="{{ url_for('web_app_dev') }}"><strong>Websites &amp; Applications</strong><span>Websites, apps and automation</span></a>
+                        <a href="{{ url_for('domain_support') }}"><strong>Domain Support</strong><span>Local domains, email and setup</span></a>
+                    </div>
+                </div>
+                <a href="/#work">Our Work</a><a href="/#clients">Clients &amp; Partners</a><a href="/about">About</a>
                 <a class="nav-cta" href="/#contact-us">Request a Quote</a>
                 {% if current_user.is_authenticated %}<a href="/client_user_acc">My Account</a>{% else %}<a class="nav-login" href="/login">Client Login</a>{% endif %}
             </div>
@@ -36,10 +46,7 @@
         <div class="site-shell footer-bottom">© 2026 Tech Xolutions (Pty) Ltd. All rights reserved.</div>
     </footer>
     <a class="whatsapp-fab" href="https://wa.me/26879651471?text=Hello%20TechX%2C%20I%20would%20like%20to%20discuss%20a%20project." target="_blank" rel="noopener" aria-label="Chat with Tech Xolutions on WhatsApp"><span>WhatsApp</span></a>
-    <script>
-        const menuButton=document.querySelector('.nav-toggle');const menu=document.querySelector('.nav-links');
-        if(menuButton&&menu){menuButton.addEventListener('click',()=>{const open=menu.classList.toggle('is-open');menuButton.setAttribute('aria-expanded',String(open));});menu.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>{menu.classList.remove('is-open');menuButton.setAttribute('aria-expanded','false');}));}
-    </script>
+    <script defer src="{{ url_for('static', filename='js/site-ux.js') }}"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>
