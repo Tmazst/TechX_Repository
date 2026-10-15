@@ -23,6 +23,10 @@
         <article class="service-card service-card--visual service-card--marketing"><span class="service-number">04</span><img src="{{ url_for('static', filename='icons/intelligence-ai-bi-business-icon.svg') }}" alt=""><h3>Digital Marketing</h3><p>Connected campaigns and discovery tools that help your offers reach the right audience and inspire action.</p><ul><li>Smart adverts and catalogues</li><li>Social content and campaigns</li><li>Email, SMS and notifications</li></ul><a href="#qm">Discover Q-Messànger <span>→</span></a></article>
         <article class="service-card service-card--visual service-card--domain"><span class="service-badge">Coming soon</span><span class="service-number">05</span><img src="{{ url_for('static', filename='icons/web-icon.png') }}" alt=""><h3>Domain Support</h3><p>Accessible local digital identities for Eswatini businesses, organisations and individuals.</p><ul><li>Business subdomain registration</li><li>Branded email addresses</li><li>DNS, SSL and setup support</li></ul><a href="{{ url_for('domain_support') }}">Explore Domain Support <span>→</span></a></article>
     </div>
+    <aside class="journey-cta" aria-label="Help choosing a service">
+        <div><span class="eyebrow">Not sure where to start?</span><h3>Tell us the result you need. We’ll help you choose the right service.</h3></div>
+        <a class="button button--primary" href="#contact-us">Talk to TechX</a>
+    </aside>
 </div></section>
 
 <section class="approach section-pad"><div class="site-shell approach-grid">
@@ -41,10 +45,14 @@
         <article class="work-card work-card--brand"><img src="{{ url_for('static', filename='images/vakashanexplore_logo.png') }}" alt="My Wedding Planner"><div><span>Event planner</span><h3>My Wedding Planner</h3></div></article>
         <article class="work-card work-card--brand"><img src="{{ url_for('static', filename='images/techconnectlogo.png') }}" alt="TechConnect Eswatini"><div><span>Digital community</span><h3>TechConnect Eswatini</h3></div></article>
     </div>
+    <aside class="journey-cta journey-cta--work" aria-label="Start a similar project">
+        <div><span class="eyebrow">Have a project in mind?</span><h3>Let’s turn your idea into something useful, visible and ready to grow.</h3></div>
+        <a class="button button--primary" href="#contact-us">Request a Quote</a>
+    </aside>
 </div></section>
 
 
-<section class="facebook-work-section section-pad" aria-labelledby="facebook-work-heading">
+<section class="facebook-work-section section-pad" data-facebook-portfolio aria-labelledby="facebook-work-heading">
     <div class="site-shell">
         <div class="section-heading section-heading--split">
             <div>
@@ -75,15 +83,15 @@
                 </blockquote>
             </div>
         </article>
-        <article class="facebook-work-card">
-            <div class="fb-post" data-href="https://www.facebook.com/permalink.php?story_fbid=pfbid036kqHa46rT5xHTA3CCsrtLUXtw6uMv39guXXRG44aHmvfmzgmHuBDYooJphLTJhZvl&amp;id=61575237714035" data-width="500" data-show-text="true">
+        <article class="facebook-work-card facebook-work-card--extra">
+            <div class="fb-post-deferred" data-href="https://www.facebook.com/permalink.php?story_fbid=pfbid036kqHa46rT5xHTA3CCsrtLUXtw6uMv39guXXRG44aHmvfmzgmHuBDYooJphLTJhZvl&amp;id=61575237714035" data-width="500" data-show-text="true">
                 <blockquote cite="https://www.facebook.com/permalink.php?story_fbid=pfbid036kqHa46rT5xHTA3CCsrtLUXtw6uMv39guXXRG44aHmvfmzgmHuBDYooJphLTJhZvl&amp;id=61575237714035" class="fb-xfbml-parse-ignore">
                     <a href="https://www.facebook.com/permalink.php?story_fbid=pfbid036kqHa46rT5xHTA3CCsrtLUXtw6uMv39guXXRG44aHmvfmzgmHuBDYooJphLTJhZvl&amp;id=61575237714035" target="_blank" rel="noopener">View featured TechX project 4 on Facebook</a>
                 </blockquote>
             </div>
         </article>
-        <article class="facebook-work-card">
-            <div class="fb-post" data-href="https://www.facebook.com/permalink.php?story_fbid=pfbid0jQq1ZqKqtEsPYaBiZDxMJdPjcpM2ZJJsppqWud7TkPtdmkqYWFtJQ9QTzBifsRDEl&amp;id=61575237714035" data-width="500" data-show-text="true">
+        <article class="facebook-work-card facebook-work-card--extra">
+            <div class="fb-post-deferred" data-href="https://www.facebook.com/permalink.php?story_fbid=pfbid0jQq1ZqKqtEsPYaBiZDxMJdPjcpM2ZJJsppqWud7TkPtdmkqYWFtJQ9QTzBifsRDEl&amp;id=61575237714035" data-width="500" data-show-text="true">
                 <blockquote cite="https://www.facebook.com/permalink.php?story_fbid=pfbid0jQq1ZqKqtEsPYaBiZDxMJdPjcpM2ZJJsppqWud7TkPtdmkqYWFtJQ9QTzBifsRDEl&amp;id=61575237714035" class="fb-xfbml-parse-ignore">
                     <a href="https://www.facebook.com/permalink.php?story_fbid=pfbid0jQq1ZqKqtEsPYaBiZDxMJdPjcpM2ZJJsppqWud7TkPtdmkqYWFtJQ9QTzBifsRDEl&amp;id=61575237714035" target="_blank" rel="noopener">View featured TechX project 5 on Facebook</a>
                 </blockquote>
@@ -91,13 +99,14 @@
         </article>
         </div>
         <div class="facebook-work-action">
-            <a class="button button--secondary" href="https://www.facebook.com/profile.php?id=61575237714035" target="_blank" rel="noopener">View more on Facebook</a>
+            <button class="button button--primary facebook-work-more" type="button" aria-expanded="false">Show 2 more projects</button>
+            <a class="button button--secondary" href="https://www.facebook.com/profile.php?id=61575237714035" target="_blank" rel="noopener">Visit our Facebook page</a>
         </div>
+        <noscript><style>.facebook-work-card--extra{display:inline-block!important}</style></noscript>
     </div>
 </section>
 
 <div id="fb-root"></div>
-<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&amp;version=v25.0&amp;appId=427392679808082"></script>
 
 <section class="clients-section section-pad" id="clients"><div class="site-shell">
     <div class="section-heading centered"><span class="eyebrow">Clients &amp; collaborations</span><h2>Ideas grow stronger through partnership.</h2><p>We work with businesses, institutions and project teams to build brands, platforms and communication solutions that create lasting value.</p></div>
