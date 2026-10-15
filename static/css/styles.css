@@ -2877,3 +2877,50 @@ section{
 
 
 
+
+
+/* Featured Facebook work */
+.facebook-work-section {
+    background: #f5f7fb;
+}
+
+.facebook-work-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.facebook-work-card {
+    min-width: 0;
+    padding: 1rem;
+    border: 1px solid rgba(11, 29, 67, 0.12);
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 12px 30px rgba(11, 29, 67, 0.08);
+    overflow: hidden;
+}
+
+.facebook-work-card .fb-post,
+.facebook-work-card iframe {
+    width: 100% !important;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.facebook-work-action {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+@media (max-width: 640px) {
+    .facebook-work-card {
+        padding: 0.65rem;
+        border-radius: 14px;
+    }
+
+    .facebook-work-grid {
+        gap: 1rem;
+    }
+}
