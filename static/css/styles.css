@@ -3154,3 +3154,116 @@ section{
     .nav-dropdown__menu,
     .nav-dropdown__toggle > span { transition: none; }
 }
+
+/* Refined service menu, equal work cards and icon rhythm */
+.nav-dropdown__toggle { font-weight: 600; }
+.nav-dropdown__toggle > i {
+    font-size: 10px;
+    transition: transform .2s ease;
+}
+.nav-dropdown.is-open .nav-dropdown__toggle > i { transform: rotate(180deg); }
+.nav-dropdown__menu strong { font-weight: 600; }
+.nav-dropdown__menu span { font-weight: 400; line-height: 1.4; }
+.nav-cta,
+.nav-login,
+.button,
+.service-card > a,
+.work-card__copy a {
+    gap: 8px;
+}
+.nav-cta i,
+.button i,
+.service-card > a i,
+.work-card__copy a i { font-size: .88em; }
+
+.work-grid--apps {
+    grid-template-columns: repeat(3,minmax(0,1fr));
+    gap: 18px;
+}
+.work-card--app {
+    min-height: 350px;
+    display: flex;
+    flex-direction: column;
+    border: 0;
+    box-shadow: 0 14px 35px rgba(11,29,67,.09);
+    transition: transform .25s ease, box-shadow .25s ease;
+}
+.work-card--app:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 45px rgba(11,29,67,.14);
+}
+.work-card--app .work-card__media {
+    height: 145px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 26px;
+}
+.work-card--app .work-card__media img {
+    width: auto;
+    max-width: 78%;
+    height: auto;
+    max-height: 88px;
+    object-fit: contain;
+}
+.work-card--app .work-card__copy {
+    flex: 1;
+    padding: 27px 28px 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+.work-card--app .work-card__copy > span {
+    color: var(--tx-blue);
+    text-transform: uppercase;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .1em;
+}
+.work-card--app .work-card__copy h3 {
+    margin: 9px 0 10px;
+    color: var(--tx-blue-deep);
+    font-size: 22px;
+    line-height: 1.2;
+}
+.work-card--app .work-card__copy p {
+    margin: 0;
+    color: #536079;
+    font-size: 14px;
+    line-height: 1.65;
+}
+.work-card--app .work-card__copy a {
+    display: inline-flex;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 18px;
+    color: var(--tx-blue);
+    font-size: 13px;
+    font-weight: 700;
+}
+.work-card--qm { background: linear-gradient(150deg,#eef4ff 0%,#fff 65%); }
+.work-card--qm .work-card__media { background: linear-gradient(135deg,#173c82,#245cc5); }
+.work-card--qm .work-card__media img { filter: drop-shadow(0 8px 20px rgba(0,0,0,.18)); }
+.work-card--wedding { background: linear-gradient(150deg,#fff3ef 0%,#fff 65%); }
+.work-card--wedding .work-card__media { background: linear-gradient(135deg,#ffd8cf,#f6a793); }
+.work-card--connect { background: linear-gradient(150deg,#edf8f8 0%,#fff 65%); }
+.work-card--connect .work-card__media { background: linear-gradient(135deg,#d9f1f2,#8fcdd1); }
+
+.footer-contact a,
+.footer-contact span { display: inline-flex; align-items: center; gap: 9px; }
+.footer-contact i { width: 14px; color: #9dbdff; text-align: center; }
+.whatsapp-fab { display: inline-flex; align-items: center; gap: 8px; }
+.whatsapp-fab i { font-size: 18px; }
+
+@media (max-width: 920px) {
+    .work-grid--apps { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 680px) {
+    .work-grid--apps { grid-template-columns: 1fr; }
+    .work-card--app { min-height: 330px; }
+    .work-card--app .work-card__media { height: 135px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .work-card--app { transition: none; }
+    .work-card--app:hover { transform: none; }
+}
