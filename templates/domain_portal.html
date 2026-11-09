@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="account-hero domain-account-hero">
+    <div class="site-shell">
+        <span class="eyebrow">eswtn.com Client Portal</span>
+        <h1>Domain and DNS management</h1>
+        <p>Track your requests and manage approved TechX domain services.</p>
+    </div>
+</section>
+
+<section class="section-pad domain-portal">
+    <div class="site-shell">
+        <div class="domain-portal__header">
+            <div><h2>Your domain requests</h2><p>DNS editing becomes available after TechX approves and activates an assigned namespace.</p></div>
+            <a class="button button--primary" href="{{ url_for('domain_support') }}#reserve-name"><i class="fa-solid fa-plus" aria-hidden="true"></i> Request a Name</a>
+        </div>
+
+        {% if domain_requests %}
+        <div class="domain-request-list">
+            {% for item in domain_requests %}
+            <article class="domain-request-item">
+                <div class="domain-request-item__name"><i class="fa-solid fa-globe" aria-hidden="true"></i><div><strong>{{ item.fqdn }}</strong><span>{{ item.request_type.replace('_', ' ')|title }}</span></div></div>
+                <span class="domain-status domain-status--{{ item.status }}">{{ item.status|title }}</span>
+                <time datetime="{{ item.created_at.isoformat() }}">{{ item.created_at.strftime('%d %b %Y') }}</time>
+                {% if item.status == 'active' %}
+                <button class="button button--secondary" type="button" disabled title="DNS editing will be enabled in Phase 2">Manage DNS</button>
+                {% else %}
+                <span class="domain-review-note">TechX review in progress</span>
+                {% endif %}
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="domain-empty-state">
+            <i class="fa-solid fa-globe-africa" aria-hidden="true"></i>
+            <h2>No eswtn.com requests yet</h2>
+            <p>Reserve a business web address or request professional email services to begin.</p>
+            <a class="button button--primary" href="{{ url_for('domain_support') }}#reserve-name">Check a Name</a>
+        </div>
+        {% endif %}
+
+        <aside class="domain-phase-notice">
+            <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+            <div><strong>DNS management is being prepared</strong><p>Phase 1 handles requests and approval. Secure Cloudflare record management will be activated in the next implementation phase.</p></div>
+        </aside>
+    </div>
+</section>
+{% endblock %}
