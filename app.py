@@ -1,5 +1,5 @@
 
-from flask import Flask,render_template,url_for,redirect,request,flash
+from flask import Flask,render_template,url_for,redirect,request,flash,jsonify
 from flask_login import login_user, LoginManager,current_user,logout_user, login_required
 from Forms import *
 from models import *
@@ -7,6 +7,7 @@ from flask_bcrypt import Bcrypt
 import Users_Data
 import secrets
 import os
+import re
 from werkzeug.utils import secure_filename
 from flask_mail import Mail, Message
 # from bs4 import BeautifulSoup as bs
@@ -453,10 +454,150 @@ def log_out():
     return redirect(url_for('home'))
 
 
-@app.route('/domain-support')
-def domain_support():
+ESWTN_RESERVED_LABELS = {
+    'www', 'mail', 'smtp', 'imap', 'pop', 'admin', 'api', 'billing',
+    'support', 'techx', 'cloudflare', 'ns1', 'ns2', 'ftp', 'status'
+}
+ESWTN_LABEL_PATTERN = re.compile(r'^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?
 
-    return render_template('domain_support.html', title='Domain Support | Tech Xolutions')
+@app.route('/about')
+def about():
+
+    return render_template('about.html')
+
+@app.route("/contact", methods=["POST", "GET"])
+def contact_us():
+    # print("DEBUG EMAIL: ",os.environ.get("EMAIL_INFO"))
+    contact_form = Contact_Form()
+    if request.method == "POST":
+        if contact_form.validate_on_submit():
+            def send_link():
+                app.config["MAIL_SERVER"] = "techxolutions.com"
+                app.config["MAIL_PORT"] = 465
+                app.config["MAIL_USE_TLS"] = True
+                em = app.config["MAIL_USERNAME"] = os.environ.get("EMAIL")
+                app.config["MAIL_PASSWORD"] = os.environ.get("TX_PWD")
+
+                # print("DEBUG EMAIL1: ",em)
+                # print("DEBUG EMAILP: ",app.config["MAIL_PASSWORD"])
+
+                mail = Mail(app)
+
+                msg = Message(contact_form.subject.data, sender=contact_form.email.data, recipients=[em])
+                msg.body = f"""{contact_form.message.data}\n
+{contact_form.email.data}\n
+<p style="font-size:25px;color:red">This is a Test</p>
+                    """
+
+                # try:
+                mail.send(msg)
+                flash("Your Message has been Successfully Sent!!", "success")
+                return "Email Sent"
+                # except Exception as e:
+                #     # print(e)
+                #     flash(f'Ooops Something went wrong!! Please Retry', 'error')
+                #     return "The mail was not sent"
+
+                # Send the pwd reset request to the above email
+            send_link()
+
+            #print("Posted")
+        else:
+            for error in contact_form.errors:
+                print('Form Error: ',error)
+            flash("Ooops!! Please be sure to fill both email & message fields, correctly","error")
+
+    return render_template("contact.html",contact_form=contact_form)
+
+
+# Press the green button in the gutter to run the script.
+if __name__ == '__main__':
+
+    app.run(debug=True)
+
+# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+)
+
+
+def ensure_domain_request_table():
+    """Create the Phase 1 request table without altering existing customer data."""
+    DomainRequest.__table__.create(bind=db.engine, checkfirst=True)
+
+
+def eswtn_name_status(raw_label):
+    label = (raw_label or '').strip().lower()
+    if not ESWTN_LABEL_PATTERN.fullmatch(label):
+        return label, False, 'Use 1–63 letters, numbers or hyphens. The name cannot start or end with a hyphen.'
+    if label in ESWTN_RESERVED_LABELS:
+        return label, False, 'This name is reserved for TechX infrastructure.'
+    existing = DomainRequest.query.filter_by(requested_label=label).filter(
+        DomainRequest.status.in_(['pending', 'approved', 'active'])
+    ).first()
+    if existing:
+        return label, False, 'This name already has an active or pending request.'
+    return label, True, 'This name is preliminarily available.'
+
+
+@app.route('/domain-support', methods=['GET', 'POST'])
+def domain_support():
+    ensure_domain_request_table()
+    form = DomainInterestForm()
+
+    if request.method == 'GET' and current_user.is_authenticated and not form.email.data:
+        form.email.data = current_user.email
+
+    if form.validate_on_submit():
+        label, available, message = eswtn_name_status(form.requested_label.data)
+        if not available:
+            flash(message, 'error')
+        else:
+            domain_request = DomainRequest(
+                user_id=current_user.id if current_user.is_authenticated else None,
+                requested_label=label,
+                email=form.email.data.strip().lower(),
+                request_type=form.request_type.data,
+                intended_use=form.intended_use.data.strip(),
+                status='pending'
+            )
+            db.session.add(domain_request)
+            db.session.commit()
+            flash(f'{label}.eswtn.com has been submitted for review.', 'success')
+            if current_user.is_authenticated:
+                return redirect(url_for('domain_portal'))
+            return redirect(url_for('domain_support', requested=label))
+
+    return render_template(
+        'domain_support.html',
+        title='eswtn.com Domain Support | Tech Xolutions',
+        form=form
+    )
+
+
+@app.route('/api/domain-availability')
+def domain_availability():
+    ensure_domain_request_table()
+    label, available, message = eswtn_name_status(request.args.get('name'))
+    return jsonify({
+        'label': label,
+        'fqdn': f'{label}.eswtn.com' if label else '',
+        'available': available,
+        'message': message
+    })
+
+
+@app.route('/domain-portal')
+@login_required
+def domain_portal():
+    ensure_domain_request_table()
+    requests = DomainRequest.query.filter(
+        (DomainRequest.user_id == current_user.id) |
+        (DomainRequest.email == current_user.email)
+    ).order_by(DomainRequest.created_at.desc()).all()
+    return render_template(
+        'domain_portal.html',
+        title='My eswtn.com Domains | Tech Xolutions',
+        domain_requests=requests
+    )
 
 @app.route('/about')
 def about():
