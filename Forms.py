@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField,PasswordField,SubmitField, TextAreaField,BooleanField, SelectField,DateField, URLField,FloatField,RadioField
-from wtforms.validators import DataRequired,Length,Email, EqualTo, ValidationError
+from wtforms.validators import DataRequired,Length,Email, EqualTo, ValidationError, Regexp
 from flask_login import current_user
 from flask_wtf.file import FileField , FileAllowed
 # from wtforms.fields.html5 import DateField,DateTimeField
@@ -232,3 +232,33 @@ class CashBookForm(FlaskForm):
 
     # def validate_email(self,email):
     #     user = user.query.filter_by
+
+class DomainInterestForm(FlaskForm):
+    requested_label = StringField(
+        'Preferred name',
+        validators=[
+            DataRequired(),
+            Length(min=1, max=63),
+            Regexp(
+                r'^[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?$',
+                message='Use letters, numbers and hyphens only. Do not start or end with a hyphen.'
+            )
+        ]
+    )
+    email = StringField('Contact email', validators=[DataRequired(), Email(), Length(max=120)])
+    request_type = SelectField(
+        'Service needed',
+        choices=[
+            ('business_subdomain', 'Business web address'),
+            ('managed_dns', 'Business web address + managed DNS'),
+            ('professional_email', 'Professional email'),
+            ('combined', 'Website, DNS and email')
+        ],
+        validators=[DataRequired()]
+    )
+    intended_use = TextAreaField(
+        'How will you use this address?',
+        validators=[DataRequired(), Length(min=10, max=500)]
+    )
+    submit = SubmitField('Request this name')
+
