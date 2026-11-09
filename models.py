@@ -87,3 +87,21 @@ class CashBook(db.Model,UserMixin):
     exp_or_income = db.Column(db.String(120))
     timestamp = db.column(db.DateTime())
 
+class DomainRequest(db.Model):
+    __tablename__ = 'domain_request'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True, index=True)
+    requested_label = db.Column(db.String(63), nullable=False, index=True)
+    email = db.Column(db.String(120), nullable=False, index=True)
+    request_type = db.Column(db.String(40), nullable=False)
+    intended_use = db.Column(db.String(500), nullable=False)
+    status = db.Column(db.String(20), nullable=False, default='pending', index=True)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    reviewed_at = db.Column(db.DateTime, nullable=True)
+    admin_notes = db.Column(db.String(500), nullable=True)
+
+    @property
+    def fqdn(self):
+        return f'{self.requested_label}.eswtn.com'
+
