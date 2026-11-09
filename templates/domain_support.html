@@ -118,6 +118,46 @@
 <script>
 (() => {
     const endpoint = '{{ url_for("domain_availability") }}';
+    const reservationSection = document.getElementById('reserve-name');
+    const reservationInput = document.getElementById('{{ form.requested_label.id }}');
+    const emailInput = document.getElementById('{{ form.email.id }}');
+    const reservationOutput = document.getElementById('domain-availability');
+
+    function showAvailableResult(output, result) {
+        output.classList.add('is-available');
+        output.textContent = '';
+
+        const message = document.createElement('span');
+        message.className = 'domain-availability__message';
+        message.textContent = '✓ ' + result.fqdn + ' is preliminarily available.';
+
+        const proceed = document.createElement('a');
+        proceed.className = 'domain-proceed-link';
+        proceed.href = '#reserve-name';
+        proceed.innerHTML = 'Proceed with this name <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>';
+        proceed.addEventListener('click', () => {
+            if (reservationInput) {
+                reservationInput.value = result.label;
+                reservationInput.dispatchEvent(new Event('input', { bubbles: true }));
+                reservationInput.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+
+            if (reservationOutput && output !== reservationOutput) {
+                reservationOutput.className = reservationOutput.dataset.baseClass || 'domain-availability';
+                reservationOutput.classList.add('is-available');
+                reservationOutput.textContent = '✓ ' + result.fqdn + ' selected. Complete the details below.';
+            }
+
+            if (reservationSection) {
+                reservationSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            window.setTimeout(() => {
+                if (emailInput) emailInput.focus({ preventScroll: true });
+            }, 550);
+        });
+
+        output.append(message, proceed);
+    }
 
     async function checkName(input, output) {
         const name = input.value.trim();
@@ -128,8 +168,12 @@
         try {
             const response = await fetch(endpoint + '?name=' + encodeURIComponent(name));
             const result = await response.json();
-            output.classList.add(result.available ? 'is-available' : 'is-unavailable');
-            output.textContent = result.available ? '✓ ' + result.fqdn + ' is preliminarily available.' : result.message;
+            if (result.available) {
+                showAvailableResult(output, result);
+            } else {
+                output.classList.add('is-unavailable');
+                output.textContent = result.message;
+            }
         } catch (error) {
             output.classList.add('is-unavailable');
             output.textContent = 'We could not check that name. Please try again.';
@@ -148,11 +192,9 @@
     }
 
     const button = document.getElementById('check-domain-name');
-    const input = document.getElementById('{{ form.requested_label.id }}');
-    const output = document.getElementById('domain-availability');
-    if (button && input && output) {
-        output.dataset.baseClass = 'domain-availability';
-        button.addEventListener('click', () => checkName(input, output));
+    if (button && reservationInput && reservationOutput) {
+        reservationOutput.dataset.baseClass = 'domain-availability';
+        button.addEventListener('click', () => checkName(reservationInput, reservationOutput));
     }
 })();
 </script>

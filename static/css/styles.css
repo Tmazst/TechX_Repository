@@ -3446,3 +3446,46 @@ section{
     .domain-quick-search__field > span { padding: 0 10px; font-size: 12px; }
     .domain-quick-search__field > button { grid-column: 1 / -1; min-height: 46px; }
 }
+
+/* Availability-to-reservation journey */
+.domain-availability.is-available {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 16px;
+}
+.domain-availability__message { font-weight: 600; }
+.domain-proceed-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 11px;
+    border-radius: 6px;
+    background: var(--tx-blue);
+    color: #fff !important;
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.2;
+    box-shadow: 0 7px 18px rgba(20,62,135,.18);
+    transition: transform .2s ease, background .2s ease;
+}
+.domain-proceed-link:hover {
+    background: var(--tx-blue-bright);
+    transform: translateY(-1px);
+}
+.domain-quick-search__result .domain-proceed-link {
+    background: #fff;
+    color: var(--tx-blue-deep) !important;
+    box-shadow: none;
+}
+.domain-quick-search__result .domain-proceed-link:hover { background: #eaf1ff; }
+#reserve-name { scroll-margin-top: 118px; }
+
+@media (max-width: 680px) {
+    .domain-availability.is-available { align-items: flex-start; flex-direction: column; }
+    .domain-proceed-link { width: 100%; justify-content: center; min-height: 40px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .domain-proceed-link { transition: none; }
+    .domain-proceed-link:hover { transform: none; }
+}
