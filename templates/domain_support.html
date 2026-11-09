@@ -1,6 +1,17 @@
 {% extends "base.html" %}
 {% block content %}
 <section class="domain-hero">
+    <div class="site-shell domain-quick-search">
+        <form class="domain-quick-search__form" id="domain-hero-search" aria-label="Check eswtn.com name availability">
+            <label for="hero-domain-name"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i> Check your DNS name</label>
+            <div class="domain-quick-search__field">
+                <input class="modern-input" id="hero-domain-name" name="name" type="text" placeholder="yourbusiness" autocomplete="off" aria-describedby="hero-domain-result">
+                <span>.eswtn.com</span>
+                <button type="submit">Search</button>
+            </div>
+            <p class="domain-availability domain-quick-search__result" id="hero-domain-result" aria-live="polite"></p>
+        </form>
+    </div>
     <div class="site-shell domain-hero__grid">
         <div class="domain-hero__copy">
             <span class="eyebrow">TechX Domain Support</span>
@@ -106,19 +117,16 @@
 {% block scripts %}
 <script>
 (() => {
-    const button = document.getElementById('check-domain-name');
-    const input = document.getElementById('{{ form.requested_label.id }}');
-    const output = document.getElementById('domain-availability');
-    if (!button || !input || !output) return;
+    const endpoint = '{{ url_for("domain_availability") }}';
 
-    button.addEventListener('click', async () => {
+    async function checkName(input, output) {
         const name = input.value.trim();
-        output.className = 'domain-availability';
+        output.className = output.dataset.baseClass || 'domain-availability';
         output.textContent = name ? 'Checking…' : 'Enter a preferred name first.';
         if (!name) return;
 
         try {
-            const response = await fetch('{{ url_for("domain_availability") }}?name=' + encodeURIComponent(name));
+            const response = await fetch(endpoint + '?name=' + encodeURIComponent(name));
             const result = await response.json();
             output.classList.add(result.available ? 'is-available' : 'is-unavailable');
             output.textContent = result.available ? '✓ ' + result.fqdn + ' is preliminarily available.' : result.message;
@@ -126,7 +134,26 @@
             output.classList.add('is-unavailable');
             output.textContent = 'We could not check that name. Please try again.';
         }
-    });
+    }
+
+    const heroForm = document.getElementById('domain-hero-search');
+    const heroInput = document.getElementById('hero-domain-name');
+    const heroOutput = document.getElementById('hero-domain-result');
+    if (heroForm && heroInput && heroOutput) {
+        heroOutput.dataset.baseClass = 'domain-availability domain-quick-search__result';
+        heroForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            checkName(heroInput, heroOutput);
+        });
+    }
+
+    const button = document.getElementById('check-domain-name');
+    const input = document.getElementById('{{ form.requested_label.id }}');
+    const output = document.getElementById('domain-availability');
+    if (button && input && output) {
+        output.dataset.baseClass = 'domain-availability';
+        button.addEventListener('click', () => checkName(input, output));
+    }
 })();
 </script>
 {% endblock %}
