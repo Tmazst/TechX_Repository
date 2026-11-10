@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField,PasswordField,SubmitField, TextAreaField,BooleanField, SelectField,DateField, URLField,FloatField,RadioField
-from wtforms.validators import DataRequired,Length,Email, EqualTo, ValidationError, Regexp
+from wtforms import StringField,PasswordField,SubmitField, TextAreaField,BooleanField, SelectField,DateField, URLField,FloatField,RadioField,IntegerField
+from wtforms.validators import DataRequired,Length,Email, EqualTo, ValidationError, Regexp, Optional, NumberRange
 from flask_login import current_user
 from flask_wtf.file import FileField , FileAllowed
 # from wtforms.fields.html5 import DateField,DateTimeField
@@ -261,4 +261,55 @@ class DomainInterestForm(FlaskForm):
         validators=[DataRequired(), Length(min=10, max=500)]
     )
     submit = SubmitField('Request this name')
+
+class DnsRecordForm(FlaskForm):
+    record_type = SelectField(
+        'Record type',
+        choices=[
+            ('A', 'A — IPv4 address'),
+            ('AAAA', 'AAAA — IPv6 address'),
+            ('CNAME', 'CNAME — Hostname alias'),
+            ('MX', 'MX — Mail server'),
+            ('TXT', 'TXT — Verification or email policy')
+        ],
+        validators=[DataRequired()]
+    )
+    name = StringField(
+        'Name',
+        validators=[Optional(), Length(max=255)],
+        default='@'
+    )
+    content = TextAreaField(
+        'Value',
+        validators=[DataRequired(), Length(max=2048)]
+    )
+    ttl = SelectField(
+        'TTL',
+        choices=[
+            (1, 'Automatic'),
+            (300, '5 minutes'),
+            (1800, '30 minutes'),
+            (3600, '1 hour'),
+            (14400, '4 hours'),
+            (86400, '1 day')
+        ],
+        coerce=int,
+        default=1,
+        validators=[DataRequired()]
+    )
+    proxied = BooleanField('Use Cloudflare proxy where supported')
+    priority = IntegerField(
+        'MX priority',
+        validators=[Optional(), NumberRange(min=0, max=65535)],
+        default=10
+    )
+    submit = SubmitField('Save DNS Record')
+
+
+class DomainAdminActionForm(FlaskForm):
+    submit = SubmitField('Confirm')
+
+
+class DnsDeleteForm(FlaskForm):
+    submit = SubmitField('Delete')
 
