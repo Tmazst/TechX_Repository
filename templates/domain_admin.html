@@ -63,7 +63,7 @@
                         <td>{{ account.plan.replace('_', ' ')|title }}</td>
                         <td>{{ account.records|length }} / {{ account.record_limit }}</td>
                         <td><span class="domain-status domain-status--{{ account.status }}">{{ account.status|title }}</span></td>
-                        <td><a class="dns-admin-view" href="{{ url_for('domain_portal', account=account.id, admin_view=1) }}">View DNS <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></td>
+                        <td><div class="dns-admin-actions"><a class="dns-admin-view" href="{{ url_for('domain_portal', account=account.id, admin_view=1) }}">View DNS <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a><form method="POST" action="{{ url_for('domain_account_status', account_id=account.id) }}">{{ action_form.hidden_tag() }}<button type="submit">{{ 'Pause editing' if account.status == 'active' else 'Resume editing' }}</button></form></div></td>
                     </tr>
                     {% endfor %}
                     </tbody>
