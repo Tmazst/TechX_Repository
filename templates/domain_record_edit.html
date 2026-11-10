@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="account-hero domain-account-hero">
+    <div class="site-shell">
+        <a class="domain-back-link" href="{{ url_for('domain_portal', account=account.id) }}#dns-records"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to DNS records</a>
+        <span class="eyebrow">Edit DNS record</span>
+        <h1>{{ account.fqdn }}</h1>
+        <p>Changes are validated against your assigned namespace before being sent to Cloudflare.</p>
+    </div>
+</section>
+
+<section class="section-pad dns-edit-page">
+    <div class="site-shell">
+        <div class="dns-edit-card">
+            <div class="dns-edit-card__current">
+                <span>Current record</span>
+                <strong>{{ dns_record.record_type }} · {{ dns_record.name }}</strong>
+                <code>{{ dns_record.content }}</code>
+            </div>
+            <form method="POST" id="dns-edit-form">
+                {{ form.hidden_tag() }}
+                <div class="dns-form-row">
+                    <div><label for="{{ form.record_type.id }}">Record type</label>{{ form.record_type(class_="modern-input") }}</div>
+                    <div><label for="{{ form.ttl.id }}">TTL</label>{{ form.ttl(class_="modern-input") }}</div>
+                </div>
+
+                <label for="{{ form.name.id }}">Name</label>
+                {{ form.name(class_="modern-input") }}
+                <small>The name must remain inside {{ account.fqdn }}.</small>
+
+                <label for="{{ form.content.id }}">Value or destination</label>
+                {{ form.content(class_="modern-input modern-textarea dns-value-input") }}
+
+                <div id="dns-edit-priority"><label for="{{ form.priority.id }}">MX priority</label>{{ form.priority(class_="modern-input") }}</div>
+                <label class="dns-checkbox" id="dns-edit-proxy">{{ form.proxied() }}<span><strong>Cloudflare proxy</strong><small>Available for A, AAAA and CNAME records.</small></span></label>
+
+                <div class="dns-edit-actions">
+                    {{ form.submit(class_="button button--primary") }}
+                    <a class="button button--secondary" href="{{ url_for('domain_portal', account=account.id) }}#dns-records">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(() => {
+    const typeField = document.getElementById('{{ form.record_type.id }}');
+    const priorityField = document.getElementById('dns-edit-priority');
+    const proxyField = document.getElementById('dns-edit-proxy');
+    if (!typeField || !priorityField || !proxyField) return;
+    function updateFields() {
+        const type = typeField.value;
+        priorityField.hidden = type !== 'MX';
+        proxyField.hidden = !['A', 'AAAA', 'CNAME'].includes(type);
+        if (proxyField.hidden) {
+            const checkbox = proxyField.querySelector('input[type="checkbox"]');
+            if (checkbox) checkbox.checked = false;
+        }
+    }
+    typeField.addEventListener('change', updateFields);
+    updateFields();
+})();
+</script>
+{% endblock %}
