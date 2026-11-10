@@ -893,6 +893,31 @@ def domain_request_reject(request_id):
     return redirect(url_for('domain_admin'))
 
 
+
+@app.route('/domain-admin/accounts/<int:account_id>/status', methods=['POST'])
+@domain_admin_required
+def domain_account_status(account_id):
+    ensure_domain_tables()
+    form = DomainAdminActionForm()
+    if not form.validate_on_submit():
+        abort(400)
+
+    account = DomainAccount.query.get_or_404(account_id)
+    if account.status == 'active':
+        account.status = 'suspended'
+        action = 'account_editing_paused'
+        message = f'DNS editing paused for {account.fqdn}. Existing DNS records remain live.'
+    else:
+        account.status = 'active'
+        action = 'account_editing_resumed'
+        message = f'DNS editing resumed for {account.fqdn}.'
+
+    add_dns_audit(account, action, account.fqdn, after={'status': account.status})
+    db.session.commit()
+    flash(message, 'success')
+    return redirect(url_for('domain_admin'))
+
+
 @app.route('/about')
 def about():
 
