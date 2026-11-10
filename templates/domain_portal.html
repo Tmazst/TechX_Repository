@@ -4,45 +4,171 @@
     <div class="site-shell">
         <span class="eyebrow">eswtn.com Client Portal</span>
         <h1>Domain and DNS management</h1>
-        <p>Track your requests and manage approved TechX domain services.</p>
+        <p>Manage approved records inside your assigned TechX namespace.</p>
     </div>
 </section>
 
 <section class="section-pad domain-portal">
     <div class="site-shell">
         <div class="domain-portal__header">
-            <div><h2>Your domain requests</h2><p>DNS editing becomes available after TechX approves and activates an assigned namespace.</p></div>
-            <a class="button button--primary" href="{{ url_for('domain_support') }}#reserve-name"><i class="fa-solid fa-plus" aria-hidden="true"></i> Request a Name</a>
+            <div>
+                <h2>Your eswtn.com services</h2>
+                <p>Every change is validated, sent securely to Cloudflare and recorded in your activity history.</p>
+            </div>
+            <div class="domain-portal__actions">
+                {% if domain_admin %}<a class="button button--secondary" href="{{ url_for('domain_admin') }}"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Admin</a>{% endif %}
+                <a class="button button--primary" href="{{ url_for('domain_support') }}#reserve-name"><i class="fa-solid fa-plus" aria-hidden="true"></i> Request a Name</a>
+            </div>
         </div>
 
-        {% if domain_requests %}
-        <div class="domain-request-list">
-            {% for item in domain_requests %}
-            <article class="domain-request-item">
-                <div class="domain-request-item__name"><i class="fa-solid fa-globe" aria-hidden="true"></i><div><strong>{{ item.fqdn }}</strong><span>{{ item.request_type.replace('_', ' ')|title }}</span></div></div>
-                <span class="domain-status domain-status--{{ item.status }}">{{ item.status|title }}</span>
-                <time datetime="{{ item.created_at.isoformat() }}">{{ item.created_at.strftime('%d %b %Y') }}</time>
-                {% if item.status == 'active' %}
-                <button class="button button--secondary" type="button" disabled title="DNS editing will be enabled in Phase 2">Manage DNS</button>
-                {% else %}
-                <span class="domain-review-note">TechX review in progress</span>
-                {% endif %}
-            </article>
+        {% if accounts %}
+        <nav class="domain-account-tabs" aria-label="Assigned eswtn.com namespaces">
+            {% for account in accounts %}
+            <a class="{% if selected_account and account.id == selected_account.id %}is-active{% endif %}" href="{{ url_for('domain_portal', account=account.id, admin_view=1 if admin_view else None) }}">
+                <i class="fa-solid fa-globe" aria-hidden="true"></i>
+                <span>{{ account.fqdn }}<small>{{ account.status|title }}</small></span>
+            </a>
             {% endfor %}
-        </div>
+        </nav>
+
+        {% if selected_account %}
+        <section class="dns-workspace" id="dns-records">
+            <header class="dns-workspace__header">
+                <div>
+                    <span class="eyebrow">Assigned namespace</span>
+                    <h2>{{ selected_account.fqdn }}</h2>
+                    <p>{{ dns_records|length }} of {{ selected_account.record_limit }} DNS records used</p>
+                </div>
+                <span class="domain-status domain-status--{{ selected_account.status }}">{{ selected_account.status|title }}</span>
+            </header>
+
+            {% if not dns_configured %}
+            <div class="dns-alert dns-alert--warning"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i><div><strong>DNS automation is not configured</strong><p>TechX must add the Cloudflare server credentials before records can be changed.</p></div></div>
+            {% elif selected_account.status != 'active' %}
+            <div class="dns-alert dns-alert--warning"><i class="fa-solid fa-pause" aria-hidden="true"></i><div><strong>DNS changes are paused</strong><p>This namespace must be active before records can be edited.</p></div></div>
+            {% else %}
+            <div class="dns-alert dns-alert--success"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i><div><strong>Secure DNS connection active</strong><p>Changes are restricted to {{ selected_account.fqdn }} and its child records.</p></div></div>
+            {% endif %}
+
+            <div class="dns-workspace__grid">
+                <div class="dns-record-panel">
+                    <div class="dns-panel-heading"><div><span class="eyebrow">Current configuration</span><h3>DNS records</h3></div></div>
+                    {% if dns_records %}
+                    <div class="dns-table-wrap">
+                        <table class="dns-table">
+                            <thead><tr><th>Type</th><th>Name</th><th>Value</th><th>TTL</th><th>Status</th><th><span class="sr-only">Actions</span></th></tr></thead>
+                            <tbody>
+                            {% for record in dns_records %}
+                            <tr>
+                                <td><span class="dns-type dns-type--{{ record.record_type|lower }}">{{ record.record_type }}</span></td>
+                                <td><strong>{{ record.name }}</strong>{% if record.priority is not none %}<small>Priority {{ record.priority }}</small>{% endif %}</td>
+                                <td><code>{{ record.content }}</code></td>
+                                <td>{{ 'Auto' if record.ttl == 1 else record.ttl ~ 's' }}</td>
+                                <td>{% if record.proxied %}<span class="dns-proxy"><i class="fa-solid fa-cloud" aria-hidden="true"></i> Proxied</span>{% else %}<span class="dns-only">DNS only</span>{% endif %}</td>
+                                <td class="dns-row-actions">
+                                    <a href="{{ url_for('domain_record_edit', record_id=record.id) }}" aria-label="Edit {{ record.record_type }} record"><i class="fa-solid fa-pen" aria-hidden="true"></i></a>
+                                    <form method="POST" action="{{ url_for('domain_record_delete', record_id=record.id) }}" onsubmit="return confirm('Delete this DNS record? This change will be sent to Cloudflare immediately.');">
+                                        {{ delete_form.hidden_tag() }}
+                                        <button type="submit" aria-label="Delete {{ record.record_type }} record"><i class="fa-solid fa-trash" aria-hidden="true"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="dns-empty"><i class="fa-solid fa-list" aria-hidden="true"></i><h3>No DNS records yet</h3><p>Add the first record for this namespace using the form.</p></div>
+                    {% endif %}
+                </div>
+
+                <aside class="dns-add-panel">
+                    <span class="eyebrow">New record</span>
+                    <h3>Add DNS record</h3>
+                    <form method="POST" action="{{ url_for('domain_record_create', account_id=selected_account.id) }}" id="dns-record-form">
+                        {{ record_form.hidden_tag() }}
+                        <label for="{{ record_form.record_type.id }}">Record type</label>
+                        {{ record_form.record_type(class_="modern-input") }}
+
+                        <label for="{{ record_form.name.id }}">Name</label>
+                        <div class="dns-name-input">{{ record_form.name(class_="modern-input", placeholder="@ or www") }}<span>.{{ selected_account.fqdn }}</span></div>
+                        <small>Use @ for {{ selected_account.fqdn }}, or enter a relative name such as www.</small>
+
+                        <label for="{{ record_form.content.id }}">Value or destination</label>
+                        {{ record_form.content(class_="modern-input modern-textarea dns-value-input", placeholder="IP address, hostname or TXT value") }}
+
+                        <div class="dns-form-row">
+                            <div><label for="{{ record_form.ttl.id }}">TTL</label>{{ record_form.ttl(class_="modern-input") }}</div>
+                            <div id="dns-priority-field"><label for="{{ record_form.priority.id }}">MX priority</label>{{ record_form.priority(class_="modern-input") }}</div>
+                        </div>
+
+                        <label class="dns-checkbox" id="dns-proxy-field">{{ record_form.proxied() }}<span><strong>Cloudflare proxy</strong><small>Available for A, AAAA and CNAME records.</small></span></label>
+                        {{ record_form.submit(class_="button button--primary form-submit", disabled=not dns_configured or selected_account.status != 'active') }}
+                    </form>
+                </aside>
+            </div>
+        </section>
+
+        {% if audit_logs %}
+        <section class="dns-activity">
+            <div class="dns-panel-heading"><div><span class="eyebrow">Accountability</span><h3>Recent DNS activity</h3></div></div>
+            <div class="dns-activity-list">
+                {% for log in audit_logs %}
+                <div><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i><span><strong>{{ log.action.replace('_', ' ')|title }}</strong>{% if log.record_name %}{{ log.record_name }}{% endif %}</span><time datetime="{{ log.created_at.isoformat() }}">{{ log.created_at.strftime('%d %b %Y, %H:%M') }}</time></div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+        {% endif %}
+
         {% else %}
         <div class="domain-empty-state">
             <i class="fa-solid fa-globe-africa" aria-hidden="true"></i>
-            <h2>No eswtn.com requests yet</h2>
-            <p>Reserve a business web address or request professional email services to begin.</p>
+            <h2>No active eswtn.com namespace yet</h2>
+            <p>Once TechX approves a request, its DNS workspace will appear here.</p>
             <a class="button button--primary" href="{{ url_for('domain_support') }}#reserve-name">Check a Name</a>
         </div>
         {% endif %}
 
-        <aside class="domain-phase-notice">
-            <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
-            <div><strong>DNS management is being prepared</strong><p>Phase 1 handles requests and approval. Secure Cloudflare record management will be activated in the next implementation phase.</p></div>
-        </aside>
+        {% if domain_requests %}
+        <section class="domain-request-history">
+            <div class="dns-panel-heading"><div><span class="eyebrow">Applications</span><h3>Request history</h3></div></div>
+            <div class="domain-request-list">
+                {% for item in domain_requests %}
+                <article class="domain-request-item">
+                    <div class="domain-request-item__name"><i class="fa-solid fa-globe" aria-hidden="true"></i><div><strong>{{ item.fqdn }}</strong><span>{{ item.request_type.replace('_', ' ')|title }}</span></div></div>
+                    <span class="domain-status domain-status--{{ item.status }}">{{ item.status|title }}</span>
+                    <time datetime="{{ item.created_at.isoformat() }}">{{ item.created_at.strftime('%d %b %Y') }}</time>
+                    {% if item.status == 'pending' %}<span class="domain-review-note">TechX review in progress</span>{% elif item.status == 'rejected' %}<span class="domain-review-note">Contact support for help</span>{% else %}<span class="domain-review-note">Namespace assigned</span>{% endif %}
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
     </div>
 </section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(() => {
+    const typeField = document.getElementById('{{ record_form.record_type.id }}');
+    const priorityField = document.getElementById('dns-priority-field');
+    const proxyField = document.getElementById('dns-proxy-field');
+    if (!typeField || !priorityField || !proxyField) return;
+
+    function updateRecordFields() {
+        const type = typeField.value;
+        priorityField.hidden = type !== 'MX';
+        proxyField.hidden = !['A', 'AAAA', 'CNAME'].includes(type);
+        if (proxyField.hidden) {
+            const checkbox = proxyField.querySelector('input[type="checkbox"]');
+            if (checkbox) checkbox.checked = false;
+        }
+    }
+
+    typeField.addEventListener('change', updateRecordFields);
+    updateRecordFields();
+})();
+</script>
 {% endblock %}
