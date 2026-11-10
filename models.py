@@ -105,3 +105,61 @@ class DomainRequest(db.Model):
     def fqdn(self):
         return f'{self.requested_label}.eswtn.com'
 
+class DomainAccount(db.Model):
+    __tablename__ = 'domain_account'
+
+    id = db.Column(db.Integer, primary_key=True)
+    request_id = db.Column(db.Integer, db.ForeignKey('domain_request.id'), nullable=False, unique=True, index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True, index=True)
+    owner_email = db.Column(db.String(120), nullable=False, index=True)
+    label = db.Column(db.String(63), nullable=False, unique=True, index=True)
+    fqdn = db.Column(db.String(255), nullable=False, unique=True, index=True)
+    plan = db.Column(db.String(40), nullable=False)
+    status = db.Column(db.String(20), nullable=False, default='active', index=True)
+    record_limit = db.Column(db.Integer, nullable=False, default=25)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    activated_at = db.Column(db.DateTime, nullable=True, default=datetime.utcnow)
+
+    records = db.relationship(
+        'ManagedDnsRecord',
+        backref='domain_account',
+        lazy=True,
+        cascade='all, delete-orphan'
+    )
+    audit_logs = db.relationship(
+        'DnsAuditLog',
+        backref='domain_account',
+        lazy=True,
+        cascade='all, delete-orphan'
+    )
+
+
+class ManagedDnsRecord(db.Model):
+    __tablename__ = 'managed_dns_record'
+
+    id = db.Column(db.Integer, primary_key=True)
+    domain_account_id = db.Column(db.Integer, db.ForeignKey('domain_account.id'), nullable=False, index=True)
+    provider_record_id = db.Column(db.String(64), nullable=False, unique=True, index=True)
+    record_type = db.Column(db.String(10), nullable=False)
+    name = db.Column(db.String(255), nullable=False, index=True)
+    content = db.Column(db.String(2048), nullable=False)
+    ttl = db.Column(db.Integer, nullable=False, default=1)
+    proxied = db.Column(db.Boolean, nullable=False, default=False)
+    priority = db.Column(db.Integer, nullable=True)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class DnsAuditLog(db.Model):
+    __tablename__ = 'dns_audit_log'
+
+    id = db.Column(db.Integer, primary_key=True)
+    domain_account_id = db.Column(db.Integer, db.ForeignKey('domain_account.id'), nullable=False, index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True, index=True)
+    action = db.Column(db.String(40), nullable=False, index=True)
+    record_name = db.Column(db.String(255), nullable=True)
+    before_value = db.Column(db.Text, nullable=True)
+    after_value = db.Column(db.Text, nullable=True)
+    ip_address = db.Column(db.String(64), nullable=True)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, index=True)
+

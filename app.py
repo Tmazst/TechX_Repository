@@ -1,5 +1,5 @@
 
-from flask import Flask,render_template,url_for,redirect,request,flash,jsonify
+from flask import Flask,render_template,url_for,redirect,request,flash,jsonify,abort
 from flask_login import login_user, LoginManager,current_user,logout_user, login_required
 from Forms import *
 from models import *
@@ -8,10 +8,23 @@ import Users_Data
 import secrets
 import os
 import re
+import json
+from datetime import datetime
+from functools import wraps
 from werkzeug.utils import secure_filename
 from flask_mail import Mail, Message
 # from bs4 import BeautifulSoup as bs
 from flask_colorpicker import colorpicker
+from domain_dns import (
+    DnsServiceError,
+    DnsValidationError,
+    build_record_payload,
+    cloudflare_configured,
+    cloudflare_create_record,
+    cloudflare_delete_record,
+    cloudflare_find_records,
+    cloudflare_update_record
+)
 
 
 
@@ -32,6 +45,7 @@ db.init_app(app)
 application = app
 
 login_manager = LoginManager(app)
+login_manager.login_view = 'login'
 
 # Log in
 @login_manager.user_loader
@@ -463,9 +477,33 @@ ESWTN_LABEL_PATTERN = re.compile(
 )
 
 
-def ensure_domain_request_table():
-    """Create the Phase 1 request table without altering existing customer data."""
-    DomainRequest.__table__.create(bind=db.engine, checkfirst=True)
+def ensure_domain_tables():
+    """Create Phase 1 and Phase 2 tables without altering existing customer data."""
+    for model in (DomainRequest, DomainAccount, ManagedDnsRecord, DnsAuditLog):
+        model.__table__.create(bind=db.engine, checkfirst=True)
+
+
+def is_domain_admin():
+    configured_emails = {
+        email.strip().lower()
+        for email in os.environ.get('DOMAIN_ADMIN_EMAILS', '').split(',')
+        if email.strip()
+    }
+    return (
+        current_user.is_authenticated
+        and current_user.email
+        and current_user.email.strip().lower() in configured_emails
+    )
+
+
+def domain_admin_required(view):
+    @wraps(view)
+    @login_required
+    def wrapped(*args, **kwargs):
+        if not is_domain_admin():
+            abort(403)
+        return view(*args, **kwargs)
+    return wrapped
 
 
 def eswtn_name_status(raw_label):
@@ -474,17 +512,55 @@ def eswtn_name_status(raw_label):
         return label, False, 'Use 1–63 letters, numbers or hyphens. The name cannot start or end with a hyphen.'
     if label in ESWTN_RESERVED_LABELS:
         return label, False, 'This name is reserved for TechX infrastructure.'
-    existing = DomainRequest.query.filter_by(requested_label=label).filter(
+    existing_request = DomainRequest.query.filter_by(requested_label=label).filter(
         DomainRequest.status.in_(['pending', 'approved', 'active'])
     ).first()
-    if existing:
+    existing_account = DomainAccount.query.filter_by(label=label).filter(
+        DomainAccount.status.in_(['active', 'suspended'])
+    ).first()
+    if existing_request or existing_account:
         return label, False, 'This name already has an active or pending request.'
     return label, True, 'This name is preliminarily available.'
 
 
+def owned_domain_account(account_id):
+    account = DomainAccount.query.get_or_404(account_id)
+    owner_email = (current_user.email or '').strip().lower()
+    owns_account = (
+        account.user_id == current_user.id
+        or account.owner_email.strip().lower() == owner_email
+    )
+    if not owns_account and not is_domain_admin():
+        abort(403)
+    return account
+
+
+def record_snapshot(record):
+    return {
+        'type': record.record_type,
+        'name': record.name,
+        'content': record.content,
+        'ttl': record.ttl,
+        'proxied': record.proxied,
+        'priority': record.priority
+    }
+
+
+def add_dns_audit(account, action, record_name=None, before=None, after=None):
+    db.session.add(DnsAuditLog(
+        domain_account_id=account.id,
+        user_id=current_user.id if current_user.is_authenticated else None,
+        action=action,
+        record_name=record_name,
+        before_value=json.dumps(before, sort_keys=True) if before is not None else None,
+        after_value=json.dumps(after, sort_keys=True) if after is not None else None,
+        ip_address=request.headers.get('X-Forwarded-For', request.remote_addr or '')[:64]
+    ))
+
+
 @app.route('/domain-support', methods=['GET', 'POST'])
 def domain_support():
-    ensure_domain_request_table()
+    ensure_domain_tables()
     form = DomainInterestForm()
 
     if request.method == 'GET' and current_user.is_authenticated and not form.email.data:
@@ -519,7 +595,7 @@ def domain_support():
 
 @app.route('/api/domain-availability')
 def domain_availability():
-    ensure_domain_request_table()
+    ensure_domain_tables()
     label, available, message = eswtn_name_status(request.args.get('name'))
     return jsonify({
         'label': label,
@@ -532,16 +608,314 @@ def domain_availability():
 @app.route('/domain-portal')
 @login_required
 def domain_portal():
-    ensure_domain_request_table()
+    ensure_domain_tables()
+    owner_email = (current_user.email or '').strip().lower()
     domain_requests = DomainRequest.query.filter(
         (DomainRequest.user_id == current_user.id) |
-        (DomainRequest.email == current_user.email)
+        (DomainRequest.email == owner_email)
     ).order_by(DomainRequest.created_at.desc()).all()
+
+    admin_view = is_domain_admin() and request.args.get('admin_view') == '1'
+    requested_account_id = request.args.get('account', type=int)
+    if admin_view and requested_account_id:
+        selected_account = DomainAccount.query.get_or_404(requested_account_id)
+        accounts = [selected_account]
+    else:
+        accounts = DomainAccount.query.filter(
+            (DomainAccount.user_id == current_user.id) |
+            (DomainAccount.owner_email == owner_email)
+        ).order_by(DomainAccount.created_at.desc()).all()
+        selected_account = next(
+            (item for item in accounts if item.id == requested_account_id),
+            accounts[0] if accounts else None
+        )
+
+    dns_records = []
+    audit_logs = []
+    if selected_account:
+        dns_records = ManagedDnsRecord.query.filter_by(
+            domain_account_id=selected_account.id
+        ).order_by(ManagedDnsRecord.record_type, ManagedDnsRecord.name).all()
+        audit_logs = DnsAuditLog.query.filter_by(
+            domain_account_id=selected_account.id
+        ).order_by(DnsAuditLog.created_at.desc()).limit(12).all()
+
     return render_template(
         'domain_portal.html',
         title='My eswtn.com Domains | Tech Xolutions',
-        domain_requests=domain_requests
+        domain_requests=domain_requests,
+        accounts=accounts,
+        selected_account=selected_account,
+        dns_records=dns_records,
+        audit_logs=audit_logs,
+        record_form=DnsRecordForm(),
+        delete_form=DnsDeleteForm(),
+        dns_configured=cloudflare_configured(),
+        domain_admin=is_domain_admin(),
+        admin_view=admin_view
     )
+
+
+@app.route('/domain-portal/<int:account_id>/records', methods=['POST'])
+@login_required
+def domain_record_create(account_id):
+    ensure_domain_tables()
+    account = owned_domain_account(account_id)
+    form = DnsRecordForm()
+
+    if account.status != 'active':
+        flash('DNS records cannot be changed while this namespace is not active.', 'error')
+        return redirect(url_for('domain_portal', account=account.id))
+    if not cloudflare_configured():
+        flash('DNS automation is not configured on the server yet.', 'error')
+        return redirect(url_for('domain_portal', account=account.id))
+    if ManagedDnsRecord.query.filter_by(domain_account_id=account.id).count() >= account.record_limit:
+        flash(f'This account has reached its limit of {account.record_limit} DNS records.', 'error')
+        return redirect(url_for('domain_portal', account=account.id))
+
+    if form.validate_on_submit():
+        try:
+            payload = build_record_payload(
+                form.record_type.data,
+                form.name.data,
+                form.content.data,
+                form.ttl.data,
+                form.proxied.data,
+                form.priority.data,
+                account.fqdn
+            )
+            provider_record = cloudflare_create_record(payload)
+            dns_record = ManagedDnsRecord(
+                domain_account_id=account.id,
+                provider_record_id=provider_record['id'],
+                record_type=provider_record.get('type', payload['type']),
+                name=provider_record.get('name', payload['name']),
+                content=provider_record.get('content', payload['content']),
+                ttl=provider_record.get('ttl', payload['ttl']),
+                proxied=provider_record.get('proxied', payload['proxied']),
+                priority=provider_record.get('priority', payload.get('priority'))
+            )
+            db.session.add(dns_record)
+            add_dns_audit(account, 'record_created', dns_record.name, after=payload)
+            db.session.commit()
+            flash(f'{dns_record.record_type} record created successfully.', 'success')
+        except (DnsValidationError, DnsServiceError) as error:
+            flash(str(error), 'error')
+    else:
+        flash('Please correct the DNS record form and try again.', 'error')
+
+    return redirect(url_for('domain_portal', account=account.id) + '#dns-records')
+
+
+@app.route('/domain-portal/records/<int:record_id>/edit', methods=['GET', 'POST'])
+@login_required
+def domain_record_edit(record_id):
+    ensure_domain_tables()
+    dns_record = ManagedDnsRecord.query.get_or_404(record_id)
+    account = owned_domain_account(dns_record.domain_account_id)
+    form = DnsRecordForm()
+
+    if request.method == 'GET':
+        form.record_type.data = dns_record.record_type
+        form.name.data = dns_record.name
+        form.content.data = dns_record.content
+        form.ttl.data = dns_record.ttl
+        form.proxied.data = dns_record.proxied
+        form.priority.data = dns_record.priority if dns_record.priority is not None else 10
+
+    if form.validate_on_submit():
+        if account.status != 'active':
+            flash('DNS records cannot be changed while this namespace is not active.', 'error')
+            return redirect(url_for('domain_portal', account=account.id))
+        if not cloudflare_configured():
+            flash('DNS automation is not configured on the server yet.', 'error')
+            return redirect(url_for('domain_portal', account=account.id))
+
+        before = record_snapshot(dns_record)
+        try:
+            payload = build_record_payload(
+                form.record_type.data,
+                form.name.data,
+                form.content.data,
+                form.ttl.data,
+                form.proxied.data,
+                form.priority.data,
+                account.fqdn
+            )
+            provider_record = cloudflare_update_record(dns_record.provider_record_id, payload)
+            dns_record.record_type = provider_record.get('type', payload['type'])
+            dns_record.name = provider_record.get('name', payload['name'])
+            dns_record.content = provider_record.get('content', payload['content'])
+            dns_record.ttl = provider_record.get('ttl', payload['ttl'])
+            dns_record.proxied = provider_record.get('proxied', payload['proxied'])
+            dns_record.priority = provider_record.get('priority', payload.get('priority'))
+            add_dns_audit(account, 'record_updated', dns_record.name, before=before, after=payload)
+            db.session.commit()
+            flash('DNS record updated successfully.', 'success')
+            return redirect(url_for('domain_portal', account=account.id) + '#dns-records')
+        except (DnsValidationError, DnsServiceError) as error:
+            flash(str(error), 'error')
+
+    return render_template(
+        'domain_record_edit.html',
+        title=f'Edit DNS Record | {account.fqdn}',
+        account=account,
+        dns_record=dns_record,
+        form=form
+    )
+
+
+@app.route('/domain-portal/records/<int:record_id>/delete', methods=['POST'])
+@login_required
+def domain_record_delete(record_id):
+    ensure_domain_tables()
+    dns_record = ManagedDnsRecord.query.get_or_404(record_id)
+    account = owned_domain_account(dns_record.domain_account_id)
+    form = DnsDeleteForm()
+
+    if not form.validate_on_submit():
+        abort(400)
+    if account.status != 'active':
+        flash('DNS records cannot be changed while this namespace is not active.', 'error')
+        return redirect(url_for('domain_portal', account=account.id))
+    if not cloudflare_configured():
+        flash('DNS automation is not configured on the server yet.', 'error')
+        return redirect(url_for('domain_portal', account=account.id))
+
+    before = record_snapshot(dns_record)
+    try:
+        cloudflare_delete_record(dns_record.provider_record_id)
+        add_dns_audit(account, 'record_deleted', dns_record.name, before=before)
+        db.session.delete(dns_record)
+        db.session.commit()
+        flash('DNS record deleted successfully.', 'success')
+    except DnsServiceError as error:
+        flash(str(error), 'error')
+
+    return redirect(url_for('domain_portal', account=account.id) + '#dns-records')
+
+
+@app.route('/domain-admin')
+@domain_admin_required
+def domain_admin():
+    ensure_domain_tables()
+    pending_requests = DomainRequest.query.filter_by(status='pending').order_by(
+        DomainRequest.created_at.asc()
+    ).all()
+    accounts = DomainAccount.query.order_by(DomainAccount.created_at.desc()).all()
+    return render_template(
+        'domain_admin.html',
+        title='eswtn.com Administration | Tech Xolutions',
+        pending_requests=pending_requests,
+        accounts=accounts,
+        action_form=DomainAdminActionForm(),
+        dns_configured=cloudflare_configured()
+    )
+
+
+@app.route('/domain-admin/requests/<int:request_id>/approve', methods=['POST'])
+@domain_admin_required
+def domain_request_approve(request_id):
+    ensure_domain_tables()
+    form = DomainAdminActionForm()
+    if not form.validate_on_submit():
+        abort(400)
+    if not cloudflare_configured():
+        flash('Configure the Cloudflare token and zone ID before activating namespaces.', 'error')
+        return redirect(url_for('domain_admin'))
+
+    domain_request_item = DomainRequest.query.get_or_404(request_id)
+    if domain_request_item.status != 'pending':
+        flash('This request has already been reviewed.', 'error')
+        return redirect(url_for('domain_admin'))
+
+    fqdn = f'{domain_request_item.requested_label}.eswtn.com'
+    existing_account = DomainAccount.query.filter(
+        (DomainAccount.request_id == domain_request_item.id) |
+        (DomainAccount.label == domain_request_item.requested_label)
+    ).first()
+    if existing_account:
+        flash('An account already exists for this request or namespace.', 'error')
+        return redirect(url_for('domain_admin'))
+
+    try:
+        provider_records = cloudflare_find_records(fqdn)
+    except DnsServiceError as error:
+        flash(str(error), 'error')
+        return redirect(url_for('domain_admin'))
+    if provider_records:
+        flash(f'{fqdn} already has Cloudflare DNS records. Review it manually before approval.', 'error')
+        return redirect(url_for('domain_admin'))
+
+    linked_user = User.query.filter_by(email=domain_request_item.email).first()
+    account = DomainAccount(
+        request_id=domain_request_item.id,
+        user_id=domain_request_item.user_id or (linked_user.id if linked_user else None),
+        owner_email=domain_request_item.email.strip().lower(),
+        label=domain_request_item.requested_label,
+        fqdn=fqdn,
+        plan=domain_request_item.request_type,
+        status='active',
+        record_limit=25,
+        activated_at=datetime.utcnow()
+    )
+    domain_request_item.status = 'active'
+    domain_request_item.reviewed_at = datetime.utcnow()
+    db.session.add(account)
+    db.session.flush()
+    add_dns_audit(account, 'account_activated', fqdn, after={
+        'plan': account.plan,
+        'owner_email': account.owner_email,
+        'record_limit': account.record_limit
+    })
+    db.session.commit()
+    flash(f'{fqdn} is active and ready for customer DNS management.', 'success')
+    return redirect(url_for('domain_admin'))
+
+
+@app.route('/domain-admin/requests/<int:request_id>/reject', methods=['POST'])
+@domain_admin_required
+def domain_request_reject(request_id):
+    ensure_domain_tables()
+    form = DomainAdminActionForm()
+    if not form.validate_on_submit():
+        abort(400)
+
+    domain_request_item = DomainRequest.query.get_or_404(request_id)
+    if domain_request_item.status != 'pending':
+        flash('This request has already been reviewed.', 'error')
+        return redirect(url_for('domain_admin'))
+
+    domain_request_item.status = 'rejected'
+    domain_request_item.reviewed_at = datetime.utcnow()
+    db.session.commit()
+    flash(f'{domain_request_item.fqdn} was rejected.', 'success')
+    return redirect(url_for('domain_admin'))
+
+
+
+@app.route('/domain-admin/accounts/<int:account_id>/status', methods=['POST'])
+@domain_admin_required
+def domain_account_status(account_id):
+    ensure_domain_tables()
+    form = DomainAdminActionForm()
+    if not form.validate_on_submit():
+        abort(400)
+
+    account = DomainAccount.query.get_or_404(account_id)
+    if account.status == 'active':
+        account.status = 'suspended'
+        action = 'account_editing_paused'
+        message = f'DNS editing paused for {account.fqdn}. Existing DNS records remain live.'
+    else:
+        account.status = 'active'
+        action = 'account_editing_resumed'
+        message = f'DNS editing resumed for {account.fqdn}.'
+
+    add_dns_audit(account, action, account.fqdn, after={'status': account.status})
+    db.session.commit()
+    flash(message, 'success')
+    return redirect(url_for('domain_admin'))
 
 
 @app.route('/about')

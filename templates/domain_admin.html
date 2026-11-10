@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="account-hero domain-account-hero">
+    <div class="site-shell">
+        <span class="eyebrow">TechX Administration</span>
+        <h1>eswtn.com domain approvals</h1>
+        <p>Review namespace requests and control customer activation.</p>
+    </div>
+</section>
+
+<section class="section-pad domain-admin">
+    <div class="site-shell">
+        <div class="domain-admin__top">
+            <div><h2>Domain operations</h2><p>Only approved namespaces can access the Cloudflare-backed DNS editor.</p></div>
+            <a class="button button--secondary" href="{{ url_for('domain_portal') }}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Client Portal</a>
+        </div>
+
+        {% if dns_configured %}
+        <div class="dns-alert dns-alert--success"><i class="fa-solid fa-cloud" aria-hidden="true"></i><div><strong>Cloudflare connection configured</strong><p>Approvals and customer DNS changes can use the server-side integration.</p></div></div>
+        {% else %}
+        <div class="dns-alert dns-alert--warning"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i><div><strong>Cloudflare credentials required</strong><p>Set CLOUDFLARE_API_TOKEN and CLOUDFLARE_ZONE_ID before approving namespaces.</p></div></div>
+        {% endif %}
+
+        <section class="domain-admin-section">
+            <div class="dns-panel-heading"><div><span class="eyebrow">Awaiting review</span><h3>Pending requests</h3></div><span class="domain-admin-count">{{ pending_requests|length }}</span></div>
+            {% if pending_requests %}
+            <div class="domain-admin-list">
+                {% for item in pending_requests %}
+                <article class="domain-admin-request">
+                    <div class="domain-admin-request__identity"><i class="fa-solid fa-globe-africa" aria-hidden="true"></i><div><strong>{{ item.fqdn }}</strong><a href="mailto:{{ item.email }}">{{ item.email }}</a></div></div>
+                    <div><span>Service</span><strong>{{ item.request_type.replace('_', ' ')|title }}</strong></div>
+                    <div><span>Intended use</span><p>{{ item.intended_use }}</p></div>
+                    <time datetime="{{ item.created_at.isoformat() }}">{{ item.created_at.strftime('%d %b %Y, %H:%M') }}</time>
+                    <div class="domain-admin-request__actions">
+                        <form method="POST" action="{{ url_for('domain_request_approve', request_id=item.id) }}">
+                            {{ action_form.hidden_tag() }}
+                            <button class="button button--primary" type="submit" {% if not dns_configured %}disabled{% endif %}><i class="fa-solid fa-check" aria-hidden="true"></i> Approve</button>
+                        </form>
+                        <form method="POST" action="{{ url_for('domain_request_reject', request_id=item.id) }}" onsubmit="return confirm('Reject {{ item.fqdn }}?');">
+                            {{ action_form.hidden_tag() }}
+                            <button class="button button--secondary domain-reject" type="submit"><i class="fa-solid fa-xmark" aria-hidden="true"></i> Reject</button>
+                        </form>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="dns-empty"><i class="fa-solid fa-circle-check" aria-hidden="true"></i><h3>No pending requests</h3><p>New eswtn.com applications will appear here.</p></div>
+            {% endif %}
+        </section>
+
+        <section class="domain-admin-section">
+            <div class="dns-panel-heading"><div><span class="eyebrow">Provisioned customers</span><h3>Active namespaces</h3></div><span class="domain-admin-count">{{ accounts|length }}</span></div>
+            {% if accounts %}
+            <div class="dns-table-wrap">
+                <table class="dns-table domain-admin-table">
+                    <thead><tr><th>Namespace</th><th>Customer</th><th>Plan</th><th>Records</th><th>Status</th><th></th></tr></thead>
+                    <tbody>
+                    {% for account in accounts %}
+                    <tr>
+                        <td><strong>{{ account.fqdn }}</strong><small>Activated {{ account.activated_at.strftime('%d %b %Y') if account.activated_at else '—' }}</small></td>
+                        <td><a href="mailto:{{ account.owner_email }}">{{ account.owner_email }}</a></td>
+                        <td>{{ account.plan.replace('_', ' ')|title }}</td>
+                        <td>{{ account.records|length }} / {{ account.record_limit }}</td>
+                        <td><span class="domain-status domain-status--{{ account.status }}">{{ account.status|title }}</span></td>
+                        <td><div class="dns-admin-actions"><a class="dns-admin-view" href="{{ url_for('domain_portal', account=account.id, admin_view=1) }}">View DNS <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a><form method="POST" action="{{ url_for('domain_account_status', account_id=account.id) }}">{{ action_form.hidden_tag() }}<button type="submit">{{ 'Pause editing' if account.status == 'active' else 'Resume editing' }}</button></form></div></td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="dns-empty"><i class="fa-solid fa-users" aria-hidden="true"></i><h3>No active namespaces</h3><p>Approved customer accounts will appear here.</p></div>
+            {% endif %}
+        </section>
+    </div>
+</section>
+{% endblock %}
