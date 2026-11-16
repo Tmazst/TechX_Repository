@@ -163,3 +163,15 @@ class DnsAuditLog(db.Model):
     ip_address = db.Column(db.String(64), nullable=True)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, index=True)
 
+
+
+class AccountEmailCode(db.Model):
+    __tablename__ = 'account_email_code'
+
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    purpose = db.Column(db.String(24), primary_key=True)
+    digest = db.Column(db.String(64), nullable=False)
+    issued_at = db.Column(db.DateTime, nullable=False)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    attempts = db.Column(db.Integer, nullable=False)
+    consumed = db.Column(db.Boolean, nullable=False)

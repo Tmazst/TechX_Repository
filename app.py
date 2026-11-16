@@ -1,5 +1,5 @@
 
-from flask import Flask,render_template,url_for,redirect,request,flash,jsonify,abort
+from flask import Flask,render_template,url_for,redirect,request,flash,jsonify,abort,session
 from flask_login import login_user, LoginManager,current_user,logout_user, login_required
 from Forms import *
 from models import *
@@ -11,6 +11,13 @@ import re
 import json
 from datetime import datetime
 from functools import wraps
+from urllib.parse import urlsplit
+from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError
+from account_email import (
+    RESET_PASSWORD, VERIFY_EMAIL, consume_code, find_account, issue_code,
+    normalize_email, session_version
+)
 from werkzeug.utils import secure_filename
 from flask_mail import Mail, Message
 # from bs4 import BeautifulSoup as bs
@@ -32,9 +39,11 @@ from domain_dns import (
 
 #Change App
 app = Flask(__name__)
-app.config['SECRET_KEY'] = "sdsdjfe832j2rj_32j"
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///techx_db.db"
-# app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://root:tmazst41@localhost/techxolutions_db"
+app.config['SECRET_KEY'] = os.environ['TECHX_SECRET_KEY']
+app.config['SESSION_COOKIE_SECURE'] = os.environ.get('TECHX_SECURE_COOKIES', '1') == '1'
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('TECHX_DATABASE_URI', 'sqlite:///techx_db.db')
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle':280}
 app.config["SQLALCHEMY_POOL_RECYCLE"] = 299
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -50,7 +59,11 @@ login_manager.login_view = 'login'
 # Log in
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(user_id)
+    user = db.session.get(User, user_id)
+    version = session.get('account_session_version')
+    if user and user.verified and version and secrets.compare_digest(version, session_version(user)):
+        return user
+    return None
 
 
 ALLOWED_EXTENSIONS = {"txt", "xlxs",'docx', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
@@ -317,47 +330,150 @@ def web_design_brief():
     return render_template("web_design_brief.html",web_brief=web_brief)
 
 
-@app.route("/client_signup", methods=["POST","GET"])
+def ensure_account_tables():
+    User.__table__.create(bind=db.engine, checkfirst=True)
+    AccountEmailCode.__table__.create(bind=db.engine, checkfirst=True)
+
+
+def safe_login_destination(target):
+    if not target or not target.startswith('/') or target.startswith('//'):
+        return None
+    if '\\' in target or any(ord(character) < 32 for character in target):
+        return None
+    parts = urlsplit(target)
+    return target if not parts.scheme and not parts.netloc else None
+
+
+def start_customer_session(user, version):
+    session.clear()
+    login_user(user)
+    session['account_session_version'] = version
+
+
+def begin_verification(user, destination):
+    session.clear()
+    session['verify_email'] = normalize_email(user.email)
+    session['verify_session_version'] = session_version(user)
+    session['verify_next'] = destination
+    if issue_code(user, VERIFY_EMAIL):
+        flash('We sent a verification code to your email.', 'success')
+    return redirect(url_for('verify_email'))
+
+
+@app.route("/client_signup", methods=["GET", "POST"])
 def sign_up():
-
-    register = Register()
-
-    db.create_all()
-
     if current_user.is_authenticated:
-        return redirect(url_for('home'))
+        return redirect(url_for('domain_portal'))
 
-    image_fl = url_for('static', filename='images/image.jpg')
-
+    register = CustomerSignupForm()
+    destination = safe_login_destination(request.args.get('next'))
     if register.validate_on_submit():
-
-        #print(f"Account Successfully Created for {register.name.data}")
-        if request.method == 'POST':
-            # context
-
-            hashd_pwd = encry_pw.generate_password_hash(register.password.data).decode('utf-8')
-            user1 = User(name=register.name.data, email=register.email.data, password=hashd_pwd,
-                         confirm_password=hashd_pwd,image="default.jpg")
-
-            # db.rollback()
+        ensure_account_tables()
+        email = normalize_email(register.email.data)
+        existing = User.query.filter(func.lower(func.trim(User.email)) == email).first()
+        if existing:
+            register.email.errors.append('An account already uses this email. Sign in or reset your password.')
+        else:
+            password_hash = encry_pw.generate_password_hash(register.password.data).decode('utf-8')
+            user = User(name=register.name.data, email=email, password=password_hash,
+                        confirm_password=password_hash, image='default.jpg')
+            db.session.add(user)
             try:
-                db.session.add(user1)
                 db.session.commit()
-                flash(f"Account Successfully Created for {register.name.data}", "success")
-                return redirect(url_for('login'))
-            except: # IntegrityError:
-                flash(f"Something went wrong, check for errors", "success")
-                Register().validate_email(register.email.data)
+            except IntegrityError:
+                db.session.rollback()
+                register.email.errors.append('Could not create the account. Try signing in or resetting your password.')
+            else:
+                return begin_verification(user, destination)
+
+    return render_template('client_signup.html', register=register, destination=destination)
 
 
-            # #print(register.name.data,register.email.data)
-    elif register.errors:
-        flash(f"Account Creation Unsuccessful ", "error")
-        #print(register.errors)
+@app.route('/verify-email', methods=['GET', 'POST'])
+def verify_email():
+    if not session.get('verify_email'):
+        return redirect(url_for('login'))
+    ensure_account_tables()
+    user = find_account(session['verify_email'])
+    if user is None or session.get('verify_session_version') != session_version(user):
+        session.clear()
+        return redirect(url_for('login'))
+
+    form = AccountCodeForm()
+    resend_form = FlaskForm()
+    if request.method == 'POST':
+        if request.form.get('action') == 'resend':
+            if resend_form.validate_on_submit():
+                if issue_code(user, VERIFY_EMAIL):
+                    flash('We sent a new verification code.', 'success')
+                else:
+                    flash('A new code could not be sent. Wait one minute and try again.', 'error')
+            return redirect(url_for('verify_email'))
+        if form.validate_on_submit():
+            if consume_code(user, VERIFY_EMAIL, form.code.data):
+                db.session.refresh(user)
+                version = session_version(user)
+                if version != session.get('verify_session_version'):
+                    db.session.rollback()
+                    session.clear()
+                    return redirect(url_for('login'))
+                user.verified = True
+                db.session.commit()
+                destination = session.get('verify_next')
+                start_customer_session(user, version)
+                flash('Your email is verified.', 'success')
+                return redirect(destination or url_for('domain_portal'))
+            form.code.errors.append('This code is invalid or has expired. Request a new code if needed.')
+
+    return render_template('account_email.html', title='Verify your email', form=form,
+                           email=user.email, resend_form=resend_form)
 
 
-    # from myproject.models import user
-    return render_template("client_signup.html",register=register)
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    form = PasswordResetRequestForm()
+    if form.validate_on_submit():
+        ensure_account_tables()
+        email = normalize_email(form.email.data)
+        user = find_account(email)
+        if user:
+            issue_code(user, RESET_PASSWORD)
+        session['reset_email'] = email
+        flash('If an account matches that email, a password reset code will be sent.', 'success')
+        return redirect(url_for('reset_password'))
+
+    return render_template('account_email.html', title='Forgot password', form=form)
+
+
+@app.route('/reset-password', methods=['GET', 'POST'])
+def reset_password():
+    email = session.get('reset_email')
+    if not email:
+        return redirect(url_for('forgot_password'))
+
+    form = CustomerResetForm()
+    if form.validate_on_submit():
+        ensure_account_tables()
+        user = find_account(email)
+        version = session_version(user) if user else None
+        if consume_code(user, RESET_PASSWORD, form.code.data):
+            db.session.refresh(user)
+            if version != session_version(user):
+                db.session.rollback()
+                return redirect(url_for('forgot_password'))
+            password_hash = encry_pw.generate_password_hash(form.password.data).decode('utf-8')
+            user.password = password_hash
+            user.confirm_password = password_hash
+            db.session.commit()
+            logout_user()
+            session.clear()
+            flash('Your password has been reset. Sign in with your new password.', 'success')
+            return redirect(url_for('login'))
+        form.code.errors.append('This code is invalid or has expired. Request a new code if needed.')
+
+    return render_template('account_email.html', title='Reset your password', form=form,
+                           email=email, reset=True)
+
 
 @app.route("/client_user_acc", methods=["POST","GET"])
 @login_required
@@ -381,44 +497,22 @@ def client_user_acc():
     return render_template("client_user_acc.html",user_acc=user_acc,signup=signup)
 
 
-@app.route("/login", methods=["POST","GET"])
+@app.route("/login", methods=["GET", "POST"])
 def login():
+    form = Login()
+    destination = safe_login_destination(request.args.get('next'))
+    if form.validate_on_submit():
+        ensure_account_tables()
+        user = find_account(form.email.data)
+        if (user and len(form.password.data.encode('utf-8')) <= 72
+                and encry_pw.check_password_hash(user.password, form.password.data)):
+            if not user.verified:
+                return begin_verification(user, destination)
+            start_customer_session(user, session_version(user))
+            return redirect(destination or url_for('domain_portal'))
+        flash('Login unsuccessful. Check your email and password.', 'error')
 
-    login = Login()
-
-    print(f"Submtion: ")
-
-
-    if login.validate_on_submit():
-
-
-        if request.method == 'POST':
-
-            user_login = User.query.filter_by(email=login.email.data).first()
-            # flash(f"Hey! {user_login.password} Welcome", "success")
-            if user_login and encry_pw.check_password_hash(user_login.password, login.password.data):
-                login_user(user_login)
-                # print("Creditantials are ok")
-                # if not user_login.verified:
-                #     return redirect(url_for('verification'))
-                # else:
-                    # After login required prompt, take me to the page I requested earlier
-                print("No Verification Needed: ", user_login.verified)
-                req_page = request.args.get('next')
-                flash(f"Hey! {user_login.name.title()} You're Logged In!", "success")
-                return redirect(req_page) if req_page else redirect(url_for('home'))
-            else:
-                flash(f"Login Unsuccessful, please use correct email or password", "error")
-                # print(login.errors)
-    else:
-        print("No Validation")
-        if login.errors:
-            for error in login.errors:
-                print("Errors: ", error)
-        else:
-            print("No Errors found", login.email.data, login.password.data)
-
-    return render_template("login.html",login=login)
+    return render_template('login.html', login=form, destination=destination)
 
 
 @app.route('/cashbook',methods=['POST','GET'])
@@ -525,12 +619,7 @@ def eswtn_name_status(raw_label):
 
 def owned_domain_account(account_id):
     account = DomainAccount.query.get_or_404(account_id)
-    owner_email = (current_user.email or '').strip().lower()
-    owns_account = (
-        account.user_id == current_user.id
-        or account.owner_email.strip().lower() == owner_email
-    )
-    if not owns_account and not is_domain_admin():
+    if account.user_id != current_user.id and not is_domain_admin():
         abort(403)
     return account
 
@@ -563,7 +652,7 @@ def domain_support():
     ensure_domain_tables()
     form = DomainInterestForm()
 
-    if request.method == 'GET' and current_user.is_authenticated and not form.email.data:
+    if current_user.is_authenticated:
         form.email.data = current_user.email
 
     if form.validate_on_submit():
@@ -574,7 +663,7 @@ def domain_support():
             domain_request = DomainRequest(
                 user_id=current_user.id if current_user.is_authenticated else None,
                 requested_label=label,
-                email=form.email.data.strip().lower(),
+                email=normalize_email(form.email.data),
                 request_type=form.request_type.data,
                 intended_use=form.intended_use.data.strip(),
                 status='pending'
@@ -609,11 +698,17 @@ def domain_availability():
 @login_required
 def domain_portal():
     ensure_domain_tables()
-    owner_email = (current_user.email or '').strip().lower()
-    domain_requests = DomainRequest.query.filter(
-        (DomainRequest.user_id == current_user.id) |
-        (DomainRequest.email == owner_email)
-    ).order_by(DomainRequest.created_at.desc()).all()
+    owner_email = normalize_email(current_user.email)
+    # Preserve guest reservations and legacy approved domains after mailbox verification.
+    for model, email_column in ((DomainRequest, DomainRequest.email),
+                                (DomainAccount, DomainAccount.owner_email)):
+        model.query.filter(model.user_id.is_(None), func.lower(func.trim(email_column)) == owner_email).update(
+            {'user_id': current_user.id}, synchronize_session=False
+        )
+    db.session.commit()
+    domain_requests = DomainRequest.query.filter_by(user_id=current_user.id).order_by(
+        DomainRequest.created_at.desc()
+    ).all()
 
     admin_view = is_domain_admin() and request.args.get('admin_view') == '1'
     requested_account_id = request.args.get('account', type=int)
@@ -621,10 +716,7 @@ def domain_portal():
         selected_account = DomainAccount.query.get_or_404(requested_account_id)
         accounts = [selected_account]
     else:
-        accounts = DomainAccount.query.filter(
-            (DomainAccount.user_id == current_user.id) |
-            (DomainAccount.owner_email == owner_email)
-        ).order_by(DomainAccount.created_at.desc()).all()
+        accounts = DomainAccount.query.filter_by(user_id=current_user.id).order_by(DomainAccount.created_at.desc()).all()
         selected_account = next(
             (item for item in accounts if item.id == requested_account_id),
             accounts[0] if accounts else None
@@ -847,10 +939,10 @@ def domain_request_approve(request_id):
         flash(f'{fqdn} already has Cloudflare DNS records. Review it manually before approval.', 'error')
         return redirect(url_for('domain_admin'))
 
-    linked_user = User.query.filter_by(email=domain_request_item.email).first()
+    linked_user = find_account(domain_request_item.email)
     account = DomainAccount(
         request_id=domain_request_item.id,
-        user_id=domain_request_item.user_id or (linked_user.id if linked_user else None),
+        user_id=domain_request_item.user_id or (linked_user.id if linked_user and linked_user.verified else None),
         owner_email=domain_request_item.email.strip().lower(),
         label=domain_request_item.requested_label,
         fqdn=fqdn,

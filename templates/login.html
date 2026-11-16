@@ -47,8 +47,8 @@
                 </div>
             </div>
             <div style="" class="group">
-                <div><a class="slinks-li" href="login">Create Account</a></div>
-                <div><a class="slinks-li" href="login">Forgot Password?</a></div>
+                <div><a class="slinks-li" href="{{ url_for('sign_up', next=destination) }}">Create Account</a></div>
+                <div><a class="slinks-li" href="{{ url_for('forgot_password') }}">Forgot Password?</a></div>
             </div>
 
         </form>

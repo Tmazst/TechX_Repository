@@ -34,7 +34,7 @@
                 </div>
                 <a href="/#work">Our Work</a><a href="/#clients">Clients &amp; Partners</a><a href="/about">About</a>
                 <a class="nav-cta" href="/#contact-us">Request a Quote <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
-                {% if current_user.is_authenticated %}<a href="/client_user_acc"><i class="fa-regular fa-user" aria-hidden="true"></i> My Account</a>{% else %}<a class="nav-login" href="/login"><i class="fa-regular fa-user" aria-hidden="true"></i> Client Login</a>{% endif %}
+                {% if current_user.is_authenticated %}<a href="/client_user_acc"><i class="fa-regular fa-user" aria-hidden="true"></i> My Account</a><a href="{{ url_for('domain_portal') }}">My Domains</a>{% else %}<a class="nav-login" href="/login"><i class="fa-regular fa-user" aria-hidden="true"></i> Client Login</a>{% endif %}
             </div>
         </nav>
     </header>

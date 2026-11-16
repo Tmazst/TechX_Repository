@@ -88,7 +88,7 @@
                 <p class="domain-availability" id="domain-availability" aria-live="polite"></p>
 
                 <label for="{{ form.email.id }}">Contact email</label>
-                {{ form.email(class_="modern-input", placeholder="you@company.com") }}
+                {{ form.email(class_="modern-input", placeholder="you@company.com", readonly=current_user.is_authenticated) }}
                 {% for error in form.email.errors %}<small class="field-error">{{ error }}</small>{% endfor %}
 
                 <label for="{{ form.request_type.id }}">Service needed</label>

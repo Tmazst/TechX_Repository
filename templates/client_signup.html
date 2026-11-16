@@ -71,7 +71,7 @@
                  <div style="padding-left:;width:100%;background-color:339ab3" class="d-flex">
                      <div>{{ register.submit(class="btns") }}</div><br>
                      <!--<input class="btns" type="submit" value="Create Account" />-->
-                     <div><a class="slinks-li" href="login">Login instead?</a></div>
+                     <div><a class="slinks-li" href="{{ url_for('login', next=destination) }}">Login instead?</a></div>
                 </div>
             </div>
 
