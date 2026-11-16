@@ -99,11 +99,9 @@ def createall(db_):
 encry_pw = Bcrypt()
 
 @app.context_processor
-def inject_ser():
-    # ser = Serializer(app.config['SECRET_KEY'])  # Define or retrieve the value for 'ser'
-    # count_jobs = count_ads()
+def account_navigation():
+    return {'sign_out_form': FlaskForm(prefix='logout')} if current_user.is_authenticated else {}
 
-    return dict()
 
 def mail_enqueries(contact_form):
 
@@ -556,10 +554,15 @@ def cashbook_table():
 
     return render_template('cashbook_table.html',cb_entries=cb_entries,cashbook_form=cashbook_form)
 
-@app.route('/logout')
+@app.route('/logout', methods=['GET', 'POST'])
+@login_required
 def log_out():
-    logout_user()
-    return redirect(url_for('home'))
+    form = FlaskForm(prefix='logout')
+    if form.validate_on_submit():
+        logout_user()
+        session.clear()
+        return redirect(url_for('home'))
+    return render_template('account_logout.html', title='Sign out of TechX', sign_out_form=form)
 
 
 ESWTN_RESERVED_LABELS = {

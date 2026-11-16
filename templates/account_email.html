@@ -1,51 +1,38 @@
-{% extends "base.html" %}
+{% extends "account_layout.html" %}
+{% from "account_fields.html" import account_field, account_csrf %}
 
-{% block content %}
-<div class="form-container">
-    {% for category, message in get_flashed_messages(with_categories=true) %}
-        <div class="flash-messages alert-{{ category }}">{{ message }}</div>
-    {% endfor %}
+{% block account_intro %}
+    {% if email %}
+        <p>Enter the eight-digit code sent to <strong>{{ email }}</strong>. The code expires after 15 minutes.</p>
+    {% else %}
+        <p>Enter the email address you use for your TechX account.</p>
+    {% endif %}
+{% endblock %}
 
-    <div class="general-flex-col border-spec">
-        <h1>{{ title }}</h1>
-        {% if email %}
-            <p>Enter the eight-digit code sent to {{ email }}. The code expires after 15 minutes.</p>
-        {% else %}
-            <p>Enter the email address you use for your TechX account.</p>
+{% block account_content %}
+<form method="post" class="account-form">
+    {{ account_csrf(form) }}
+    {% if email %}
+        {{ account_field(form.code, "one-time-code") }}
+        {% if reset %}
+            {{ account_field(form.password, "new-password") }}
+            {{ account_field(form.confirm, "new-password") }}
         {% endif %}
+    {% else %}
+        {{ account_field(form.email, "email", "Email address") }}
+    {% endif %}
+    {{ form.submit(class="account-button account-button--primary") }}
+</form>
 
-        <form method="post">
-            {{ form.hidden_tag() }}
-            {% for field in form if field.type not in ('CSRFTokenField', 'SubmitField') %}
-                <div class="group">
-                    {{ field.label }}
-                    {% if field.name == 'code' %}
-                        {{ field(class="form-control", inputmode="numeric", autocomplete="one-time-code", maxlength=8) }}
-                    {% elif field.type == 'PasswordField' %}
-                        {{ field(class="form-control", autocomplete="new-password") }}
-                    {% else %}
-                        {{ field(class="form-control", autocomplete="email") }}
-                    {% endif %}
-                    {% for error in field.errors %}
-                        <div class="span-error">{{ error }}</div>
-                    {% endfor %}
-                </div>
-            {% endfor %}
-            {% for error in form.csrf_token.errors %}
-                <p class="span-error">{{ error }}</p>
-            {% endfor %}
-            {{ form.submit(class="btns") }}
+<div class="account-actions">
+    {% if resend_form %}
+        <form method="post" class="account-actions__form">
+            {{ resend_form.csrf_token(id="resend-csrf-token") }}
+            <button class="account-button account-button--secondary" type="submit" name="action" value="resend">Resend code</button>
         </form>
-
-        {% if resend_form %}
-            <form method="post">
-                {{ resend_form.hidden_tag() }}
-                <button class="btns" type="submit" name="action" value="resend">Resend code</button>
-            </form>
-        {% elif reset %}
-            <a href="{{ url_for('forgot_password') }}">Request a new code</a>
-        {% endif %}
-        <a href="{{ url_for('login') }}">Back to sign in</a>
-    </div>
+    {% elif reset %}
+        <a href="{{ url_for('forgot_password') }}">Request a new code</a>
+    {% endif %}
+    <a href="{{ url_for('login') }}">Back to sign in</a>
 </div>
 {% endblock %}

@@ -1,0 +1,12 @@
+{% extends "account_layout.html" %}
+
+{% block account_content %}
+<form method="post" class="account-form">
+    {{ sign_out_form.csrf_token(id="confirm-logout-csrf-token") }}
+    {% for error in sign_out_form.csrf_token.errors %}
+        <p class="account-notice account-notice--error" role="alert">{{ error }}</p>
+    {% endfor %}
+    <button class="account-button account-button--primary" type="submit">Sign out</button>
+</form>
+<div class="account-actions"><a href="{{ url_for('domain_portal') }}">Back to My Domains</a></div>
+{% endblock %}
