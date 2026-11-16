@@ -1,14 +1,17 @@
-{% macro account_field(field, autocomplete, label=none) %}
+{% macro account_field(field, autocomplete, label=none, hint=none) %}
     <div class="account-field">
         {{ field.label(text=label or field.label.text) }}
-        {% set errors = {'aria-invalid': 'true', 'aria-describedby': field.id ~ '-errors'} if field.errors else {} %}
+        {% set descriptions = ([field.id ~ '-hint'] if hint else []) + ([field.id ~ '-errors'] if field.errors else []) %}
+        {% set attributes = {'aria-describedby': descriptions | join(' ')} if descriptions else {} %}
+        {% if field.errors %}{% set attributes = dict(attributes, **{'aria-invalid': 'true'}) %}{% endif %}
         {% if field.name == 'code' %}
-            {{ field(inputmode="numeric", autocomplete=autocomplete, maxlength=8, **errors) }}
+            {{ field(inputmode="numeric", autocomplete=autocomplete, maxlength=8, **attributes) }}
         {% elif field.name == 'email' %}
-            {{ field(type="email", autocomplete=autocomplete, autocapitalize="none", **errors) }}
+            {{ field(type="email", autocomplete=autocomplete, autocapitalize="none", **attributes) }}
         {% else %}
-            {{ field(autocomplete=autocomplete, **errors) }}
+            {{ field(autocomplete=autocomplete, **attributes) }}
         {% endif %}
+        {% if hint %}<p class="account-field__hint" id="{{ field.id }}-hint">{{ hint }}</p>{% endif %}
         {% if field.errors %}
             <ul class="account-field__errors" id="{{ field.id }}-errors">
                 {% for error in field.errors %}<li>{{ error }}</li>{% endfor %}

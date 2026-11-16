@@ -13,10 +13,10 @@
 <form method="post" class="account-form">
     {{ account_csrf(form) }}
     {% if email %}
-        {{ account_field(form.code, "one-time-code") }}
+        {{ account_field(form.code, "one-time-code", hint="Enter the 8 digits from your email.") }}
         {% if reset %}
-            {{ account_field(form.password, "new-password") }}
-            {{ account_field(form.confirm, "new-password") }}
+            {{ account_field(form.password, "new-password", hint="Use at least 8 characters.") }}
+            {{ account_field(form.confirm, "new-password", hint="Type your new password again.") }}
         {% endif %}
     {% else %}
         {{ account_field(form.email, "email", "Email address") }}

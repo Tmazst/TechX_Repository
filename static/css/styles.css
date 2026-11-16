@@ -257,7 +257,7 @@ html { scroll-behavior: smooth; }
     color:white;
 }
 
-#project-2 div,label,small,li,h4{
+#project-2 :is(div, label, small, li, h4){
     color:white !important;
 }
 .ser-ov-title{
@@ -3674,6 +3674,7 @@ section{
     outline-offset: 2px;
 }
 .account-field input:focus { border: 1px solid var(--tx-blue-bright) !important; }
+.account-field__hint { margin: 0; color: #46546c; font-size: 13px; }
 .account-field__errors { margin: 0; padding-left: 20px; color: #a12620; font-size: 13px; }
 .account-button {
     display: inline-flex;
