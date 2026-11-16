@@ -37,6 +37,9 @@
                 {% if current_user.is_authenticated %}
                     <a href="{{ url_for('client_user_acc') }}">My Account</a>
                     <a href="{{ url_for('domain_portal') }}">My Domains</a>
+                    {% if can_manage_domains %}
+                        <a href="{{ url_for('domain_admin') }}">Domain Admin</a>
+                    {% endif %}
                     <form class="nav-sign-out" method="post" action="{{ url_for('log_out') }}">
                         {{ sign_out_form.hidden_tag() }}
                         <button type="submit"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i> Sign out</button>

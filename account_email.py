@@ -44,23 +44,14 @@ def _code_digest(user, purpose, code):
     return _digest(f'{purpose}:{user.id}:{normalize_email(user.email)}:{user.password}:{code}')
 
 
-def _send_email(recipient, purpose, code):
+def send_site_email(message):
     host = os.environ['AUTH_SMTP_HOST']
-    sender = os.environ['AUTH_SMTP_FROM']
     username = os.environ.get('AUTH_SMTP_USERNAME')
     password = os.environ.get('AUTH_SMTP_PASSWORD')
     use_ssl = os.environ.get('AUTH_SMTP_SSL', '0') == '1'
     port = int(os.environ.get('AUTH_SMTP_PORT', '465' if use_ssl else '587'))
 
-    message = EmailMessage()
-    message['From'] = sender
-    message['To'] = recipient
-    message['Subject'] = 'Verify your TechX email' if purpose == VERIFY_EMAIL else 'Reset your TechX password'
-    message.set_content(
-        f'Your TechX code is {code}. It expires in 15 minutes and can be used once. '
-        'If you did not request this code, you can ignore this email.'
-    )
-
+    message['From'] = os.environ['AUTH_SMTP_FROM']
     tls = ssl.create_default_context()
     connection = (
         smtplib.SMTP_SSL(host, port, timeout=10, context=tls)
@@ -72,6 +63,17 @@ def _send_email(recipient, purpose, code):
         if username:
             smtp.login(username, password or '')
         smtp.send_message(message)
+
+
+def _send_email(recipient, purpose, code):
+    message = EmailMessage()
+    message['To'] = recipient
+    message['Subject'] = 'Verify your TechX email' if purpose == VERIFY_EMAIL else 'Reset your TechX password'
+    message.set_content(
+        f'Your TechX code is {code}. It expires in 15 minutes and can be used once. '
+        'If you did not request this code, you can ignore this email.'
+    )
+    send_site_email(message)
 
 
 def issue_code(user, purpose):

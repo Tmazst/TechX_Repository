@@ -16,10 +16,11 @@ from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from account_email import (
     RESET_PASSWORD, VERIFY_EMAIL, consume_code, find_account, issue_code,
-    normalize_email, session_version
+    normalize_email, send_site_email, session_version
 )
 from werkzeug.utils import secure_filename
-from flask_mail import Mail, Message
+from email.message import EmailMessage
+from smtplib import SMTPException
 # from bs4 import BeautifulSoup as bs
 from flask_colorpicker import colorpicker
 from domain_dns import (
@@ -100,38 +101,33 @@ encry_pw = Bcrypt()
 
 @app.context_processor
 def account_navigation():
-    return {'sign_out_form': FlaskForm(prefix='logout')} if current_user.is_authenticated else {}
+    if not current_user.is_authenticated:
+        return {}
+    return {'sign_out_form': FlaskForm(prefix='logout'), 'can_manage_domains': is_domain_admin()}
 
 
-def mail_enqueries(contact_form):
+def deliver_enquiry(form):
+    if not form.validate_on_submit():
+        flash('Enter a valid email address and describe your project.', 'error')
+        return False
 
-    def send_link():
-        app.config["MAIL_SERVER"] = "techxolutions.com"
-        app.config["MAIL_PORT"] = 465
-        app.config["MAIL_USE_TLS"] = True
-        em = app.config["MAIL_USERNAME"] = os.environ.get("EMAIL_INFO")
-        app.config["MAIL_PASSWORD"] = os.environ.get("TX_PWD")
+    message = EmailMessage()
+    message['To'] = 'thabo@eswtn.com'
+    message['Reply-To'] = form.email.data.strip()
+    message['Subject'] = 'New TechX website enquiry'
+    subject = (form.subject.data or '').strip() or 'General enquiry'
+    name = (form.name.data or '').strip() or 'Not provided'
+    message.set_content(f"Name: {name}\nEmail: {form.email.data.strip()}\nSubject: {subject}\n\n{form.message.data.strip()}")
 
-        mail = Mail(app)
+    try:
+        send_site_email(message)
+    except (KeyError, ValueError, OSError, SMTPException) as error:
+        app.logger.error('TechX enquiry delivery failed (%s)', type(error).__name__)
+        flash('We could not send your enquiry. Please try again.', 'error')
+        return False
 
-        msg = Message(contact_form.subject.data, sender=contact_form.email.data, recipients=[em])
-        msg.body = f"""{contact_form.message.data}\n
-{contact_form.email.data}\n
-<p style="font-size:25px;color:red">This is a Test</p>
-                    """
-
-        # try:
-        mail.send(msg)
-        flash("Your Message has been Successfully Sent!!", "success")
-        return f"Email Sent Successfully"
-        # except Exception as e:
-        #     flash(f'Ooops Something went wrong!! Please Retry', 'error')
-        #     return f"The mail was not sent"
-
-        # Send the pwd reset request to the above email
-    send_link()
-
-
+    flash('Your enquiry was sent.', 'success')
+    return True
 
 
 @app.route("/", methods=['POST','GET'])
@@ -144,14 +140,8 @@ def home():
     contact_form = Contact_Form()
     title = "Tech Xolutions (TechX)"
 
-    contact_form = Contact_Form()
-
-    if request.method == "POST":
-        if contact_form.validate_on_submit():
-            mail_enqueries(contact_form)
-        else:
-            return flash("Ooops!! Please be sure to fill both email & message fields, correctly","error")
-        # soup = bs(request.form, "html.parser")
+    if request.method == "POST" and deliver_enquiry(contact_form):
+        return redirect(url_for('home', _anchor='contact-us'))
 
     return render_template("index.html",title=title,contact_form=contact_form,logo_options=logo_options,
                            poster_options=poster_options,brochure_options=brochure_options,flyer_options=flyer_options)
@@ -1020,45 +1010,9 @@ def about():
 
 @app.route("/contact", methods=["POST", "GET"])
 def contact_us():
-    # print("DEBUG EMAIL: ",os.environ.get("EMAIL_INFO"))
     contact_form = Contact_Form()
-    if request.method == "POST":
-        if contact_form.validate_on_submit():
-            def send_link():
-                app.config["MAIL_SERVER"] = "techxolutions.com"
-                app.config["MAIL_PORT"] = 465
-                app.config["MAIL_USE_TLS"] = True
-                em = app.config["MAIL_USERNAME"] = os.environ.get("EMAIL")
-                app.config["MAIL_PASSWORD"] = os.environ.get("TX_PWD")
-
-                # print("DEBUG EMAIL1: ",em)
-                # print("DEBUG EMAILP: ",app.config["MAIL_PASSWORD"])
-
-                mail = Mail(app)
-
-                msg = Message(contact_form.subject.data, sender=contact_form.email.data, recipients=[em])
-                msg.body = f"""{contact_form.message.data}\n
-{contact_form.email.data}\n
-<p style="font-size:25px;color:red">This is a Test</p>
-                    """
-
-                # try:
-                mail.send(msg)
-                flash("Your Message has been Successfully Sent!!", "success")
-                return "Email Sent"
-                # except Exception as e:
-                #     # print(e)
-                #     flash(f'Ooops Something went wrong!! Please Retry', 'error')
-                #     return "The mail was not sent"
-
-                # Send the pwd reset request to the above email
-            send_link()
-
-            #print("Posted")
-        else:
-            for error in contact_form.errors:
-                print('Form Error: ',error)
-            flash("Ooops!! Please be sure to fill both email & message fields, correctly","error")
+    if request.method == "POST" and deliver_enquiry(contact_form):
+        return redirect(url_for('contact_us'))
 
     return render_template("contact.html",contact_form=contact_form)
 
