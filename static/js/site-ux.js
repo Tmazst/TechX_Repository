@@ -11,16 +11,30 @@
     };
 
     if (menuButton && menu) {
-        menuButton.addEventListener('click', () => {
-            const open = menu.classList.toggle('is-open');
-            menuButton.setAttribute('aria-expanded', String(open));
-            if (!open) closeServices();
-        });
-        menu.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => {
+        const closeMenu = () => {
             menu.classList.remove('is-open');
             menuButton.setAttribute('aria-expanded', 'false');
             closeServices();
-        }));
+        };
+        menuButton.addEventListener('click', () => {
+            if (menu.classList.contains('is-open')) {
+                closeMenu();
+            } else {
+                menu.classList.add('is-open');
+                menuButton.setAttribute('aria-expanded', 'true');
+            }
+        });
+        menu.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMenu));
+        document.addEventListener('keydown', (event) => {
+            if (event.key !== 'Escape') return;
+            if (services?.classList.contains('is-open')) {
+                closeServices();
+                servicesButton.focus();
+            } else if (menu.classList.contains('is-open')) {
+                closeMenu();
+                menuButton.focus();
+            }
+        });
     }
 
     if (services && servicesButton) {
@@ -30,12 +44,6 @@
         });
         document.addEventListener('click', (event) => {
             if (!services.contains(event.target)) closeServices();
-        });
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape') {
-                closeServices();
-                servicesButton.focus();
-            }
         });
     }
 

@@ -1,0 +1,38 @@
+{% extends "account_layout.html" %}
+{% from "account_fields.html" import account_field, account_csrf %}
+
+{% block account_intro %}
+    {% if email %}
+        <p>Enter the eight-digit code sent to <strong>{{ email }}</strong>. The code expires after 15 minutes.</p>
+    {% else %}
+        <p>Enter the email address you use for your TechX account.</p>
+    {% endif %}
+{% endblock %}
+
+{% block account_content %}
+<form method="post" class="account-form">
+    {{ account_csrf(form) }}
+    {% if email %}
+        {{ account_field(form.code, "one-time-code", hint="Enter the 8 digits from your email.") }}
+        {% if reset %}
+            {{ account_field(form.password, "new-password", hint="Use at least 8 characters.") }}
+            {{ account_field(form.confirm, "new-password", hint="Type your new password again.") }}
+        {% endif %}
+    {% else %}
+        {{ account_field(form.email, "email", "Email address") }}
+    {% endif %}
+    {{ form.submit(class="account-button account-button--primary") }}
+</form>
+
+<div class="account-actions">
+    {% if resend_form %}
+        <form method="post" class="account-actions__form">
+            {{ resend_form.csrf_token(id="resend-csrf-token") }}
+            <button class="account-button account-button--secondary" type="submit" name="action" value="resend">Resend code</button>
+        </form>
+    {% elif reset %}
+        <a href="{{ url_for('forgot_password') }}">Request a new code</a>
+    {% endif %}
+    <a href="{{ url_for('login') }}">Back to sign in</a>
+</div>
+{% endblock %}

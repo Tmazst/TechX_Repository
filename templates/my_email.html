@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="account-hero domain-account-hero">
+    <div class="site-shell">
+        <h1>My Email</h1>
+        <p>Track your requests and find mailbox settings.</p>
+    </div>
+</section>
+<section class="section-pad">
+    <div class="site-shell business-email-list">
+        <a class="button button--secondary" href="{{ url_for('business_email') }}">Request a mailbox</a>
+        {% for category, message in get_flashed_messages(with_categories=true) %}
+            <p class="account-notice account-notice--{{ category }}" role="{{ 'alert' if category == 'error' else 'status' }}">{{ message }}</p>
+        {% endfor %}
+        {% for item in items %}
+            <article class="domain-admin-section email-request">
+                <h2>{{ item.address }}</h2>
+                {% if item.status == 'pending' and item.mode == 'external' %}
+                    <p><strong>{{ 'Domain verified · Awaiting approval' if item.verified_at else 'Verify your domain' }}</strong></p>
+                    <p>Keep this TXT record at your DNS provider until TechX approves your request.</p>
+                    <dl>
+                        <dt>Name</dt><dd><code>{{ item.verification_name }}</code></dd>
+                        <dt>Value</dt><dd><code>{{ item.verification_code }}</code></dd>
+                    </dl>
+                    <form method="post" action="{{ url_for('business_email_verify', request_id=item.id) }}">
+                        {{ action_form.hidden_tag() }}
+                        <button type="submit" class="account-button account-button--primary">Check DNS</button>
+                    </form>
+                {% elif item.status == 'pending' %}
+                    <p><strong>Awaiting approval</strong>. TechX will review your request{% if item.mode == 'managed' %} after the subdomain is approved{% endif %}.</p>
+                {% elif item.status == 'approved' %}
+                    <p><strong>Setting up your mailbox</strong>. TechX will confirm when the mailbox can send and receive.</p>
+                {% elif item.status == 'dns_setup' %}
+                    {% if item.mode == 'external' %}
+                        <p><strong>Connect your domain</strong>. Your mailbox has been created. If you already receive email at this domain, agree on a switch time with TechX before replacing your current MX records.</p>
+                        <dl>
+                            <dt>MX destination after cutover</dt><dd><code>{{ mail_host }}</code> (priority 10)</dd>
+                            <dt>SPF sender to authorize</dt><dd><code>{{ mail_spf }}</code></dd>
+                        </dl>
+                        <p>Keep one SPF policy and preserve other authorized senders. TechX will confirm the DKIM and DMARC settings for your domain.</p>
+                        <form method="post" action="{{ url_for('business_email_verify', request_id=item.id) }}">
+                            {{ action_form.hidden_tag() }}
+                            <button type="submit" class="account-button account-button--primary">Check mail routing</button>
+                        </form>
+                    {% else %}
+                        <p><strong>Checking delivery</strong>. TechX will configure your mail records and test sending and receiving.</p>
+                    {% endif %}
+                {% elif item.status == 'ready' %}
+                    <p><strong>Ready to use</strong>. Use the sign-in details provided by TechX.</p>
+                    <dl>
+                        <dt>Mail server</dt><dd><code>{{ mail_host }}</code></dd>
+                        <dt>Incoming mail</dt><dd>IMAP 993, SSL/TLS</dd>
+                        <dt>Outgoing mail</dt><dd>SMTP 587, STARTTLS</dd>
+                    </dl>
+                {% else %}
+                    <p><strong>Request declined</strong>. Contact TechX if you need help.</p>
+                {% endif %}
+            </article>
+        {% else %}
+            <p>You haven’t requested an email address yet.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

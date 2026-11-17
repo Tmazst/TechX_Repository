@@ -30,11 +30,24 @@
                         <a href="{{ url_for('web_app_dev') }}"><strong>Websites &amp; Applications</strong><span>Websites, apps and automation</span></a>
                         <a href="/#qm"><strong>Digital Marketing</strong><span>Campaigns, content and Q-Messànger</span></a>
                         <a href="{{ url_for('domain_support') }}"><strong>Domain Support</strong><span>Local domains, email and setup</span></a>
+                        <a href="{{ url_for('business_email') }}"><strong>Business Email</strong><span>Mailboxes for your domain</span></a>
                     </div>
                 </div>
                 <a href="/#work">Our Work</a><a href="/#clients">Clients &amp; Partners</a><a href="/about">About</a>
                 <a class="nav-cta" href="/#contact-us">Request a Quote <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
-                {% if current_user.is_authenticated %}<a href="/client_user_acc"><i class="fa-regular fa-user" aria-hidden="true"></i> My Account</a>{% else %}<a class="nav-login" href="/login"><i class="fa-regular fa-user" aria-hidden="true"></i> Client Login</a>{% endif %}
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('client_user_acc') }}">My Account</a>
+                    <a href="{{ url_for('domain_portal') }}">My Domains</a>
+                    {% if can_manage_domains %}
+                        <a href="{{ url_for('domain_admin') }}">Domain Admin</a>
+                    {% endif %}
+                    <form class="nav-sign-out" method="post" action="{{ url_for('log_out') }}">
+                        {{ sign_out_form.hidden_tag() }}
+                        <button type="submit"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i> Sign out</button>
+                    </form>
+                {% else %}
+                    <a class="nav-login" href="{{ url_for('login') }}"><i class="fa-regular fa-user" aria-hidden="true"></i> Client Login</a>
+                {% endif %}
             </div>
         </nav>
     </header>

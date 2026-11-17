@@ -1,5 +1,5 @@
 
-from flask import Flask,render_template,url_for,redirect,request,flash,jsonify,abort
+from flask import Flask,render_template,url_for,redirect,request,flash,jsonify,abort,session
 from flask_login import login_user, LoginManager,current_user,logout_user, login_required
 from Forms import *
 from models import *
@@ -11,8 +11,17 @@ import re
 import json
 from datetime import datetime
 from functools import wraps
+from urllib.parse import urlsplit
+from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError
+from account_email import (
+    RESET_PASSWORD, VERIFY_EMAIL, consume_code, find_account, issue_code,
+    normalize_email, send_site_email, session_version
+)
 from werkzeug.utils import secure_filename
-from flask_mail import Mail, Message
+from email.message import EmailMessage
+from business_email import MAIL_HOST, MAIL_SPF, has_verification_record, mail_dns_hosts, mail_dns_status, normalize_domain
+from smtplib import SMTPException
 # from bs4 import BeautifulSoup as bs
 from flask_colorpicker import colorpicker
 from domain_dns import (
@@ -32,9 +41,11 @@ from domain_dns import (
 
 #Change App
 app = Flask(__name__)
-app.config['SECRET_KEY'] = "sdsdjfe832j2rj_32j"
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///techx_db.db"
-# app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://root:tmazst41@localhost/techxolutions_db"
+app.config['SECRET_KEY'] = os.environ['TECHX_SECRET_KEY']
+app.config['SESSION_COOKIE_SECURE'] = os.environ.get('TECHX_SECURE_COOKIES', '1') == '1'
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('TECHX_DATABASE_URI', 'sqlite:///techx_db.db')
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle':280}
 app.config["SQLALCHEMY_POOL_RECYCLE"] = 299
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -50,7 +61,11 @@ login_manager.login_view = 'login'
 # Log in
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(user_id)
+    user = db.session.get(User, user_id)
+    version = session.get('account_session_version')
+    if user and user.verified and version and secrets.compare_digest(version, session_version(user)):
+        return user
+    return None
 
 
 ALLOWED_EXTENSIONS = {"txt", "xlxs",'docx', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
@@ -86,41 +101,34 @@ def createall(db_):
 encry_pw = Bcrypt()
 
 @app.context_processor
-def inject_ser():
-    # ser = Serializer(app.config['SECRET_KEY'])  # Define or retrieve the value for 'ser'
-    # count_jobs = count_ads()
-
-    return dict()
-
-def mail_enqueries(contact_form):
-
-    def send_link():
-        app.config["MAIL_SERVER"] = "techxolutions.com"
-        app.config["MAIL_PORT"] = 465
-        app.config["MAIL_USE_TLS"] = True
-        em = app.config["MAIL_USERNAME"] = os.environ.get("EMAIL_INFO")
-        app.config["MAIL_PASSWORD"] = os.environ.get("TX_PWD")
-
-        mail = Mail(app)
-
-        msg = Message(contact_form.subject.data, sender=contact_form.email.data, recipients=[em])
-        msg.body = f"""{contact_form.message.data}\n
-{contact_form.email.data}\n
-<p style="font-size:25px;color:red">This is a Test</p>
-                    """
-
-        # try:
-        mail.send(msg)
-        flash("Your Message has been Successfully Sent!!", "success")
-        return f"Email Sent Successfully"
-        # except Exception as e:
-        #     flash(f'Ooops Something went wrong!! Please Retry', 'error')
-        #     return f"The mail was not sent"
-
-        # Send the pwd reset request to the above email
-    send_link()
+def account_navigation():
+    if not current_user.is_authenticated:
+        return {}
+    return {'sign_out_form': FlaskForm(prefix='logout'), 'can_manage_domains': is_domain_admin()}
 
 
+def deliver_enquiry(form):
+    if not form.validate_on_submit():
+        flash('Enter a valid email address and describe your project.', 'error')
+        return False
+
+    message = EmailMessage()
+    message['To'] = 'thabo@eswtn.com'
+    message['Reply-To'] = form.email.data.strip()
+    message['Subject'] = 'New TechX website enquiry'
+    subject = (form.subject.data or '').strip() or 'General enquiry'
+    name = (form.name.data or '').strip() or 'Not provided'
+    message.set_content(f"Name: {name}\nEmail: {form.email.data.strip()}\nSubject: {subject}\n\n{form.message.data.strip()}")
+
+    try:
+        send_site_email(message)
+    except (KeyError, ValueError, OSError, SMTPException) as error:
+        app.logger.error('TechX enquiry delivery failed (%s)', type(error).__name__)
+        flash('We could not send your enquiry. Please try again.', 'error')
+        return False
+
+    flash('Your enquiry was sent.', 'success')
+    return True
 
 
 @app.route("/", methods=['POST','GET'])
@@ -133,14 +141,8 @@ def home():
     contact_form = Contact_Form()
     title = "Tech Xolutions (TechX)"
 
-    contact_form = Contact_Form()
-
-    if request.method == "POST":
-        if contact_form.validate_on_submit():
-            mail_enqueries(contact_form)
-        else:
-            return flash("Ooops!! Please be sure to fill both email & message fields, correctly","error")
-        # soup = bs(request.form, "html.parser")
+    if request.method == "POST" and deliver_enquiry(contact_form):
+        return redirect(url_for('home', _anchor='contact-us'))
 
     return render_template("index.html",title=title,contact_form=contact_form,logo_options=logo_options,
                            poster_options=poster_options,brochure_options=brochure_options,flyer_options=flyer_options)
@@ -317,47 +319,150 @@ def web_design_brief():
     return render_template("web_design_brief.html",web_brief=web_brief)
 
 
-@app.route("/client_signup", methods=["POST","GET"])
+def ensure_account_tables():
+    User.__table__.create(bind=db.engine, checkfirst=True)
+    AccountEmailCode.__table__.create(bind=db.engine, checkfirst=True)
+
+
+def safe_login_destination(target):
+    if not target or not target.startswith('/') or target.startswith('//'):
+        return None
+    if '\\' in target or any(ord(character) < 32 for character in target):
+        return None
+    parts = urlsplit(target)
+    return target if not parts.scheme and not parts.netloc else None
+
+
+def start_customer_session(user, version):
+    session.clear()
+    login_user(user)
+    session['account_session_version'] = version
+
+
+def begin_verification(user, destination):
+    session.clear()
+    session['verify_email'] = normalize_email(user.email)
+    session['verify_session_version'] = session_version(user)
+    session['verify_next'] = destination
+    if issue_code(user, VERIFY_EMAIL):
+        flash('We sent a verification code to your email.', 'success')
+    return redirect(url_for('verify_email'))
+
+
+@app.route("/client_signup", methods=["GET", "POST"])
 def sign_up():
-
-    register = Register()
-
-    db.create_all()
-
     if current_user.is_authenticated:
-        return redirect(url_for('home'))
+        return redirect(url_for('domain_portal'))
 
-    image_fl = url_for('static', filename='images/image.jpg')
-
+    register = CustomerSignupForm()
+    destination = safe_login_destination(request.args.get('next'))
     if register.validate_on_submit():
-
-        #print(f"Account Successfully Created for {register.name.data}")
-        if request.method == 'POST':
-            # context
-
-            hashd_pwd = encry_pw.generate_password_hash(register.password.data).decode('utf-8')
-            user1 = User(name=register.name.data, email=register.email.data, password=hashd_pwd,
-                         confirm_password=hashd_pwd,image="default.jpg")
-
-            # db.rollback()
+        ensure_account_tables()
+        email = normalize_email(register.email.data)
+        existing = User.query.filter(func.lower(func.trim(User.email)) == email).first()
+        if existing:
+            register.email.errors.append('An account already uses this email. Sign in or reset your password.')
+        else:
+            password_hash = encry_pw.generate_password_hash(register.password.data).decode('utf-8')
+            user = User(name=register.name.data, email=email, password=password_hash,
+                        confirm_password=password_hash, image='default.jpg')
+            db.session.add(user)
             try:
-                db.session.add(user1)
                 db.session.commit()
-                flash(f"Account Successfully Created for {register.name.data}", "success")
-                return redirect(url_for('login'))
-            except: # IntegrityError:
-                flash(f"Something went wrong, check for errors", "success")
-                Register().validate_email(register.email.data)
+            except IntegrityError:
+                db.session.rollback()
+                register.email.errors.append('Could not create the account. Try signing in or resetting your password.')
+            else:
+                return begin_verification(user, destination)
+
+    return render_template('client_signup.html', register=register, destination=destination)
 
 
-            # #print(register.name.data,register.email.data)
-    elif register.errors:
-        flash(f"Account Creation Unsuccessful ", "error")
-        #print(register.errors)
+@app.route('/verify-email', methods=['GET', 'POST'])
+def verify_email():
+    if not session.get('verify_email'):
+        return redirect(url_for('login'))
+    ensure_account_tables()
+    user = find_account(session['verify_email'])
+    if user is None or session.get('verify_session_version') != session_version(user):
+        session.clear()
+        return redirect(url_for('login'))
+
+    form = AccountCodeForm()
+    resend_form = FlaskForm()
+    if request.method == 'POST':
+        if request.form.get('action') == 'resend':
+            if resend_form.validate_on_submit():
+                if issue_code(user, VERIFY_EMAIL):
+                    flash('We sent a new verification code.', 'success')
+                else:
+                    flash('A new code could not be sent. Wait one minute and try again.', 'error')
+            return redirect(url_for('verify_email'))
+        if form.validate_on_submit():
+            if consume_code(user, VERIFY_EMAIL, form.code.data):
+                db.session.refresh(user)
+                version = session_version(user)
+                if version != session.get('verify_session_version'):
+                    db.session.rollback()
+                    session.clear()
+                    return redirect(url_for('login'))
+                user.verified = True
+                db.session.commit()
+                destination = session.get('verify_next')
+                start_customer_session(user, version)
+                flash('Your email is verified.', 'success')
+                return redirect(destination or url_for('domain_portal'))
+            form.code.errors.append('This code is invalid or has expired. Request a new code if needed.')
+
+    return render_template('account_email.html', title='Verify your email', form=form,
+                           email=user.email, resend_form=resend_form)
 
 
-    # from myproject.models import user
-    return render_template("client_signup.html",register=register)
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    form = PasswordResetRequestForm()
+    if form.validate_on_submit():
+        ensure_account_tables()
+        email = normalize_email(form.email.data)
+        user = find_account(email)
+        if user:
+            issue_code(user, RESET_PASSWORD)
+        session['reset_email'] = email
+        flash('If an account matches that email, a password reset code will be sent.', 'success')
+        return redirect(url_for('reset_password'))
+
+    return render_template('account_email.html', title='Forgot password', form=form)
+
+
+@app.route('/reset-password', methods=['GET', 'POST'])
+def reset_password():
+    email = session.get('reset_email')
+    if not email:
+        return redirect(url_for('forgot_password'))
+
+    form = CustomerResetForm()
+    if form.validate_on_submit():
+        ensure_account_tables()
+        user = find_account(email)
+        version = session_version(user) if user else None
+        if consume_code(user, RESET_PASSWORD, form.code.data):
+            db.session.refresh(user)
+            if version != session_version(user):
+                db.session.rollback()
+                return redirect(url_for('forgot_password'))
+            password_hash = encry_pw.generate_password_hash(form.password.data).decode('utf-8')
+            user.password = password_hash
+            user.confirm_password = password_hash
+            db.session.commit()
+            logout_user()
+            session.clear()
+            flash('Your password has been reset. Sign in with your new password.', 'success')
+            return redirect(url_for('login'))
+        form.code.errors.append('This code is invalid or has expired. Request a new code if needed.')
+
+    return render_template('account_email.html', title='Reset your password', form=form,
+                           email=email, reset=True)
+
 
 @app.route("/client_user_acc", methods=["POST","GET"])
 @login_required
@@ -381,44 +486,22 @@ def client_user_acc():
     return render_template("client_user_acc.html",user_acc=user_acc,signup=signup)
 
 
-@app.route("/login", methods=["POST","GET"])
+@app.route("/login", methods=["GET", "POST"])
 def login():
+    form = Login()
+    destination = safe_login_destination(request.args.get('next'))
+    if form.validate_on_submit():
+        ensure_account_tables()
+        user = find_account(form.email.data)
+        if (user and len(form.password.data.encode('utf-8')) <= 72
+                and encry_pw.check_password_hash(user.password, form.password.data)):
+            if not user.verified:
+                return begin_verification(user, destination)
+            start_customer_session(user, session_version(user))
+            return redirect(destination or url_for('domain_portal'))
+        flash('Login unsuccessful. Check your email and password.', 'error')
 
-    login = Login()
-
-    print(f"Submtion: ")
-
-
-    if login.validate_on_submit():
-
-
-        if request.method == 'POST':
-
-            user_login = User.query.filter_by(email=login.email.data).first()
-            # flash(f"Hey! {user_login.password} Welcome", "success")
-            if user_login and encry_pw.check_password_hash(user_login.password, login.password.data):
-                login_user(user_login)
-                # print("Creditantials are ok")
-                # if not user_login.verified:
-                #     return redirect(url_for('verification'))
-                # else:
-                    # After login required prompt, take me to the page I requested earlier
-                print("No Verification Needed: ", user_login.verified)
-                req_page = request.args.get('next')
-                flash(f"Hey! {user_login.name.title()} You're Logged In!", "success")
-                return redirect(req_page) if req_page else redirect(url_for('home'))
-            else:
-                flash(f"Login Unsuccessful, please use correct email or password", "error")
-                # print(login.errors)
-    else:
-        print("No Validation")
-        if login.errors:
-            for error in login.errors:
-                print("Errors: ", error)
-        else:
-            print("No Errors found", login.email.data, login.password.data)
-
-    return render_template("login.html",login=login)
+    return render_template('login.html', login=form, destination=destination)
 
 
 @app.route('/cashbook',methods=['POST','GET'])
@@ -462,10 +545,15 @@ def cashbook_table():
 
     return render_template('cashbook_table.html',cb_entries=cb_entries,cashbook_form=cashbook_form)
 
-@app.route('/logout')
+@app.route('/logout', methods=['GET', 'POST'])
+@login_required
 def log_out():
-    logout_user()
-    return redirect(url_for('home'))
+    form = FlaskForm(prefix='logout')
+    if form.validate_on_submit():
+        logout_user()
+        session.clear()
+        return redirect(url_for('home'))
+    return render_template('account_logout.html', title='Sign out of TechX', sign_out_form=form)
 
 
 ESWTN_RESERVED_LABELS = {
@@ -525,12 +613,7 @@ def eswtn_name_status(raw_label):
 
 def owned_domain_account(account_id):
     account = DomainAccount.query.get_or_404(account_id)
-    owner_email = (current_user.email or '').strip().lower()
-    owns_account = (
-        account.user_id == current_user.id
-        or account.owner_email.strip().lower() == owner_email
-    )
-    if not owns_account and not is_domain_admin():
+    if account.user_id != current_user.id and not is_domain_admin():
         abort(403)
     return account
 
@@ -563,7 +646,7 @@ def domain_support():
     ensure_domain_tables()
     form = DomainInterestForm()
 
-    if request.method == 'GET' and current_user.is_authenticated and not form.email.data:
+    if current_user.is_authenticated:
         form.email.data = current_user.email
 
     if form.validate_on_submit():
@@ -574,7 +657,7 @@ def domain_support():
             domain_request = DomainRequest(
                 user_id=current_user.id if current_user.is_authenticated else None,
                 requested_label=label,
-                email=form.email.data.strip().lower(),
+                email=normalize_email(form.email.data),
                 request_type=form.request_type.data,
                 intended_use=form.intended_use.data.strip(),
                 status='pending'
@@ -609,11 +692,17 @@ def domain_availability():
 @login_required
 def domain_portal():
     ensure_domain_tables()
-    owner_email = (current_user.email or '').strip().lower()
-    domain_requests = DomainRequest.query.filter(
-        (DomainRequest.user_id == current_user.id) |
-        (DomainRequest.email == owner_email)
-    ).order_by(DomainRequest.created_at.desc()).all()
+    owner_email = normalize_email(current_user.email)
+    # Preserve guest reservations and legacy approved domains after mailbox verification.
+    for model, email_column in ((DomainRequest, DomainRequest.email),
+                                (DomainAccount, DomainAccount.owner_email)):
+        model.query.filter(model.user_id.is_(None), func.lower(func.trim(email_column)) == owner_email).update(
+            {'user_id': current_user.id}, synchronize_session=False
+        )
+    db.session.commit()
+    domain_requests = DomainRequest.query.filter_by(user_id=current_user.id).order_by(
+        DomainRequest.created_at.desc()
+    ).all()
 
     admin_view = is_domain_admin() and request.args.get('admin_view') == '1'
     requested_account_id = request.args.get('account', type=int)
@@ -621,10 +710,7 @@ def domain_portal():
         selected_account = DomainAccount.query.get_or_404(requested_account_id)
         accounts = [selected_account]
     else:
-        accounts = DomainAccount.query.filter(
-            (DomainAccount.user_id == current_user.id) |
-            (DomainAccount.owner_email == owner_email)
-        ).order_by(DomainAccount.created_at.desc()).all()
+        accounts = DomainAccount.query.filter_by(user_id=current_user.id).order_by(DomainAccount.created_at.desc()).all()
         selected_account = next(
             (item for item in accounts if item.id == requested_account_id),
             accounts[0] if accounts else None
@@ -795,10 +881,169 @@ def domain_record_delete(record_id):
     return redirect(url_for('domain_portal', account=account.id) + '#dns-records')
 
 
+def ensure_business_email_tables():
+    ensure_domain_tables()
+    BusinessEmailRequest.__table__.create(bind=db.engine, checkfirst=True)
+
+
+@app.route('/business-email')
+def business_email():
+    return render_template('business_email.html', title='Business Email | TechX')
+
+
+@app.route('/business-email/setup/<mode>', methods=['GET', 'POST'])
+@login_required
+def business_email_setup(mode):
+    if mode not in ('managed', 'external'):
+        abort(404)
+    ensure_business_email_tables()
+    form = BusinessEmailForm()
+    if form.validate_on_submit():
+        try:
+            return submit_business_email_request(form, mode)
+        except ValueError as error:
+            form.domain.errors.append(str(error))
+        except IntegrityError:
+            db.session.rollback()
+            flash('You already requested this address. Check My Email for its status.', 'error')
+    return render_template('business_email_setup.html', title='Request a mailbox', form=form, mode=mode)
+
+
+def submit_business_email_request(form, mode):
+    mailbox = form.mailbox.data.lower()
+    raw_domain = form.domain.data.strip().lower()
+    if mode == 'managed':
+        label = raw_domain.rstrip('.')
+        if label.endswith('.eswtn.com'):
+            label = label[:-len('.eswtn.com')]
+        domain = f'{label}.eswtn.com'
+        existing = DomainAccount.query.filter_by(fqdn=domain, user_id=current_user.id, status='active').first()
+        pending = DomainRequest.query.filter_by(requested_label=label, user_id=current_user.id, status='pending').first()
+        if not existing and not pending:
+            label, available, reason = eswtn_name_status(label)
+            if not available:
+                raise ValueError(reason)
+            db.session.add(DomainRequest(
+                user_id=current_user.id, requested_label=label, email=normalize_email(current_user.email),
+                request_type='professional_email', intended_use='Business Email mailbox request',
+                status='pending',
+            ))
+    else:
+        domain = normalize_domain(raw_domain)
+        if domain == 'eswtn.com' or domain.endswith('.eswtn.com'):
+            raise ValueError('Choose the eswtn.com option for a TechX-managed address.')
+    if len(f'{mailbox}@{domain}') > 254:
+        raise ValueError('Choose a shorter mailbox name or domain.')
+
+    item = BusinessEmailRequest(
+        user_id=current_user.id, domain=domain, mailbox=mailbox, mode=mode,
+        verification_code=f'techx-mail={secrets.token_urlsafe(24)}' if mode == 'external' else None,
+    )
+    db.session.add(item)
+    db.session.commit()
+    flash('Your mailbox request was submitted.', 'success')
+    return redirect(url_for('my_email'))
+
+
+@app.route('/my-email')
+@login_required
+def my_email():
+    ensure_business_email_tables()
+    items = BusinessEmailRequest.query.filter_by(user_id=current_user.id).order_by(
+        BusinessEmailRequest.created_at.desc()
+    ).all()
+    return render_template('my_email.html', title='My Email', items=items,
+                           action_form=DomainAdminActionForm(), mail_host=MAIL_HOST, mail_spf=MAIL_SPF)
+
+
+@app.route('/my-email/<int:request_id>/verify', methods=['POST'])
+@login_required
+def business_email_verify(request_id):
+    ensure_business_email_tables()
+    if not DomainAdminActionForm().validate_on_submit():
+        abort(400)
+    item = BusinessEmailRequest.query.filter_by(id=request_id, user_id=current_user.id,
+                                               mode='external').first_or_404()
+    if item.status == 'dns_setup':
+        hosts = mail_dns_hosts(item.domain)
+        if hosts is None:
+            flash('DNS is unavailable. Try again shortly.', 'error')
+        elif set(hosts) == {MAIL_HOST}:
+            flash('Mail is routed to TechX. We’ll complete the send and receive checks.', 'success')
+        elif hosts:
+            flash(f'Current mail servers: {", ".join(hosts)}. Your mail is not yet routed only to TechX.', 'error')
+        else:
+            flash('No MX record was found. Add the mail record shown below and check again.', 'error')
+        return redirect(url_for('my_email'))
+    if item.status != 'pending':
+        abort(404)
+    verified = has_verification_record(item)
+    if verified:
+        item.verified_at = datetime.utcnow()
+        db.session.commit()
+        flash(f'{item.domain} is verified. TechX can now review your request.', 'success')
+    else:
+        flash('DNS is unavailable. Try again shortly.' if verified is None else
+              'The verification record was not found. Check the name and value, then try again.', 'error')
+    return redirect(url_for('my_email'))
+
+
+@app.route('/domain-admin/email/<int:request_id>/<action>', methods=['POST'])
+@domain_admin_required
+def business_email_review(request_id, action):
+    ensure_business_email_tables()
+    if not DomainAdminActionForm().validate_on_submit():
+        abort(400)
+    item = db.session.get(BusinessEmailRequest, request_id)
+    if item is None:
+        abort(404)
+    destination = url_for('domain_admin', _anchor='email-requests')
+    previous = item.status
+    changes = {}
+    if action == 'reject' and previous == 'pending':
+        changes['status'] = 'rejected'
+    elif action == 'approve' and previous == 'pending':
+        if item.mode == 'external':
+            eligible = item.verified_at is not None and has_verification_record(item)
+            error = 'The customer needs a current DNS verification record before approval.'
+        else:
+            eligible = DomainAccount.query.filter_by(
+                fqdn=item.domain, user_id=item.user_id, status='active'
+            ).first()
+            error = 'Approve the customer’s eswtn.com domain request first.'
+        if not eligible:
+            flash(error, 'error')
+            return redirect(destination)
+        changes = {'status': 'approved', 'reserved_address': item.address}
+    elif action == 'provisioned' and previous == 'approved':
+        changes['status'] = 'dns_setup'
+    elif action == 'ready' and previous == 'dns_setup':
+        if request.form.get('mail_tested') != 'yes' or mail_dns_status(item.domain) is not True:
+            flash('Confirm the mailbox passed send and receive tests and that its MX points only to TechX.', 'error')
+            return redirect(destination)
+        changes['status'] = 'ready'
+    else:
+        flash('That action is unavailable for the current request status.', 'error')
+        return redirect(destination)
+    address = item.address
+    try:
+        updated = BusinessEmailRequest.query.filter_by(id=item.id, status=previous).update(changes)
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        flash('This mailbox address is already allocated.', 'error')
+    else:
+        if updated:
+            flash(f'{address}: request updated.', 'success')
+        else:
+            flash('The request has already changed. Review its current status before trying again.', 'error')
+    return redirect(destination)
+
+
 @app.route('/domain-admin')
 @domain_admin_required
 def domain_admin():
-    ensure_domain_tables()
+    ensure_business_email_tables()
     pending_requests = DomainRequest.query.filter_by(status='pending').order_by(
         DomainRequest.created_at.asc()
     ).all()
@@ -807,6 +1052,7 @@ def domain_admin():
         'domain_admin.html',
         title='eswtn.com Administration | Tech Xolutions',
         pending_requests=pending_requests,
+        email_requests=BusinessEmailRequest.query.order_by(BusinessEmailRequest.created_at.desc()).all(),
         accounts=accounts,
         action_form=DomainAdminActionForm(),
         dns_configured=cloudflare_configured()
@@ -847,10 +1093,10 @@ def domain_request_approve(request_id):
         flash(f'{fqdn} already has Cloudflare DNS records. Review it manually before approval.', 'error')
         return redirect(url_for('domain_admin'))
 
-    linked_user = User.query.filter_by(email=domain_request_item.email).first()
+    linked_user = find_account(domain_request_item.email)
     account = DomainAccount(
         request_id=domain_request_item.id,
-        user_id=domain_request_item.user_id or (linked_user.id if linked_user else None),
+        user_id=domain_request_item.user_id or (linked_user.id if linked_user and linked_user.verified else None),
         owner_email=domain_request_item.email.strip().lower(),
         label=domain_request_item.requested_label,
         fqdn=fqdn,
@@ -925,45 +1171,9 @@ def about():
 
 @app.route("/contact", methods=["POST", "GET"])
 def contact_us():
-    # print("DEBUG EMAIL: ",os.environ.get("EMAIL_INFO"))
     contact_form = Contact_Form()
-    if request.method == "POST":
-        if contact_form.validate_on_submit():
-            def send_link():
-                app.config["MAIL_SERVER"] = "techxolutions.com"
-                app.config["MAIL_PORT"] = 465
-                app.config["MAIL_USE_TLS"] = True
-                em = app.config["MAIL_USERNAME"] = os.environ.get("EMAIL")
-                app.config["MAIL_PASSWORD"] = os.environ.get("TX_PWD")
-
-                # print("DEBUG EMAIL1: ",em)
-                # print("DEBUG EMAILP: ",app.config["MAIL_PASSWORD"])
-
-                mail = Mail(app)
-
-                msg = Message(contact_form.subject.data, sender=contact_form.email.data, recipients=[em])
-                msg.body = f"""{contact_form.message.data}\n
-{contact_form.email.data}\n
-<p style="font-size:25px;color:red">This is a Test</p>
-                    """
-
-                # try:
-                mail.send(msg)
-                flash("Your Message has been Successfully Sent!!", "success")
-                return "Email Sent"
-                # except Exception as e:
-                #     # print(e)
-                #     flash(f'Ooops Something went wrong!! Please Retry', 'error')
-                #     return "The mail was not sent"
-
-                # Send the pwd reset request to the above email
-            send_link()
-
-            #print("Posted")
-        else:
-            for error in contact_form.errors:
-                print('Form Error: ',error)
-            flash("Ooops!! Please be sure to fill both email & message fields, correctly","error")
+    if request.method == "POST" and deliver_enquiry(contact_form):
+        return redirect(url_for('contact_us'))
 
     return render_template("contact.html",contact_form=contact_form)
 

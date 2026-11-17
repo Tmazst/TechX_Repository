@@ -132,7 +132,7 @@ Its structure aligns with international mind‑sport standards set by the WBF, I
     </div>
     <div class="contact-panel">
         {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}{% for category, message in messages %}<div class="form-alert form-alert--{{ category }}">{{ message }}</div>{% endfor %}{% endif %}{% endwith %}
-        <form action="{{ url_for('home') }}" method="post">{{ contact_form.hidden_tag() }}
+        <form action="{{ url_for('home', _anchor='contact-us') }}" method="post">{{ contact_form.hidden_tag() }}
             <label>Your name{{ contact_form.name(class="modern-input", placeholder="Full name") }}</label>
             <label>Email address{{ contact_form.email(class="modern-input", placeholder="name@company.com") }}</label>
             <label>What do you need?{{ contact_form.subject(class="modern-input", placeholder="Branding, signage, website, app or marketing") }}</label>

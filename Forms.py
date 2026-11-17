@@ -119,7 +119,7 @@ class Contact_Form(FlaskForm):
     name = StringField('name')
     email = StringField('email', validators=[DataRequired(),Email()])
     subject = StringField("subject")
-    message = TextAreaField("Message",validators=[Length(min=8, max=2000)])
+    message = TextAreaField("Message",validators=[DataRequired(), Length(min=8, max=2000)])
     submit = SubmitField("Send")
 
 
@@ -215,11 +215,11 @@ class Reset(FlaskForm):
     reset = SubmitField('Reset')
 
 
-class Reset_Request(FlaskForm):
+class PasswordResetRequestForm(FlaskForm):
 
-    email = StringField('email', validators=[DataRequired(), Email()])
+    email = StringField('email', validators=[DataRequired(), Email(), Length(max=120)])
 
-    reset = SubmitField('Submit')
+    submit = SubmitField('Send reset code')
 
 
 class CashBookForm(FlaskForm):
@@ -313,3 +313,38 @@ class DomainAdminActionForm(FlaskForm):
 class DnsDeleteForm(FlaskForm):
     submit = SubmitField('Delete')
 
+
+
+def validate_password_bytes(form, field):
+    if len(field.data.encode('utf-8')) > 72:
+        raise ValidationError('Use a password with at most 72 bytes.')
+
+
+class CustomerSignupForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired(), Length(min=2, max=20)])
+    email = StringField('Email', validators=[DataRequired(), Email(), Length(max=120)])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=64), validate_password_bytes])
+    confirm = PasswordField('Confirm password', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Create account')
+
+
+class AccountCodeForm(FlaskForm):
+    code = StringField('Email code', validators=[
+        DataRequired(), Regexp(r'^[0-9]{8}$', message='Enter the eight-digit code from your email.')
+    ])
+    submit = SubmitField('Verify email')
+
+
+class CustomerResetForm(AccountCodeForm):
+    password = PasswordField('New password', validators=[DataRequired(), Length(min=8, max=64), validate_password_bytes])
+    confirm = PasswordField('Confirm new password', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Reset password')
+
+
+class BusinessEmailForm(FlaskForm):
+    domain = StringField('Domain', validators=[DataRequired(), Length(max=253)])
+    mailbox = StringField('Mailbox name', validators=[
+        DataRequired(), Length(max=64),
+        Regexp(r'^[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*\Z',
+               message='Use letters, numbers, dots, underscores or hyphens between letters or numbers.')
+    ])

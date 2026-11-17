@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="account-page" aria-labelledby="account-title">
+    <div class="account-card">
+        <header class="account-card__header">
+            <h1 id="account-title">{{ title }}</h1>
+            {% block account_intro %}{% endblock %}
+        </header>
+        {% for category, message in get_flashed_messages(with_categories=true) %}
+            <p class="account-notice account-notice--{{ category }}" role="{{ 'alert' if category == 'error' else 'status' }}">{{ message }}</p>
+        {% endfor %}
+        {% block account_content %}{% endblock %}
+    </div>
+</section>
+{% endblock %}

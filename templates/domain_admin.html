@@ -15,8 +15,14 @@
             <a class="button button--secondary" href="{{ url_for('domain_portal') }}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Client Portal</a>
         </div>
 
+        {% for category, message in get_flashed_messages(with_categories=true) %}
+        <div class="dns-alert dns-alert--{{ 'warning' if category == 'error' else 'success' }}" role="{{ 'alert' if category == 'error' else 'status' }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+
         {% if dns_configured %}
-        <div class="dns-alert dns-alert--success"><i class="fa-solid fa-cloud" aria-hidden="true"></i><div><strong>Cloudflare connection configured</strong><p>Approvals and customer DNS changes can use the server-side integration.</p></div></div>
+        <div class="dns-alert dns-alert--success"><i class="fa-solid fa-cloud" aria-hidden="true"></i><div><strong>Cloudflare settings present</strong><p>Approving a request checks Cloudflare for existing DNS records at that name.</p></div></div>
         {% else %}
         <div class="dns-alert dns-alert--warning"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i><div><strong>Cloudflare credentials required</strong><p>Set CLOUDFLARE_API_TOKEN and CLOUDFLARE_ZONE_ID before approving namespaces.</p></div></div>
         {% endif %}
@@ -49,8 +55,10 @@
             {% endif %}
         </section>
 
+        {% include "business_email_admin.html" %}
+
         <section class="domain-admin-section">
-            <div class="dns-panel-heading"><div><span class="eyebrow">Provisioned customers</span><h3>Active namespaces</h3></div><span class="domain-admin-count">{{ accounts|length }}</span></div>
+            <div class="dns-panel-heading"><div><span class="eyebrow">Provisioned customers</span><h3>Approved namespaces</h3></div><span class="domain-admin-count">{{ accounts|length }}</span></div>
             {% if accounts %}
             <div class="dns-table-wrap">
                 <table class="dns-table domain-admin-table">
