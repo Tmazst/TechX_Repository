@@ -339,3 +339,12 @@ class CustomerResetForm(AccountCodeForm):
     password = PasswordField('New password', validators=[DataRequired(), Length(min=8, max=64), validate_password_bytes])
     confirm = PasswordField('Confirm new password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Reset password')
+
+
+class BusinessEmailForm(FlaskForm):
+    domain = StringField('Domain', validators=[DataRequired(), Length(max=253)])
+    mailbox = StringField('Mailbox name', validators=[
+        DataRequired(), Length(max=64),
+        Regexp(r'^[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*\Z',
+               message='Use letters, numbers, dots, underscores or hyphens between letters or numbers.')
+    ])

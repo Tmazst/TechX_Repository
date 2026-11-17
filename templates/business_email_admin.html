@@ -1,0 +1,39 @@
+<section class="domain-admin-section" id="email-requests">
+    <div class="dns-panel-heading"><h3>Email requests</h3></div>
+    {% for item in email_requests %}
+        <article class="email-request email-request--admin">
+            <h4>{{ item.address }}</h4>
+            <p>{{ item.customer.email }} · {{ item.status|capitalize }}</p>
+            {% if item.mode == 'external' %}
+                <p>Customer-owned domain · {{ 'TXT verified' if item.verified_at else 'Awaiting TXT verification' }}</p>
+            {% else %}
+                <p>TechX subdomain · Approve the customer’s domain request first.</p>
+            {% endif %}
+            {% if item.status == 'pending' %}
+                <div class="account-actions">
+                    <form class="account-actions__form" method="post" action="{{ url_for('business_email_review', request_id=item.id, action='approve') }}">
+                        {{ action_form.hidden_tag() }}
+                        <button class="account-button account-button--primary" type="submit">Approve mailbox</button>
+                    </form>
+                    <form class="account-actions__form" method="post" action="{{ url_for('business_email_review', request_id=item.id, action='reject') }}">
+                        {{ action_form.hidden_tag() }}
+                        <button class="account-button account-button--secondary" type="submit">Decline request</button>
+                    </form>
+                </div>
+            {% elif item.status == 'approved' %}
+                <form method="post" action="{{ url_for('business_email_review', request_id=item.id, action='provisioned') }}">
+                    {{ action_form.hidden_tag() }}
+                    <button class="account-button account-button--primary" type="submit">Confirm mailbox created</button>
+                </form>
+            {% elif item.status == 'dns_setup' %}
+                <form class="account-form" method="post" action="{{ url_for('business_email_review', request_id=item.id, action='ready') }}">
+                    {{ action_form.hidden_tag() }}
+                    <label><input type="checkbox" name="mail_tested" value="yes" required> Mailbox login, sending and receiving tested.</label>
+                    <button class="account-button account-button--primary" type="submit">Mark ready</button>
+                </form>
+            {% endif %}
+        </article>
+    {% else %}
+        <p>No business email requests yet.</p>
+    {% endfor %}
+</section>

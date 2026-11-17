@@ -20,6 +20,7 @@ from account_email import (
 )
 from werkzeug.utils import secure_filename
 from email.message import EmailMessage
+from business_email import MAIL_HOST, MAIL_SPF, has_verification_record, mail_dns_hosts, mail_dns_status, normalize_domain
 from smtplib import SMTPException
 # from bs4 import BeautifulSoup as bs
 from flask_colorpicker import colorpicker
@@ -880,10 +881,169 @@ def domain_record_delete(record_id):
     return redirect(url_for('domain_portal', account=account.id) + '#dns-records')
 
 
+def ensure_business_email_tables():
+    ensure_domain_tables()
+    BusinessEmailRequest.__table__.create(bind=db.engine, checkfirst=True)
+
+
+@app.route('/business-email')
+def business_email():
+    return render_template('business_email.html', title='Business Email | TechX')
+
+
+@app.route('/business-email/setup/<mode>', methods=['GET', 'POST'])
+@login_required
+def business_email_setup(mode):
+    if mode not in ('managed', 'external'):
+        abort(404)
+    ensure_business_email_tables()
+    form = BusinessEmailForm()
+    if form.validate_on_submit():
+        try:
+            return submit_business_email_request(form, mode)
+        except ValueError as error:
+            form.domain.errors.append(str(error))
+        except IntegrityError:
+            db.session.rollback()
+            flash('You already requested this address. Check My Email for its status.', 'error')
+    return render_template('business_email_setup.html', title='Request a mailbox', form=form, mode=mode)
+
+
+def submit_business_email_request(form, mode):
+    mailbox = form.mailbox.data.lower()
+    raw_domain = form.domain.data.strip().lower()
+    if mode == 'managed':
+        label = raw_domain.rstrip('.')
+        if label.endswith('.eswtn.com'):
+            label = label[:-len('.eswtn.com')]
+        domain = f'{label}.eswtn.com'
+        existing = DomainAccount.query.filter_by(fqdn=domain, user_id=current_user.id, status='active').first()
+        pending = DomainRequest.query.filter_by(requested_label=label, user_id=current_user.id, status='pending').first()
+        if not existing and not pending:
+            label, available, reason = eswtn_name_status(label)
+            if not available:
+                raise ValueError(reason)
+            db.session.add(DomainRequest(
+                user_id=current_user.id, requested_label=label, email=normalize_email(current_user.email),
+                request_type='professional_email', intended_use='Business Email mailbox request',
+                status='pending',
+            ))
+    else:
+        domain = normalize_domain(raw_domain)
+        if domain == 'eswtn.com' or domain.endswith('.eswtn.com'):
+            raise ValueError('Choose the eswtn.com option for a TechX-managed address.')
+    if len(f'{mailbox}@{domain}') > 254:
+        raise ValueError('Choose a shorter mailbox name or domain.')
+
+    item = BusinessEmailRequest(
+        user_id=current_user.id, domain=domain, mailbox=mailbox, mode=mode,
+        verification_code=f'techx-mail={secrets.token_urlsafe(24)}' if mode == 'external' else None,
+    )
+    db.session.add(item)
+    db.session.commit()
+    flash('Your mailbox request was submitted.', 'success')
+    return redirect(url_for('my_email'))
+
+
+@app.route('/my-email')
+@login_required
+def my_email():
+    ensure_business_email_tables()
+    items = BusinessEmailRequest.query.filter_by(user_id=current_user.id).order_by(
+        BusinessEmailRequest.created_at.desc()
+    ).all()
+    return render_template('my_email.html', title='My Email', items=items,
+                           action_form=DomainAdminActionForm(), mail_host=MAIL_HOST, mail_spf=MAIL_SPF)
+
+
+@app.route('/my-email/<int:request_id>/verify', methods=['POST'])
+@login_required
+def business_email_verify(request_id):
+    ensure_business_email_tables()
+    if not DomainAdminActionForm().validate_on_submit():
+        abort(400)
+    item = BusinessEmailRequest.query.filter_by(id=request_id, user_id=current_user.id,
+                                               mode='external').first_or_404()
+    if item.status == 'dns_setup':
+        hosts = mail_dns_hosts(item.domain)
+        if hosts is None:
+            flash('DNS is unavailable. Try again shortly.', 'error')
+        elif set(hosts) == {MAIL_HOST}:
+            flash('Mail is routed to TechX. We’ll complete the send and receive checks.', 'success')
+        elif hosts:
+            flash(f'Current mail servers: {", ".join(hosts)}. Your mail is not yet routed only to TechX.', 'error')
+        else:
+            flash('No MX record was found. Add the mail record shown below and check again.', 'error')
+        return redirect(url_for('my_email'))
+    if item.status != 'pending':
+        abort(404)
+    verified = has_verification_record(item)
+    if verified:
+        item.verified_at = datetime.utcnow()
+        db.session.commit()
+        flash(f'{item.domain} is verified. TechX can now review your request.', 'success')
+    else:
+        flash('DNS is unavailable. Try again shortly.' if verified is None else
+              'The verification record was not found. Check the name and value, then try again.', 'error')
+    return redirect(url_for('my_email'))
+
+
+@app.route('/domain-admin/email/<int:request_id>/<action>', methods=['POST'])
+@domain_admin_required
+def business_email_review(request_id, action):
+    ensure_business_email_tables()
+    if not DomainAdminActionForm().validate_on_submit():
+        abort(400)
+    item = db.session.get(BusinessEmailRequest, request_id)
+    if item is None:
+        abort(404)
+    destination = url_for('domain_admin', _anchor='email-requests')
+    previous = item.status
+    changes = {}
+    if action == 'reject' and previous == 'pending':
+        changes['status'] = 'rejected'
+    elif action == 'approve' and previous == 'pending':
+        if item.mode == 'external':
+            eligible = item.verified_at is not None and has_verification_record(item)
+            error = 'The customer needs a current DNS verification record before approval.'
+        else:
+            eligible = DomainAccount.query.filter_by(
+                fqdn=item.domain, user_id=item.user_id, status='active'
+            ).first()
+            error = 'Approve the customer’s eswtn.com domain request first.'
+        if not eligible:
+            flash(error, 'error')
+            return redirect(destination)
+        changes = {'status': 'approved', 'reserved_address': item.address}
+    elif action == 'provisioned' and previous == 'approved':
+        changes['status'] = 'dns_setup'
+    elif action == 'ready' and previous == 'dns_setup':
+        if request.form.get('mail_tested') != 'yes' or mail_dns_status(item.domain) is not True:
+            flash('Confirm the mailbox passed send and receive tests and that its MX points only to TechX.', 'error')
+            return redirect(destination)
+        changes['status'] = 'ready'
+    else:
+        flash('That action is unavailable for the current request status.', 'error')
+        return redirect(destination)
+    address = item.address
+    try:
+        updated = BusinessEmailRequest.query.filter_by(id=item.id, status=previous).update(changes)
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        flash('This mailbox address is already allocated.', 'error')
+    else:
+        if updated:
+            flash(f'{address}: request updated.', 'success')
+        else:
+            flash('The request has already changed. Review its current status before trying again.', 'error')
+    return redirect(destination)
+
+
 @app.route('/domain-admin')
 @domain_admin_required
 def domain_admin():
-    ensure_domain_tables()
+    ensure_business_email_tables()
     pending_requests = DomainRequest.query.filter_by(status='pending').order_by(
         DomainRequest.created_at.asc()
     ).all()
@@ -892,6 +1052,7 @@ def domain_admin():
         'domain_admin.html',
         title='eswtn.com Administration | Tech Xolutions',
         pending_requests=pending_requests,
+        email_requests=BusinessEmailRequest.query.order_by(BusinessEmailRequest.created_at.desc()).all(),
         accounts=accounts,
         action_form=DomainAdminActionForm(),
         dns_configured=cloudflare_configured()

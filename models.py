@@ -175,3 +175,29 @@ class AccountEmailCode(db.Model):
     expires_at = db.Column(db.DateTime, nullable=False)
     attempts = db.Column(db.Integer, nullable=False)
     consumed = db.Column(db.Boolean, nullable=False)
+
+
+class BusinessEmailRequest(db.Model):
+    __tablename__ = 'business_email_request'
+    __table_args__ = (db.UniqueConstraint('user_id', 'domain', 'mailbox'),)
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, index=True)
+    domain = db.Column(db.String(253), nullable=False)
+    mailbox = db.Column(db.String(64), nullable=False)
+    mode = db.Column(db.String(12), nullable=False)
+    status = db.Column(db.String(16), nullable=False, default='pending', index=True)
+    verification_code = db.Column(db.String(64), unique=True)
+    verified_at = db.Column(db.DateTime)
+    reserved_address = db.Column(db.String(254), unique=True)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    customer = db.relationship('User')
+
+    @property
+    def address(self):
+        return f'{self.mailbox}@{self.domain}'
+
+    @property
+    def verification_name(self):
+        return f'_techx-mail.{self.domain}'

@@ -3717,3 +3717,20 @@ section{
 }
 .account-notice--success { background: #eaf7ef; color: #185a38; }
 .account-notice--error { background: #fff0ef; color: #8b221d; }
+
+/* Business email requests */
+.business-email-layout, .business-email-list { display: grid; align-items: start; gap: 18px; }
+.business-email-layout { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.business-email-layout > a, .business-email-list > a { justify-self: start; }
+.business-email-list { max-width: 800px; }
+.business-email-layout p, .business-email-list p, .email-request p { font-size: 15px; }
+.email-request h2, .email-request h4, .email-request code { overflow-wrap: anywhere; }
+.email-request dl { display: grid; grid-template-columns: minmax(6rem, auto) minmax(0, 1fr); gap: 8px 16px; }
+.email-request dt { font-weight: 700; }
+.email-request dd { margin: 0; }
+.email-request--admin { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--tx-line); }
+.email-request--admin .account-form { justify-items: start; }
+@media (max-width: 680px) {
+    .business-email-layout { grid-template-columns: 1fr; }
+    .email-request dl { grid-template-columns: 1fr; }
+}

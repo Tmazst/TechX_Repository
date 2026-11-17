@@ -55,6 +55,8 @@
             {% endif %}
         </section>
 
+        {% include "business_email_admin.html" %}
+
         <section class="domain-admin-section">
             <div class="dns-panel-heading"><div><span class="eyebrow">Provisioned customers</span><h3>Approved namespaces</h3></div><span class="domain-admin-count">{{ accounts|length }}</span></div>
             {% if accounts %}

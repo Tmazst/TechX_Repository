@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="account-hero domain-account-hero">
+    <div class="site-shell">
+        <h1>Business Email</h1>
+        <p>Request a mailbox with TechX and follow its setup in My Email.</p>
+    </div>
+</section>
+<section class="section-pad">
+    <div class="site-shell business-email-layout">
+        <article class="domain-admin-section">
+            <h2>Get an eswtn.com address</h2>
+            <p>Choose a new TechX subdomain or use one already in My Domains. For example, <strong>info@company.eswtn.com</strong>.</p>
+            <a class="button button--secondary" href="{{ url_for('business_email_setup', mode='managed') }}">Choose an eswtn.com address</a>
+        </article>
+        <article class="domain-admin-section">
+            <h2>Use a domain I own</h2>
+            <p>Set up an address such as <strong>info@company.com</strong>. You’ll need access to your domain’s DNS settings.</p>
+            <a class="button button--secondary" href="{{ url_for('business_email_setup', mode='external') }}">Use my own domain</a>
+        </article>
+        <a class="button button--secondary" href="{{ url_for('my_email') }}">My Email</a>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "account_layout.html" %}
+{% from "account_fields.html" import account_field, account_csrf %}
+
+{% block account_intro %}
+<p>{% if mode == 'managed' %}Choose the name that will appear before eswtn.com.{% else %}Enter your domain. We’ll give you a DNS record to verify that you control it.{% endif %}</p>
+{% endblock %}
+
+{% block account_content %}
+<form method="post" class="account-form" data-email-preview="{{ mode }}">
+    {{ account_csrf(form) }}
+    {% if mode == 'managed' %}
+        {{ account_field(form.domain, "off", "Subdomain", "For example, enter company for company.eswtn.com.") }}
+    {% else %}
+        {{ account_field(form.domain, "off", "Your domain", "For example, company.com.") }}
+    {% endif %}
+    {{ account_field(form.mailbox, "off", hint="Enter the part before @, such as info or support.") }}
+    <p class="account-notice" data-email-address hidden></p>
+    <button class="account-button account-button--primary" type="submit">Request mailbox</button>
+</form>
+<div class="account-actions"><a href="{{ url_for('business_email') }}">Back to Business Email</a></div>
+{% endblock %}
+
+{% block scripts %}
+<script defer src="{{ url_for('static', filename='js/business-email.js') }}"></script>
+{% endblock %}
