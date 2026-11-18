@@ -199,5 +199,11 @@ class BusinessEmailRequest(db.Model):
         return f'{self.mailbox}@{self.domain}'
 
     @property
+    def managed_domain_account(self):
+        if self.mode != 'managed':
+            return None
+        return DomainAccount.query.filter_by(fqdn=self.domain, user_id=self.user_id).first()
+
+    @property
     def verification_name(self):
         return f'_techx-mail.{self.domain}'

@@ -1007,9 +1007,8 @@ def business_email_review(request_id, action):
             eligible = item.verified_at is not None and has_verification_record(item)
             error = 'The customer needs a current DNS verification record before approval.'
         else:
-            eligible = DomainAccount.query.filter_by(
-                fqdn=item.domain, user_id=item.user_id, status='active'
-            ).first()
+            account = item.managed_domain_account
+            eligible = account is not None and account.status == 'active'
             error = 'Approve the customer’s eswtn.com domain request first.'
         if not eligible:
             flash(error, 'error')

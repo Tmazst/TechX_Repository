@@ -3730,6 +3730,10 @@ section{
 .email-request dd { margin: 0; }
 .email-request--admin { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--tx-line); }
 .email-request--admin .account-form { justify-items: start; }
+.email-request--admin .email-request__address { color: #10213e !important; font-size: 22px; font-weight: 700; margin: 8px 0 18px; }
+.email-request--admin dd { overflow-wrap: anywhere; }
+.email-request__details { margin: 18px 0; }
+.email-request__details summary { color: #173d85; cursor: pointer; font-weight: 600; }
 @media (max-width: 680px) {
     .business-email-layout { grid-template-columns: 1fr; }
     .email-request dl { grid-template-columns: 1fr; }

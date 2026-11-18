@@ -27,7 +27,14 @@
                         <button type="submit" class="account-button account-button--primary">Check DNS</button>
                     </form>
                 {% elif item.status == 'pending' %}
-                    <p><strong>Awaiting approval</strong>. TechX will review your request{% if item.mode == 'managed' %} after the subdomain is approved{% endif %}.</p>
+                    {% set domain_account = item.managed_domain_account %}
+                    {% if domain_account and domain_account.status == 'active' %}
+                        <p><strong>Awaiting mailbox approval.</strong> Your subdomain is active. TechX will review your mailbox request.</p>
+                    {% elif domain_account %}
+                        <p><strong>Subdomain inactive.</strong> Contact TechX to reactivate your subdomain before mailbox approval.</p>
+                    {% else %}
+                        <p><strong>Awaiting subdomain approval.</strong> TechX will review your mailbox request after the subdomain is approved.</p>
+                    {% endif %}
                 {% elif item.status == 'approved' %}
                     <p><strong>Setting up your mailbox</strong>. TechX will confirm when the mailbox can send and receive.</p>
                 {% elif item.status == 'dns_setup' %}

@@ -2,13 +2,37 @@
     <div class="dns-panel-heading"><h3>Email requests</h3></div>
     {% for item in email_requests %}
         <article class="email-request email-request--admin">
-            <h4>{{ item.address }}</h4>
-            <p>{{ item.customer.email }} · {{ item.status|capitalize }}</p>
+            {% set domain_account = item.managed_domain_account %}
+            <span class="eyebrow">Requested mailbox</span>
+            <h4 class="email-request__address">{{ item.address }}</h4>
+            <dl>
+                <dt>Customer account</dt><dd>{{ item.customer.email }}</dd>
+                <dt>Customer name</dt><dd>{{ item.customer.name or 'Not provided' }}</dd>
+                <dt>Domain</dt><dd>{{ item.domain }}</dd>
+                <dt>Mailbox status</dt><dd>{{ 'Awaiting mailbox approval' if item.status == 'pending' else item.status|replace('_', ' ')|capitalize }}</dd>
+                <dt>Submitted (UTC)</dt><dd>{{ item.created_at.strftime('%d %b %Y, %H:%M') }}</dd>
+            </dl>
             {% if item.mode == 'external' %}
                 <p>Customer-owned domain · {{ 'TXT verified' if item.verified_at else 'Awaiting TXT verification' }}</p>
             {% else %}
-                <p>TechX subdomain · Approve the customer’s domain request first.</p>
+                {% if domain_account and domain_account.status == 'active' %}
+                    <p><strong>Subdomain active · Ownership confirmed.</strong> Ready for mailbox review.</p>
+                {% elif domain_account %}
+                    <p><strong>Subdomain {{ domain_account.status }}.</strong> Reactivate the customer’s subdomain before mailbox approval.</p>
+                {% else %}
+                    <p><strong>Awaiting subdomain approval.</strong> Approve the customer’s domain request first.</p>
+                {% endif %}
             {% endif %}
+            <details class="email-request__details">
+                <summary>View request details</summary>
+                <dl>
+                    <dt>Request ID</dt><dd>{{ item.id }}</dd>
+                    <dt>Phone</dt><dd>{{ item.customer.contacts|default('Not provided', true) }}</dd>
+                    <dt>Address</dt><dd>{{ item.customer.address|default('Not provided', true) }}</dd>
+                    <dt>Setup type</dt><dd>{{ 'TechX subdomain' if item.mode == 'managed' else 'Customer-owned domain' }}</dd>
+                </dl>
+                <p>Mailbox provisioning is manual. Approval reserves the address; confirm creation and delivery tests before marking it ready.</p>
+            </details>
             {% if item.status == 'pending' %}
                 <div class="account-actions">
                     <form class="account-actions__form" method="post" action="{{ url_for('business_email_review', request_id=item.id, action='approve') }}">
