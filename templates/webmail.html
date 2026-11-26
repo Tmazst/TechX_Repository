@@ -18,6 +18,18 @@
             {% endif %}
             <p><a class="account-link" href="mailto:support@techx.eswtn.com">Contact mailbox support</a></p>
         </article>
+        {% if config.TECHX_WEBMAIL_ENABLED %}
+            <article class="domain-admin-section">
+                <h2>Install Webmail</h2>
+                <p>Open Webmail using the button above, then install it for direct access from your desktop or home screen.</p>
+                <ul>
+                    <li><strong>Windows · Edge</strong> — Open <em>More tools</em>, then <em>Apps</em> and <em>Install this site as an app</em>.</li>
+                    <li><strong>Computer · Chrome</strong> — Open <em>Cast, save, and share</em> in the browser menu and choose <em>Install page as app</em>.</li>
+                    <li><strong>Android · Chrome</strong> — Open the browser menu, choose <em>Install and create shortcut</em> and tap <em>Install</em>.</li>
+                    <li><strong>iPhone · Safari</strong> — Tap <em>Share</em>, then <em>Add to Home Screen</em>. Turn on <em>Open as Web App</em> if shown, then tap <em>Add</em>.</li>
+                </ul>
+            </article>
+        {% endif %}
     </div>
 </section>
 {% endblock %}
