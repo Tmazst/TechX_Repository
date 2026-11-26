@@ -41,20 +41,16 @@ class techx_pwa extends rcube_plugin
         $webmail->output->add_header('<meta name="theme-color" content="#294393">');
 
         if ($this->has_install_link) {
-            $webmail->output->add_header('<link rel="stylesheet" href="' . $assets . 'install.css">');
-            $webmail->output->add_header('<script defer src="' . $assets . 'install.js?v=2"></script>');
+            $webmail->output->add_header('<link rel="stylesheet" href="' . $assets . 'install.css?v=3">');
+            $webmail->output->add_header('<script defer src="' . $assets . 'install.js?v=3"></script>');
             $webmail->output->add_footer(<<<'HTML'
-<dialog id="techx-webmail-install-help" aria-labelledby="techx-webmail-install-heading">
-    <h2 id="techx-webmail-install-heading">Install Webmail</h2>
-    <p>Add TechX Webmail to your desktop or home screen from this page.</p>
-    <ul>
-        <li><strong>Edge on Windows</strong> · More tools → Apps → Install this site as an app.</li>
-        <li><strong>Chrome on a computer</strong> · Cast, save, and share → Install page as app.</li>
-        <li><strong>Chrome on Android</strong> · Install and create shortcut → Install. Some versions show Add to Home screen.</li>
-        <li><strong>Safari on iPhone</strong> · Share → Add to Home Screen → Add. Turn on Open as Web App if shown.</li>
-    </ul>
-    <form method="dialog">
-        <button type="submit" class="btn btn-primary">Close</button>
+<dialog id="techx-webmail-install-help" aria-labelledby="techx-webmail-install-heading" aria-describedby="techx-webmail-install-action">
+    <img src="/static.php/plugins/techx_pwa/icon-192.png" width="64" height="64" alt="">
+    <h2 id="techx-webmail-install-heading">Install TechX Webmail</h2>
+    <p id="techx-webmail-install-action"></p>
+    <form method="dialog" class="techx-install-actions">
+        <button type="submit" class="btn btn-secondary" autofocus>Got it</button>
+        <button type="button" class="btn btn-primary" id="techx-webmail-install-now" hidden>Install</button>
     </form>
 </dialog>
 HTML

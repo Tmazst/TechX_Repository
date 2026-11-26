@@ -1,12 +1,13 @@
 #techx-webmail-install-help {
-    width: min(30rem, calc(100% - 2rem));
+    width: min(26rem, calc(100% - 2rem));
     max-height: calc(100% - 2rem);
     overflow: auto;
-    padding: 1.25rem;
+    padding: 1.5rem;
     border: 0;
-    border-radius: .5rem;
+    border-radius: .9rem;
     background: Canvas;
     color: CanvasText;
+    text-align: center;
 }
 
 #techx-webmail-install-help::backdrop {
@@ -14,11 +15,25 @@
 }
 
 #techx-webmail-install-help h2 {
-    font-size: 1.25rem;
+    margin: .75rem 0 .5rem;
+    font-size: 1.4rem;
 }
 
-#techx-webmail-install-help li + li {
-    margin-top: .5rem;
+#techx-webmail-install-help img {
+    border: 1px solid #dce3f2;
+    border-radius: 1rem;
+}
+
+.techx-install-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: .5rem;
+    margin-top: 1.25rem;
+}
+
+.techx-install-actions [hidden] {
+    display: none;
 }
 
 @media (display-mode: standalone) {
