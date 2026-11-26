@@ -66,11 +66,11 @@ Confirm that Certbot has automatic renewal enabled and a deploy hook that reload
 
 Sign in at `https://webmail.eswtn.com/` with a pilot mailbox. Send and receive an external test message, reply with an attachment, and sign out. Repeat with another mailbox and confirm each login shows its own inbox and sends from its own address. For a multi-domain rollout, include two pilot addresses with the same local part on different domains.
 
-After the pilot succeeds, deploy this website revision and set `TECHX_WEBMAIL_ENABLED=1` in the environment for `techx.service`. Restart `techx.service` and verify `/webmail`, the guest navigation, Business Email, and the Webmail button on a ready mailbox in My Email. To hide the website entry, unset `TECHX_WEBMAIL_ENABLED` and restart the service. To take the inbox endpoint offline, stop the Roundcube service and disable its Nginx vhost.
+After the pilot succeeds, deploy this website revision and set `TECHX_WEBMAIL_ENABLED=1` in the environment for `techx.service`. Restart `techx.service` and verify `/webmail`, the guest navigation, Business Email, and the direct Open Webmail link at the top of My Email. To hide the public entry, unset `TECHX_WEBMAIL_ENABLED` and restart the service. Signed-in customers can still open Webmail from My Email. To take the inbox endpoint offline, stop the Roundcube service and disable its Nginx vhost.
 
 ## Install Webmail on your device
 
-The Roundcube image includes the TechX Webmail PWA. Its launch URL is `https://webmail.eswtn.com/`, so the installed icon opens the inbox or the mailbox sign-in screen if the session has expired. Installation uses the browser's app menu. Supported browsers may also show an Install Webmail button on the sign-in screen. The app uses the live mailbox over HTTPS and requires an internet connection.
+The Roundcube image includes the TechX Webmail PWA. Its launch URL is `https://webmail.eswtn.com/`, so the installed icon opens the inbox or the mailbox sign-in screen if the session has expired. Use Install Webmail below the sign-in form or in Roundcube's main menu. When the browser offers a native installation prompt, the link opens it. Otherwise, the link displays browser-specific steps. The app uses the live mailbox over HTTPS and requires an internet connection.
 
 For an existing deployment, rebuild and recreate the Roundcube container with the commands in [Start Roundcube](#start-roundcube). Keep the existing Compose project and both named volumes. Verify Webmail before restarting `techx.service` to publish the updated website instructions.
 
