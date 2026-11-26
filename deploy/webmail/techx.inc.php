@@ -9,6 +9,7 @@ $config['x_frame_options'] = 'deny';
 $config['identities_level'] = 3;
 $config['login_autocomplete'] = 1;
 $config['login_username_filter'] = 'email';
+$config['plugins'][] = 'techx_pwa';
 
 $tls = ['verify_peer' => true, 'verify_peer_name' => true];
 $config['imap_conn_options'] = ['ssl' => $tls];
