@@ -31,6 +31,9 @@
                         <a href="/#qm"><strong>Digital Marketing</strong><span>Campaigns, content and Q-Messànger</span></a>
                         <a href="{{ url_for('domain_support') }}"><strong>Domain Support</strong><span>Local domains, email and setup</span></a>
                         <a href="{{ url_for('business_email') }}"><strong>Business Email</strong><span>Mailboxes for your domain</span></a>
+                        {% if config.TECHX_WEBMAIL_ENABLED %}
+                            <a href="{{ url_for('webmail') }}"><strong>Webmail</strong><span>Open your inbox</span></a>
+                        {% endif %}
                     </div>
                 </div>
                 <a href="{{ url_for('business_email') }}">Business Email</a>
@@ -48,6 +51,9 @@
                         <button type="submit"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i> Sign out</button>
                     </form>
                 {% else %}
+                    {% if config.TECHX_WEBMAIL_ENABLED %}
+                        <a href="{{ url_for('webmail') }}">Webmail</a>
+                    {% endif %}
                     <a class="nav-login" href="{{ url_for('login') }}"><i class="fa-regular fa-user" aria-hidden="true"></i> Client Login</a>
                 {% endif %}
             </div>

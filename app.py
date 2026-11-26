@@ -45,6 +45,7 @@ app.config['SECRET_KEY'] = os.environ['TECHX_SECRET_KEY']
 app.config['SESSION_COOKIE_SECURE'] = os.environ.get('TECHX_SECURE_COOKIES', '1') == '1'
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['TECHX_WEBMAIL_ENABLED'] = os.environ.get('TECHX_WEBMAIL_ENABLED') == '1'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('TECHX_DATABASE_URI', 'sqlite:///techx_db.db')
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle':280}
 app.config["SQLALCHEMY_POOL_RECYCLE"] = 299
@@ -889,6 +890,11 @@ def ensure_business_email_tables():
 @app.route('/business-email')
 def business_email():
     return render_template('business_email.html', title='Business Email | TechX')
+
+
+@app.route('/webmail')
+def webmail():
+    return render_template('webmail.html', title='Webmail | TechX')
 
 
 @app.route('/business-email/setup/<mode>', methods=['GET', 'POST'])

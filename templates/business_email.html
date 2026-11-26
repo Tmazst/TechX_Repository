@@ -19,6 +19,9 @@
             <a class="button button--secondary" href="{{ url_for('business_email_setup', mode='external') }}">Use my own domain</a>
         </article>
         <a class="button button--secondary" href="{{ url_for('my_email') }}">My Email</a>
+        {% if config.TECHX_WEBMAIL_ENABLED %}
+            <a class="button button--primary" href="{{ url_for('webmail') }}">Open Webmail</a>
+        {% endif %}
     </div>
 </section>
 {% endblock %}

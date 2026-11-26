@@ -54,6 +54,9 @@
                     {% endif %}
                 {% elif item.status == 'ready' %}
                     <p><strong>Ready to use</strong>. Use the sign-in details provided by TechX.</p>
+                    {% if config.TECHX_WEBMAIL_ENABLED %}
+                        <a class="button button--primary" href="{{ url_for('webmail') }}">Open Webmail</a>
+                    {% endif %}
                     <dl>
                         <dt>Mail server</dt><dd><code>{{ mail_host }}</code></dd>
                         <dt>Incoming mail</dt><dd>IMAP 993, SSL/TLS</dd>
