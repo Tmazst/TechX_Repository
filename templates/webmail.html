@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="account-hero domain-account-hero">
+    <div class="site-shell">
+        <h1>TechX Webmail</h1>
+        <p>Read and send email from your browser.</p>
+    </div>
+</section>
+<section class="section-pad">
+    <div class="site-shell business-email-list">
+        <article class="domain-admin-section">
+            {% if config.TECHX_WEBMAIL_ENABLED %}
+                <h2>Open your inbox</h2>
+                <p>Sign in with your TechX mailbox address and mailbox password.</p>
+                <a class="button button--primary" href="https://webmail.eswtn.com/" rel="noreferrer">Sign in to Webmail <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+            {% else %}
+                <h2>Webmail is currently unavailable</h2>
+            {% endif %}
+            <p><a class="account-link" href="mailto:support@techx.eswtn.com">Contact mailbox support</a></p>
+        </article>
+    </div>
+</section>
+{% endblock %}
