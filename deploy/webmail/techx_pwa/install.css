@@ -1,0 +1,28 @@
+#techx-webmail-install-help {
+    width: min(30rem, calc(100% - 2rem));
+    max-height: calc(100% - 2rem);
+    overflow: auto;
+    padding: 1.25rem;
+    border: 0;
+    border-radius: .5rem;
+    background: Canvas;
+    color: CanvasText;
+}
+
+#techx-webmail-install-help::backdrop {
+    background: rgb(0 0 0 / 55%);
+}
+
+#techx-webmail-install-help h2 {
+    font-size: 1.25rem;
+}
+
+#techx-webmail-install-help li + li {
+    margin-top: .5rem;
+}
+
+@media (display-mode: standalone) {
+    .techx-webmail-install {
+        display: none !important;
+    }
+}

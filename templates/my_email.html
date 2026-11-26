@@ -8,7 +8,10 @@
 </section>
 <section class="section-pad">
     <div class="site-shell business-email-list">
-        <a class="button button--secondary" href="{{ url_for('business_email') }}">Request a mailbox</a>
+        <div class="account-actions">
+            <a class="button button--primary" href="https://webmail.eswtn.com/" rel="noreferrer"><i class="fa-solid fa-envelope" aria-hidden="true"></i> Open Webmail</a>
+            <a class="button button--secondary" href="{{ url_for('business_email') }}">Request a mailbox</a>
+        </div>
         {% for category, message in get_flashed_messages(with_categories=true) %}
             <p class="account-notice account-notice--{{ category }}" role="{{ 'alert' if category == 'error' else 'status' }}">{{ message }}</p>
         {% endfor %}
@@ -54,9 +57,6 @@
                     {% endif %}
                 {% elif item.status == 'ready' %}
                     <p><strong>Ready to use</strong>. Use the sign-in details provided by TechX.</p>
-                    {% if config.TECHX_WEBMAIL_ENABLED %}
-                        <a class="button button--primary" href="{{ url_for('webmail') }}">Open Webmail</a>
-                    {% endif %}
                     <dl>
                         <dt>Mail server</dt><dd><code>{{ mail_host }}</code></dd>
                         <dt>Incoming mail</dt><dd>IMAP 993, SSL/TLS</dd>

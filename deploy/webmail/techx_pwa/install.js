@@ -1,26 +1,46 @@
-window.addEventListener('beforeinstallprompt', (event) => {
-    const loginFooter = document.getElementById('login-footer');
-    if (!loginFooter) {
+(() => {
+    const installLinks = document.querySelectorAll('.techx-webmail-install');
+    const help = document.getElementById('techx-webmail-install-help');
+    const removeInstallLinks = () => installLinks.forEach((link) => link.remove());
+
+    if (window.matchMedia('(display-mode: standalone)').matches || navigator.standalone) {
+        removeInstallLinks();
         return;
     }
 
-    event.preventDefault();
+    let installPrompt;
+    window.addEventListener('beforeinstallprompt', (event) => {
+        event.preventDefault();
+        installPrompt = event;
+    });
 
-    const installButton = document.createElement('button');
-    installButton.type = 'button';
-    installButton.className = 'btn btn-link btn-sm d-block mx-auto';
-    installButton.textContent = 'Install Webmail';
-    installButton.addEventListener('click', async () => {
-        installButton.disabled = true;
-        try {
-            await event.prompt();
-        } catch {
-            // The browser menu remains available if the prompt has expired.
-        } finally {
-            installButton.remove();
-        }
-    }, { once: true });
+    window.addEventListener('appinstalled', removeInstallLinks, { once: true });
 
-    loginFooter.append(installButton);
-    window.addEventListener('appinstalled', () => installButton.remove(), { once: true });
-}, { once: true });
+    for (const link of installLinks) {
+        link.addEventListener('click', async (event) => {
+            if (!installPrompt && typeof help?.showModal !== 'function') {
+                return;
+            }
+
+            event.preventDefault();
+            if (installPrompt) {
+                const prompt = installPrompt;
+                installPrompt = undefined;
+                try {
+                    await prompt.prompt();
+                    return;
+                } catch {
+                    // An expired browser prompt can still fall back to the install steps.
+                }
+            }
+
+            if (typeof help?.showModal === 'function') {
+                if (!help.open) {
+                    help.showModal();
+                }
+            } else {
+                window.location.assign(link.href);
+            }
+        });
+    }
+})();
