@@ -1,9 +1,32 @@
 (() => {
     const installLinks = document.querySelectorAll('.techx-webmail-install');
     const help = document.getElementById('techx-webmail-install-help');
+    const storageKey = 'techx-webmail-install-intro';
     const removeInstallLinks = () => installLinks.forEach((link) => link.remove());
+    const rememberIntro = () => {
+        try {
+            localStorage.setItem(storageKey, '1');
+        } catch {
+            // The dialog can still be used when browser storage is unavailable.
+        }
+    };
 
-    if (window.matchMedia('(display-mode: standalone)').matches || navigator.standalone) {
+    const launchMarker = new URLSearchParams(window.location.search).get('_techx_app') === '1';
+    const appMode = window.matchMedia('(display-mode: standalone), (display-mode: minimal-ui), (display-mode: window-controls-overlay)');
+    const appWindowKey = 'techx-webmail-app-window';
+    let appWindow = launchMarker || appMode.matches || navigator.standalone;
+    try {
+        // Preserve app context as Roundcube moves to URLs without the launch marker.
+        appWindow = appWindow || sessionStorage.getItem(appWindowKey) === '1';
+        if (appWindow) {
+            sessionStorage.setItem(appWindowKey, '1');
+        }
+    } catch {
+        // The current URL and display mode still identify the installed app.
+    }
+
+    if (appWindow) {
+        rememberIntro();
         removeInstallLinks();
         return;
     }
@@ -19,7 +42,6 @@
     const agent = navigator.userAgent;
     const appleMobile = /iPad|iPhone|iPod/.test(agent) ||
         (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    const storageKey = 'techx-webmail-install-intro';
     let installPrompt;
     let seen = false;
     let signInStarted = false;
@@ -59,11 +81,7 @@
             help.showModal();
         }
         seen = true;
-        try {
-            localStorage.setItem(storageKey, '1');
-        } catch {
-            // The dialog can still be used when browser storage is unavailable.
-        }
+        rememberIntro();
     };
 
     try {
@@ -101,6 +119,7 @@
 
     window.addEventListener('appinstalled', () => {
         installed = true;
+        rememberIntro();
         removeInstallLinks();
         if (help.open) {
             help.close();

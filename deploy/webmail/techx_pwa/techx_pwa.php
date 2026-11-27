@@ -8,8 +8,22 @@ class techx_pwa extends rcube_plugin
 
     public function init()
     {
+        $this->add_hook('ready', [$this, 'open_inbox_from_root']);
         $this->add_hook('template_container', [$this, 'add_install_link']);
         $this->add_hook('render_page', [$this, 'add_install_metadata']);
+    }
+
+    public function open_inbox_from_root(array $request): array
+    {
+        // Roundcube runs the ready hook after validating the mailbox session.
+        // Older app icons still open the bare root.
+        if ($request['task'] === 'mail' && $request['action'] === ''
+            && ($_SERVER['REQUEST_METHOD'] ?? '') === 'GET'
+            && ($_SERVER['REQUEST_URI'] ?? '') === '/') {
+            rcmail::get_instance()->output->redirect(['_task' => 'mail', '_mbox' => 'INBOX'], 0);
+        }
+
+        return $request;
     }
 
     public function add_install_link(array $container): array
@@ -36,13 +50,13 @@ class techx_pwa extends rcube_plugin
         $webmail = rcmail::get_instance();
         $assets = '/static.php/plugins/techx_pwa/';
 
-        $webmail->output->add_header('<link rel="manifest" href="' . $assets . 'manifest.json">');
+        $webmail->output->add_header('<link rel="manifest" href="' . $assets . 'manifest.json?v=2">');
         $webmail->output->add_header('<link rel="apple-touch-icon" href="' . $assets . 'icon-192.png">');
         $webmail->output->add_header('<meta name="theme-color" content="#294393">');
 
         if ($this->has_install_link) {
-            $webmail->output->add_header('<link rel="stylesheet" href="' . $assets . 'install.css?v=3">');
-            $webmail->output->add_header('<script defer src="' . $assets . 'install.js?v=3"></script>');
+            $webmail->output->add_header('<link rel="stylesheet" href="' . $assets . 'install.css?v=4">');
+            $webmail->output->add_header('<script defer src="' . $assets . 'install.js?v=4"></script>');
             $webmail->output->add_footer(<<<'HTML'
 <dialog id="techx-webmail-install-help" aria-labelledby="techx-webmail-install-heading" aria-describedby="techx-webmail-install-action">
     <img src="/static.php/plugins/techx_pwa/icon-192.png" width="64" height="64" alt="">

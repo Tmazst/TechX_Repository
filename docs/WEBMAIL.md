@@ -70,7 +70,9 @@ After the pilot succeeds, deploy this website revision and set `TECHX_WEBMAIL_EN
 
 ## Install Webmail on your device
 
-The Roundcube image includes the TechX Webmail PWA. Its launch URL is `https://webmail.eswtn.com/`, so the installed icon opens the inbox or the mailbox sign-in screen if the session has expired. Use Install Webmail below the sign-in form or in Roundcube's main menu. The branded dialog shows an Install button when the browser provides a native prompt and one browser-specific action otherwise. The dialog can appear once on the idle sign-in screen when the native prompt is available or on iPhone and iPad. The app uses the live mailbox over HTTPS and requires an internet connection.
+The Roundcube image includes the TechX Webmail PWA. The launcher requests the Inbox directly. Roundcube opens it for a valid mailbox session or shows its normal sign-in screen and returns to the Inbox after successful sign-in. Older icons that open the Webmail root also reach the Inbox when signed in. The installed app skips installation prompts, including on its sign-in screen.
+
+Use Install Webmail below the sign-in form or in Roundcube's main menu in a browser tab. The branded dialog shows an Install button when the browser provides a native prompt and one browser-specific action otherwise. The dialog can appear once on the idle browser sign-in screen when the native prompt is available or on iPhone and iPad. The app uses the live mailbox over HTTPS and requires an internet connection.
 
 For an existing deployment, rebuild and recreate the Roundcube container with the commands in [Start Roundcube](#start-roundcube). Keep the existing Compose project and both named volumes. Verify Webmail before restarting `techx.service` to publish the updated website instructions.
 

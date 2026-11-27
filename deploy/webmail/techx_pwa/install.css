@@ -36,7 +36,7 @@
     display: none;
 }
 
-@media (display-mode: standalone) {
+@media (display-mode: standalone), (display-mode: minimal-ui), (display-mode: window-controls-overlay) {
     .techx-webmail-install {
         display: none !important;
     }
